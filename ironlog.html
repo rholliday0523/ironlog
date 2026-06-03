@@ -404,6 +404,40 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 .divider-line{flex:1;height:1px;background:var(--border2)}
 .divider-txt{font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--steel2);letter-spacing:2px;text-transform:uppercase;white-space:nowrap}
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--dark)}::-webkit-scrollbar-thumb{background:var(--steel2);border-radius:3px}
+
+/* ── BADGE SIDEBARS ── */
+.badge-sidebar{position:fixed;top:80px;width:54px;display:flex;flex-direction:column;gap:6px;z-index:50;padding:6px 0}
+.badge-sidebar.left{left:6px;align-items:flex-end}
+.badge-sidebar.right{right:6px;align-items:flex-start}
+.sdg-badge{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid var(--border2);background:var(--dark2);cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;flex-shrink:0}
+.sdg-badge:hover{transform:scale(1.15);z-index:10}
+.sdg-badge.cat-lift{border-color:rgba(245,158,11,.6);background:rgba(245,158,11,.1);box-shadow:0 0 8px rgba(245,158,11,.2)}
+.sdg-badge.cat-steps{border-color:rgba(42,154,212,.6);background:rgba(42,154,212,.1);box-shadow:0 0 8px rgba(42,154,212,.2)}
+.sdg-badge.cat-streak{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1);box-shadow:0 0 8px rgba(239,68,68,.2)}
+.sdg-badge.cat-bible{border-color:rgba(167,139,250,.6);background:rgba(167,139,250,.1);box-shadow:0 0 8px rgba(167,139,250,.2)}
+.sdg-badge.cat-body{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.1);box-shadow:0 0 8px rgba(52,211,153,.2)}
+.sdg-badge.cat-nutr{border-color:rgba(251,146,60,.6);background:rgba(251,146,60,.1);box-shadow:0 0 8px rgba(251,146,60,.2)}
+.sdg-badge.cat-cardio{border-color:rgba(20,184,166,.6);background:rgba(20,184,166,.1);box-shadow:0 0 8px rgba(20,184,166,.2)}
+.sdg-badge.cat-game{border-color:rgba(248,113,113,.6);background:rgba(248,113,113,.1);box-shadow:0 0 8px rgba(248,113,113,.2)}
+.sdg-badge .sdg-tip{display:none;position:absolute;left:52px;top:50%;transform:translateY(-50%);background:var(--dark);border:1px solid var(--border2);border-radius:3px;padding:5px 9px;white-space:nowrap;font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:.5px;color:var(--white);z-index:20;pointer-events:none}
+.badge-sidebar.right .sdg-badge .sdg-tip{left:auto;right:52px}
+.sdg-badge:hover .sdg-tip{display:block}
+/* New badge pop animation */
+@keyframes badgePop{0%{transform:scale(0);opacity:0}60%{transform:scale(1.3)}100%{transform:scale(1);opacity:1}}
+.sdg-badge.new-unlock{animation:badgePop .5s cubic-bezier(.34,1.56,.64,1) forwards}
+/* Mobile: horizontal strip under header */
+.badge-mobile-strip{display:none;gap:8px;padding:6px 1rem;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border)}
+.badge-mobile-strip::-webkit-scrollbar{display:none}
+.bmob-badge{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;border:2px solid var(--border2);background:var(--dark2);flex-shrink:0;position:relative}
+.bmob-badge.cat-lift{border-color:rgba(245,158,11,.6);background:rgba(245,158,11,.1)}
+.bmob-badge.cat-steps{border-color:rgba(42,154,212,.6);background:rgba(42,154,212,.1)}
+.bmob-badge.cat-streak{border-color:rgba(239,68,68,.6);background:rgba(239,68,68,.1)}
+.bmob-badge.cat-bible{border-color:rgba(167,139,250,.6);background:rgba(167,139,250,.1)}
+.bmob-badge.cat-body{border-color:rgba(52,211,153,.6);background:rgba(52,211,153,.1)}
+.bmob-badge.cat-nutr{border-color:rgba(251,146,60,.6);background:rgba(251,146,60,.1)}
+.bmob-badge.cat-cardio{border-color:rgba(20,184,166,.6);background:rgba(20,184,166,.1)}
+.bmob-badge.cat-game{border-color:rgba(248,113,113,.6);background:rgba(248,113,113,.1)}
+@media(max-width:1100px){.badge-sidebar{display:none}.badge-mobile-strip{display:flex}}
 /* WEEKLY STEPS GRID */
 .wk-steps-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .wk-step-col{display:flex;flex-direction:column;align-items:center;gap:4px}
@@ -511,6 +545,11 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
     <div id="live-date" class="clock-date">Loading...</div>
   </div>
 </div>
+<!-- Badge sidebars (desktop) -->
+<div class="badge-sidebar left" id="badge-left"></div>
+<div class="badge-sidebar right" id="badge-right"></div>
+<!-- Badge strip (mobile) -->
+<div class="badge-mobile-strip" id="badge-mobile"></div>
 <div class="date-nav" id="date-nav" style="display:none">
   <button class="dnav-arr" onclick="navDate(-1)">&#x25C4;</button>
   <div class="dnav-center" onclick="openCalendar()"><div id="dnav-label" class="dnav-label">TODAY</div><div id="dnav-sub" class="dnav-sub">Tap to open calendar</div></div>
@@ -702,19 +741,22 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
   <div class="week-grid" id="week-last"></div>
   <div class="sec-lbl">&#x2601; Google Drive Sync</div>
   <div class="card" id="sync-card">
-    <!-- Status bar -->
     <div id="sync-status-bar" style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding:.65rem .9rem;border-radius:2px;background:var(--dark3);border:1px solid var(--border2)">
-      <div id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:var(--steel2);flex-shrink:0"></div>
-      <div id="sync-status-txt" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--mid);flex:1">Not connected to Google Drive</div>
+      <div id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:var(--steel2);flex-shrink:0;transition:background .4s"></div>
+      <div id="sync-status-txt" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--mid);flex:1">Not signed in</div>
       <div id="sync-last" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--steel2)"></div>
     </div>
-    <!-- Buttons -->
-    <div class="settings-row" style="margin-bottom:.75rem">
-      <button class="settings-btn" id="sync-now-btn" onclick="syncNow()" style="border-color:rgba(42,154,212,.4);color:var(--blue2)">&#x2191; Sync Now</button>
-      <button class="settings-btn" id="sync-load-btn" onclick="loadFromDrive()" style="border-color:rgba(42,154,212,.4);color:var(--blue2)">&#x2193; Load from Drive</button>
+    <div id="sync-signin-row" style="margin-bottom:.75rem">
+      <button onclick="driveSignIn()" style="width:100%;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;background:linear-gradient(135deg,#4285F4,#34A853);border:none;color:#fff;cursor:pointer;border-radius:2px">&#x1F511; Sign In with Google</button>
     </div>
-    <div class="settings-note" style="margin-bottom:1rem">Saves your data to <strong style="color:var(--light)">ironlog-sync.json</strong> in your Google Drive. Open the tracker on any device and tap <em>Load from Drive</em> to pull your data.</div>
-    <!-- Divider -->
+    <div id="sync-action-row" style="display:none;margin-bottom:.75rem">
+      <div class="settings-row">
+        <button class="settings-btn" onclick="syncNow()" style="border-color:rgba(42,154,212,.4);color:var(--blue2)">&#x2191; Save to Drive</button>
+        <button class="settings-btn" onclick="loadFromDrive()" style="border-color:rgba(42,154,212,.4);color:var(--blue2)">&#x2193; Load from Drive</button>
+        <button class="settings-btn" onclick="driveSignOut()" style="border-color:rgba(255,255,255,.15);color:var(--mid)">Sign Out</button>
+      </div>
+    </div>
+    <div class="settings-note" style="margin-bottom:1rem">Sign in once on each device. Your data saves to <strong style="color:var(--light)">ironlog-sync.json</strong> in Google Drive and auto-syncs every time you log something.</div>
     <div style="height:1px;background:var(--border2);margin-bottom:1rem"></div>
     <div class="sec-lbl" style="margin:0 0 .6rem">Local Backup</div>
     <div class="settings-row"><button class="settings-btn exp" onclick="exportData()">&#x1F4E4; Export File</button><button class="settings-btn imp" onclick="document.getElementById('import-input').click()">&#x1F4E5; Import File</button><input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)"></div>
@@ -1486,6 +1528,7 @@ function updateStats(){
   if($('h-lifted-fill'))$('h-lifted-fill').style.width=Math.min(100,(tl/1000000)*100)+'%';
   if($('s-prs'))$('s-prs').textContent=todayPRs;
   updateStepDisplay();
+  try{ renderBadgeSidebars(); }catch(e){}
 }
 function updateStepDisplay(){
   const steps=stepsLog[ACTIVE_DATE]||0;
@@ -1526,8 +1569,9 @@ function saveWorkout(){
     const lastS=game.lastSaved?new Date(game.lastSaved):null;
     if(lastS){const diff=(new Date()-lastS)/(86400000);game.streak=diff<3?game.streak+1:1;}else game.streak=1;
     game.lastSaved=new Date().toISOString();
-    saveStorage();savedToday=true;stopSessTimer();
+    _origSaveStorage();savedToday=true;stopSessTimer();
     finalizeSave(xpE,prevLvl,totalMin+' min',fmtDur(sessSeconds));
+    scheduleAutoSync();
     return;
   }
   const exercises=[];
@@ -1549,10 +1593,11 @@ function saveWorkout(){
   const lastS=game.lastSaved?new Date(game.lastSaved):null;
   if(lastS){const diff=(new Date()-lastS)/(86400000);game.streak=diff<3?game.streak+1:1;}else game.streak=1;
   game.lastSaved=new Date().toISOString();
-  saveStorage();savedToday=true;stopSessTimer();
+  _origSaveStorage();savedToday=true;stopSessTimer();
   checkMilestones(prevLifted,game.totalLifted);
   finalizeSave(xpE,prevLvl,totalVol.toLocaleString()+' lbs',fmtDur(sessSeconds));
   todayPRs=0;
+  scheduleAutoSync();
 }
 function finalizeSave(xpE,prevLvl,volStr,durStr){
   const $=id=>document.getElementById(id);
@@ -1829,11 +1874,16 @@ function saveBodyWeight(){
 }
 function setSteps(amount){
   const n=parseInt(amount);if(!n||n<0){alert('Enter a valid step count.');return;}
-  stepsLog[ACTIVE_DATE]=n;saveStorage();updateStepDisplay();
+  stepsLog[ACTIVE_DATE]=n;
+  const inp=document.getElementById('steps-add-inp');if(inp)inp.value='';
+  // Save to localStorage directly — never block UI
+  try{localStorage.setItem('il_steps',JSON.stringify(stepsLog));}catch(e){}
+  updateStepDisplay();
+  scheduleAutoSync();
 }
-function quickSetSteps(n){stepsLog[ACTIVE_DATE]=n;saveStorage();updateStepDisplay();}
-function resetSteps(){if(!confirm('Reset steps for this day to 0?'))return;stepsLog[ACTIVE_DATE]=0;saveStorage();updateStepDisplay();}
-function setEnergy(rating){energyLog[ACTIVE_DATE]=rating;saveStorage();renderBodyTab();}
+function quickSetSteps(n){stepsLog[ACTIVE_DATE]=n;try{localStorage.setItem('il_steps',JSON.stringify(stepsLog));}catch(e){}updateStepDisplay();scheduleAutoSync();}
+function resetSteps(){if(!confirm('Reset steps for this day to 0?'))return;stepsLog[ACTIVE_DATE]=0;try{localStorage.setItem('il_steps',JSON.stringify(stepsLog));}catch(e){}updateStepDisplay();scheduleAutoSync();}
+function setEnergy(rating){energyLog[ACTIVE_DATE]=rating;try{localStorage.setItem('il_energy',JSON.stringify(energyLog));}catch(e){}renderBodyTab();scheduleAutoSync();}
 function renderBodyTab(){
   updateStepDisplay();
   // ── Weekly steps grid ──
@@ -2010,34 +2060,156 @@ function renderDayLog(){
 
 // ── ACHIEVEMENTS ──────────────────────────────────────────────────────────
 const ACHIEVEMENTS=[
-  {id:'first',name:'First Blood',desc:'Log your first workout',icon:'&#x1FA78;',check:()=>game.totalWorkouts>=1},
-  {id:'sets10',name:'Getting Warm',desc:'Complete 10 sets',icon:'&#x1F525;',check:()=>game.totalSets>=10},
-  {id:'sets100',name:'Century',desc:'Complete 100 sets',icon:'&#x1F4AF;',check:()=>game.totalSets>=100},
-  {id:'sets500',name:'Iron Will',desc:'Complete 500 sets',icon:'&#x2699;',check:()=>game.totalSets>=500},
-  {id:'firstpr',name:'Record Breaker',desc:'Set your first PR',icon:'&#x1F4C8;',check:()=>game.totalPRs>=1},
-  {id:'prs5',name:'PR Machine',desc:'Set 5 PRs',icon:'&#x1F3C6;',check:()=>game.totalPRs>=5},
-  {id:'prs25',name:'PR Legend',desc:'Set 25 PRs',icon:'&#x1F451;',check:()=>game.totalPRs>=25},
-  {id:'streak3',name:'On a Roll',desc:'3 session streak',icon:'&#x1F525;',check:()=>game.streak>=3},
-  {id:'streak7',name:'Unstoppable',desc:'7 session streak',icon:'&#x1F680;',check:()=>game.streak>=7},
-  {id:'streak14',name:'Two Week Warrior',desc:'14 session streak',icon:'&#x1F6E1;',check:()=>game.streak>=14},
-  {id:'lifted10k',name:'10K Club',desc:'Lift 10,000 lbs total',icon:'&#x26A1;',check:()=>(game.totalLifted||0)>=10000},
-  {id:'lifted100k',name:'100K Club',desc:'Lift 100,000 lbs total',icon:'&#x1F4AA;',check:()=>(game.totalLifted||0)>=100000},
-  {id:'lifted1m',name:'Million Pound Club',desc:'Lift 1,000,000 lbs',icon:'&#x1F48E;',check:()=>(game.totalLifted||0)>=1000000},
-  {id:'level5',name:'Level 5',desc:'Reach level 5',icon:'&#x2B50;',check:()=>game.level>=5},
-  {id:'level10',name:'Level 10',desc:'Reach level 10',icon:'&#x1F48E;',check:()=>game.level>=10},
-  {id:'workouts5',name:'5 Sessions',desc:'Complete 5 workouts',icon:'&#x1F4C5;',check:()=>game.totalWorkouts>=5},
-  {id:'workouts25',name:'25 Sessions',desc:'Complete 25 workouts',icon:'&#x1F5D3;',check:()=>game.totalWorkouts>=25},
-  {id:'alldays',name:'Full Rotation',desc:'Log all 5 workout types',icon:'&#x1F504;',check:()=>['chest','back','shoulders','legs','arms'].every(d=>history.some(h=>h.day===d))},
-  {id:'steps12k',name:'Steps Goal',desc:'Hit 12,000 steps in a day',icon:'&#x1F463;',check:()=>Object.values(stepsLog).some(s=>s>=12000)},
-  {id:'cardio5',name:'Cardio Grinder',desc:'Log 5 cardio sessions',icon:'&#x1F3C3;',check:()=>Object.values(cardioLog).reduce((a,v)=>a+v.length,0)>=5},
-  {id:'suppweek',name:'Supplement King',desc:'Log supplements 7 days',icon:'&#x1F48A;',check:()=>Object.keys(suppData).length>=7},
-  {id:'bw10',name:'Scale Warrior',desc:'Log weight 10 times',icon:'&#x2696;',check:()=>Object.keys(bwLog).length>=10},
-  {id:'backup',name:'Data Protector',desc:'Export a backup',icon:'&#x1F4BE;',check:()=>!!localStorage.getItem('il_exported')},
-  {id:'foodlib',name:'Food Librarian',desc:'Save 5 foods to library',icon:'&#x1F4DA;',check:()=>foodLibrary.length>=5},
+  // 🏋️ LIFTING
+  {id:'first',      cat:'lift',  name:'First Blood',         desc:'Log your first workout',           icon:'🩸', check:()=>game.totalWorkouts>=1},
+  {id:'sets10',     cat:'lift',  name:'Getting Warm',        desc:'Complete 10 sets',                 icon:'🔥', check:()=>game.totalSets>=10},
+  {id:'sets100',    cat:'lift',  name:'Century',             desc:'Complete 100 sets',                icon:'💯', check:()=>game.totalSets>=100},
+  {id:'sets500',    cat:'lift',  name:'Iron Will',           desc:'Complete 500 sets',                icon:'⚙️', check:()=>game.totalSets>=500},
+  {id:'sets1000',   cat:'lift',  name:'1000 Sets',           desc:'Complete 1,000 sets',              icon:'🏗️', check:()=>game.totalSets>=1000},
+  {id:'lifted10k',  cat:'lift',  name:'10K Club',            desc:'Lift 10,000 lbs total',            icon:'⚡', check:()=>(game.totalLifted||0)>=10000},
+  {id:'lifted50k',  cat:'lift',  name:'50K Crusher',         desc:'Lift 50,000 lbs total',            icon:'🔩', check:()=>(game.totalLifted||0)>=50000},
+  {id:'lifted100k', cat:'lift',  name:'100K Club',           desc:'Lift 100,000 lbs total',           icon:'💪', check:()=>(game.totalLifted||0)>=100000},
+  {id:'lifted500k', cat:'lift',  name:'Half Million',        desc:'Lift 500,000 lbs total',           icon:'🏋️', check:()=>(game.totalLifted||0)>=500000},
+  {id:'lifted1m',   cat:'lift',  name:'Million Pound Club',  desc:'Lift 1,000,000 lbs',               icon:'💎', check:()=>(game.totalLifted||0)>=1000000},
+  {id:'alldays',    cat:'lift',  name:'Full Rotation',       desc:'Log all 5 workout types',          icon:'🔄', check:()=>['chest','back','shoulders','legs','arms'].every(d=>history.some(h=>h.day===d))},
+  // 🏆 PRs
+  {id:'firstpr',    cat:'game',  name:'Record Breaker',      desc:'Set your first PR',                icon:'📈', check:()=>game.totalPRs>=1},
+  {id:'prs5',       cat:'game',  name:'PR Machine',          desc:'Set 5 PRs',                        icon:'🏆', check:()=>game.totalPRs>=5},
+  {id:'prs25',      cat:'game',  name:'PR Legend',           desc:'Set 25 PRs',                       icon:'👑', check:()=>game.totalPRs>=25},
+  {id:'prs50',      cat:'game',  name:'PR God',              desc:'Set 50 PRs',                       icon:'🌟', check:()=>game.totalPRs>=50},
+  // 🔥 STREAKS
+  {id:'streak3',    cat:'streak',name:'On a Roll',           desc:'3 workout streak',                 icon:'🔥', check:()=>game.streak>=3},
+  {id:'streak7',    cat:'streak',name:'Unstoppable',         desc:'7 workout streak',                 icon:'🚀', check:()=>game.streak>=7},
+  {id:'streak14',   cat:'streak',name:'Two Week Warrior',    desc:'14 workout streak',                icon:'🛡️', check:()=>game.streak>=14},
+  {id:'streak30',   cat:'streak',name:'Month of Iron',       desc:'30 workout streak',                icon:'⚔️', check:()=>game.streak>=30},
+  // 📅 SESSIONS
+  {id:'workouts5',  cat:'game',  name:'5 Sessions',          desc:'Complete 5 workouts',              icon:'📅', check:()=>game.totalWorkouts>=5},
+  {id:'workouts25', cat:'game',  name:'25 Sessions',         desc:'Complete 25 workouts',             icon:'🗓️', check:()=>game.totalWorkouts>=25},
+  {id:'workouts50', cat:'game',  name:'50 Sessions',         desc:'Complete 50 workouts',             icon:'📆', check:()=>game.totalWorkouts>=50},
+  {id:'workouts100',cat:'game',  name:'Century Warrior',     desc:'Complete 100 workouts',            icon:'🎖️', check:()=>game.totalWorkouts>=100},
+  {id:'level5',     cat:'game',  name:'Level 5',             desc:'Reach level 5',                    icon:'⭐', check:()=>game.level>=5},
+  {id:'level10',    cat:'game',  name:'Level 10',            desc:'Reach level 10',                   icon:'🌠', check:()=>game.level>=10},
+  {id:'level20',    cat:'game',  name:'Level 20',            desc:'Reach level 20',                   icon:'🌌', check:()=>game.level>=20},
+  // 👟 STEPS
+  {id:'steps5k',    cat:'steps', name:'First Steps',         desc:'Log 5,000 steps in a day',         icon:'👣', check:()=>Object.values(stepsLog).some(s=>s>=5000)},
+  {id:'steps10k',   cat:'steps', name:'10K Walker',          desc:'Log 10,000 steps in a day',        icon:'🦶', check:()=>Object.values(stepsLog).some(s=>s>=10000)},
+  {id:'steps12k',   cat:'steps', name:'Steps Goal',          desc:'Hit 12,000 steps in a day',        icon:'👟', check:()=>Object.values(stepsLog).some(s=>s>=12000)},
+  {id:'steps15k',   cat:'steps', name:'Step Beast',          desc:'Hit 15,000 steps in a day',        icon:'🏃', check:()=>Object.values(stepsLog).some(s=>s>=15000)},
+  {id:'steps20k',   cat:'steps', name:'Step Legend',         desc:'Hit 20,000 steps in a day',        icon:'⚡', check:()=>Object.values(stepsLog).some(s=>s>=20000)},
+  {id:'steps100k',  cat:'steps', name:'100K Steps Club',     desc:'Log 100,000 total steps',          icon:'🌍', check:()=>Object.values(stepsLog).reduce((a,v)=>a+(v||0),0)>=100000},
+  {id:'steps500k',  cat:'steps', name:'500K Steps',          desc:'Log 500,000 total steps',          icon:'🗺️', check:()=>Object.values(stepsLog).reduce((a,v)=>a+(v||0),0)>=500000},
+  {id:'steps1m',    cat:'steps', name:'Million Steps',       desc:'Log 1,000,000 total steps',        icon:'🌎', check:()=>Object.values(stepsLog).reduce((a,v)=>a+(v||0),0)>=1000000},
+  // 🏃 CARDIO
+  {id:'cardio1',    cat:'cardio',name:'Cardio Starter',      desc:'Log first cardio session',         icon:'💨', check:()=>Object.values(cardioLog).reduce((a,v)=>a+v.length,0)>=1},
+  {id:'cardio5',    cat:'cardio',name:'Cardio Grinder',      desc:'Log 5 cardio sessions',            icon:'🏃', check:()=>Object.values(cardioLog).reduce((a,v)=>a+v.length,0)>=5},
+  {id:'cardio20',   cat:'cardio',name:'Cardio Machine',      desc:'Log 20 cardio sessions',           icon:'🚴', check:()=>Object.values(cardioLog).reduce((a,v)=>a+v.length,0)>=20},
+  {id:'cardio60',   cat:'cardio',name:'60 Min Day',          desc:'Log 60+ min cardio in one day',    icon:'⏱️', check:()=>Object.values(cardioLog).some(v=>(v||[]).reduce((a,c)=>a+c.duration,0)>=60)},
+  // 🥗 NUTRITION
+  {id:'foodlib',    cat:'nutr',  name:'Food Librarian',      desc:'Save 5 foods to library',          icon:'📚', check:()=>foodLibrary.length>=5},
+  {id:'foodlib20',  cat:'nutr',  name:'Master Chef',         desc:'Save 20 foods to library',         icon:'👨‍🍳', check:()=>foodLibrary.length>=20},
+  {id:'nutr7',      cat:'nutr',  name:'Nutrition Week',      desc:'Log nutrition 7 days',             icon:'🥗', check:()=>Object.keys(nutrData).filter(k=>(nutrData[k]?.checked||[]).length>0).length>=7},
+  {id:'nutr30',     cat:'nutr',  name:'Nutrition Month',     desc:'Log nutrition 30 days',            icon:'🥦', check:()=>Object.keys(nutrData).filter(k=>(nutrData[k]?.checked||[]).length>0).length>=30},
+  {id:'suppweek',   cat:'nutr',  name:'Supplement King',     desc:'Log supplements 7 days',           icon:'💊', check:()=>Object.keys(suppData).filter(k=>(suppData[k]?.checked||[]).length>0).length>=7},
+  {id:'supp30',     cat:'nutr',  name:'Supplement Legend',   desc:'Log supplements 30 days',          icon:'🧪', check:()=>Object.keys(suppData).filter(k=>(suppData[k]?.checked||[]).length>0).length>=30},
+  // ⚖️ BODY
+  {id:'bw1',        cat:'body',  name:'Weigh In',            desc:'Log your weight once',             icon:'⚖️', check:()=>Object.keys(bwLog).length>=1},
+  {id:'bw10',       cat:'body',  name:'Scale Warrior',       desc:'Log weight 10 times',              icon:'📉', check:()=>Object.keys(bwLog).length>=10},
+  {id:'bw30',       cat:'body',  name:'Scale Master',        desc:'Log weight 30 times',              icon:'📊', check:()=>Object.keys(bwLog).length>=30},
+  {id:'energy7',    cat:'body',  name:'Energy Tracker',      desc:'Log energy 7 days',                icon:'🔋', check:()=>Object.keys(energyLog).length>=7},
+  // ✝️ BIBLE
+  {id:'bible1',     cat:'bible', name:'First Reading',       desc:'Log your first Bible reading',     icon:'✝️', check:()=>Object.values(bibleLog).some(v=>v.read)},
+  {id:'bible7',     cat:'bible', name:'Bible Week',          desc:'Read the Bible 7 days',            icon:'📖', check:()=>Object.values(bibleLog).filter(v=>v.read).length>=7},
+  {id:'bible30',    cat:'bible', name:'Bible Month',         desc:'Read the Bible 30 days',           icon:'🙏', check:()=>Object.values(bibleLog).filter(v=>v.read).length>=30},
+  {id:'bible100',   cat:'bible', name:'Centurion',           desc:'Read the Bible 100 days',          icon:'⛪', check:()=>Object.values(bibleLog).filter(v=>v.read).length>=100},
+  {id:'bibleNT',    cat:'bible', name:'New Testament',       desc:'Complete the New Testament',       icon:'🕊️', check:()=>['Matthew','Mark','Luke','John','Acts','Romans','1 Corinthians','2 Corinthians','Galatians','Ephesians','Philippians','Colossians','1 Thessalonians','2 Thessalonians','1 Timothy','2 Timothy','Titus','Philemon','Hebrews','James','1 Peter','2 Peter','1 John','2 John','3 John','Jude','Revelation'].every(b=>{const t=CHAPTER_COUNTS[b]||1;return Array.from({length:t},(_,i)=>i+1).every(c=>isChRead(b,c));})},
+  {id:'bible10ch',  cat:'bible', name:'10 Chapters',         desc:'Read 10 chapters total',           icon:'📜', check:()=>Object.keys(bibleChapters).length>=10},
+  {id:'bible50ch',  cat:'bible', name:'50 Chapters',         desc:'Read 50 chapters total',           icon:'📕', check:()=>Object.keys(bibleChapters).length>=50},
+  {id:'bible260ch', cat:'bible', name:'NT Complete',         desc:'Read 260 NT chapters',             icon:'✨', check:()=>Object.keys(bibleChapters).length>=260},
+  // 💾 MISC
+  {id:'backup',     cat:'game',  name:'Data Protector',      desc:'Export a backup',                  icon:'💾', check:()=>!!localStorage.getItem('il_exported')},
 ];
+
+let _prevUnlocked = new Set();
+
+function getUnlocked(){ return ACHIEVEMENTS.filter(a=>{ try{return a.check();}catch(e){return false;} }); }
+
 function renderAchievements(){
-  const grid=document.getElementById('ach-grid');if(!grid)return;grid.innerHTML='';
-  ACHIEVEMENTS.forEach(a=>{const ul=a.check();const div=document.createElement('div');div.className='ach-card'+(ul?' unlocked':'');div.innerHTML=`<div class="ach-icon">${a.icon}</div><div class="ach-name">${a.name}</div><div class="ach-desc">${a.desc}</div>`;grid.appendChild(div);});
+  const grid=document.getElementById('ach-grid');if(!grid)return;
+  const cats={lift:'🏋️ Lifting',game:'🏆 Progress',streak:'🔥 Streaks',steps:'👟 Steps',cardio:'🏃 Cardio',nutr:'🥗 Nutrition',body:'⚖️ Body',bible:'✝️ Bible'};
+  const byCat={};
+  ACHIEVEMENTS.forEach(a=>{if(!byCat[a.cat])byCat[a.cat]=[];byCat[a.cat].push(a);});
+  grid.innerHTML='';
+  Object.entries(cats).forEach(([cat,label])=>{
+    if(!byCat[cat])return;
+    const sec=document.createElement('div');sec.style.cssText='margin-bottom:1.25rem';
+    sec.innerHTML=`<div class="sec-lbl" style="margin:0 0 .6rem">${label}</div><div class="ach-grid" style="margin:0"></div>`;
+    const subGrid=sec.querySelector('.ach-grid');
+    byCat[cat].forEach(a=>{
+      let ul=false;try{ul=a.check();}catch(e){}
+      const div=document.createElement('div');
+      div.className='ach-card'+(ul?' unlocked':'');
+      div.innerHTML=`<div class="ach-icon">${ul?a.icon:'🔒'}</div><div class="ach-name">${ul?a.name:'???'}</div><div class="ach-desc">${ul?a.desc:'Keep going...'}</div>`;
+      subGrid.appendChild(div);
+    });
+    grid.appendChild(sec);
+  });
+  renderBadgeSidebars();
+}
+
+function renderBadgeSidebars(){
+  const unlocked=getUnlocked();
+  const left=document.getElementById('badge-left');
+  const right=document.getElementById('badge-right');
+  const mob=document.getElementById('badge-mobile');
+  if(!left||!right||!mob)return;
+
+  // Check for newly unlocked badges
+  const newlyUnlocked=unlocked.filter(a=>!_prevUnlocked.has(a.id));
+  newlyUnlocked.forEach(a=>{
+    _prevUnlocked.add(a.id);
+    showBadgeUnlockNotif(a);
+  });
+  unlocked.forEach(a=>_prevUnlocked.add(a.id));
+
+  // Split left/right by category
+  const leftCats=['lift','streak','game'];
+  const rightCats=['steps','cardio','nutr','body','bible'];
+  const leftBadges=unlocked.filter(a=>leftCats.includes(a.cat));
+  const rightBadges=unlocked.filter(a=>rightCats.includes(a.cat));
+
+  const makeBadge=(a,side)=>{
+    const d=document.createElement('div');
+    d.className=`sdg-badge cat-${a.cat}`;
+    d.innerHTML=`${a.icon}<div class="sdg-tip">${a.name}</div>`;
+    d.title=a.name+': '+a.desc;
+    return d;
+  };
+  const makeMob=(a)=>{
+    const d=document.createElement('div');
+    d.className=`bmob-badge cat-${a.cat}`;
+    d.innerHTML=a.icon;
+    d.title=a.name+': '+a.desc;
+    return d;
+  };
+
+  left.innerHTML=''; right.innerHTML=''; mob.innerHTML='';
+  leftBadges.forEach(a=>left.appendChild(makeBadge(a,'left')));
+  rightBadges.forEach(a=>right.appendChild(makeBadge(a,'right')));
+  unlocked.forEach(a=>mob.appendChild(makeMob(a)));
+  if(!unlocked.length){
+    const ph=document.createElement('div');
+    ph.style.cssText='font-family:Barlow Condensed,sans-serif;font-size:10px;letter-spacing:1px;color:var(--steel2);padding:4px 0;text-align:center';
+    ph.textContent='Earn badges!';
+    mob.appendChild(ph);
+  }
+}
+
+function showBadgeUnlockNotif(a){
+  const notif=document.createElement('div');
+  notif.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--dark2);border:1px solid var(--gold);border-radius:4px;padding:12px 20px;display:flex;align-items:center;gap:12px;z-index:999;animation:badgePop .4s ease;box-shadow:0 4px 20px rgba(0,0,0,.5)';
+  notif.innerHTML=`<div style="font-size:28px">${a.icon}</div><div><div style="font-family:Bebas Neue,sans-serif;font-size:18px;letter-spacing:2px;color:var(--gold)">BADGE UNLOCKED!</div><div style="font-family:Barlow Condensed,sans-serif;font-size:13px;color:var(--white)">${a.name}</div><div style="font-family:Barlow Condensed,sans-serif;font-size:11px;color:var(--mid)">${a.desc}</div></div>`;
+  document.body.appendChild(notif);
+  setTimeout(()=>notif.remove(),3500);
 }
 
 // ── WEEKLY ────────────────────────────────────────────────────────────────
@@ -2263,13 +2435,16 @@ function renderBibleLog(){
   }).join('');
 }
 
-// ── GOOGLE DRIVE SYNC ─────────────────────────────────────────────────────
-const DRIVE_MCP_URL = 'https://drivemcp.googleapis.com/mcp/v1';
+// ── GOOGLE DRIVE SYNC (OAuth – works on any browser/device) ──────────────
+const GAPI_CLIENT_ID = '955360920616-kpahkqapceh4lml88pog76ugfgfcucap.apps.googleusercontent.com';
+const GAPI_SCOPE = 'https://www.googleapis.com/auth/drive.file';
 const SYNC_FILENAME = 'ironlog-sync.json';
-let driveFileId = null;
+let driveAccessToken = null;
+let driveFileId = localStorage.getItem('il_drive_file_id') || null;
 let syncInProgress = false;
+let autoSyncTimer = null;
 
-function setSyncStatus(state, msg, lastSynced) {
+function setSyncStatus(state, msg, sub) {
   const dot = document.getElementById('sync-dot');
   const txt = document.getElementById('sync-status-txt');
   const last = document.getElementById('sync-last');
@@ -2281,105 +2456,137 @@ function setSyncStatus(state, msg, lastSynced) {
   if (dot) dot.style.background = color;
   if (hDot) hDot.style.background = color;
   if (txt) txt.textContent = msg;
-  if (last && lastSynced) last.textContent = 'Last sync: ' + lastSynced;
+  if (last) last.textContent = sub || '';
   if (hLbl) {
-    if (state === 'ok') hLbl.textContent = lastSynced ? 'Synced ' + lastSynced : 'Synced';
-    else if (state === 'syncing') hLbl.textContent = 'Syncing…';
-    else if (state === 'error') hLbl.textContent = 'Sync error';
-    else hLbl.textContent = 'Not synced';
+    if (state==='ok') hLbl.textContent = sub ? 'Synced ' + sub : 'Synced';
+    else if (state==='syncing') hLbl.textContent = 'Syncing…';
+    else if (state==='error') hLbl.textContent = 'Sync error';
+    else hLbl.textContent = 'Not signed in';
   }
-  if (pill) pill.style.borderColor = state === 'ok' ? 'rgba(34,176,90,.35)' : state === 'error' ? 'rgba(232,56,13,.35)' : state === 'syncing' ? 'rgba(212,168,67,.35)' : 'var(--border2)';
+  if (pill) pill.style.borderColor = state==='ok' ? 'rgba(34,176,90,.35)' : state==='error' ? 'rgba(232,56,13,.35)' : state==='syncing' ? 'rgba(212,168,67,.35)' : 'var(--border2)';
+  // Show/hide signin vs action buttons
+  const signinRow = document.getElementById('sync-signin-row');
+  const actionRow = document.getElementById('sync-action-row');
+  if (signinRow && actionRow) {
+    const signedIn = !!driveAccessToken;
+    signinRow.style.display = signedIn ? 'none' : 'block';
+    actionRow.style.display = signedIn ? 'block' : 'none';
+  }
 }
 
-async function callDriveMCP(toolName, args) {
-  const res = await fetch(DRIVE_MCP_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ method: 'tools/call', params: { name: toolName, arguments: args } })
+function driveSignIn() {
+  const REDIRECT_URI = 'https://rholliday0523.github.io/ironlog/ironlog.html';
+  const params = new URLSearchParams({
+    client_id: GAPI_CLIENT_ID,
+    redirect_uri: REDIRECT_URI,
+    response_type: 'token',
+    scope: GAPI_SCOPE,
+    prompt: 'consent'
   });
-  if (!res.ok) throw new Error('Drive MCP error: ' + res.status);
-  const json = await res.json();
-  if (json.error) throw new Error(json.error.message || 'MCP error');
-  // Parse text content from result
-  const content = json.result?.content;
-  if (!content) return null;
-  const text = content.find(c => c.type === 'text')?.text;
-  return text ? JSON.parse(text) : null;
+  const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
+  // Save current state so we can restore after redirect
+  localStorage.setItem('il_pre_auth', '1');
+  // Redirect the whole page to Google sign-in — works on all browsers including mobile
+  window.location.href = authUrl;
 }
 
-async function findSyncFile() {
+function driveSignOut() {
+  driveAccessToken = null;
+  driveFileId = null;
+  localStorage.removeItem('il_drive_token');
+  localStorage.removeItem('il_drive_file_id');
+  setSyncStatus('idle', 'Signed out');
+}
+
+async function findDriveFile() {
+  if (!driveAccessToken) return null;
   try {
-    const result = await callDriveMCP('search_files', { query: `name='${SYNC_FILENAME}' and trashed=false` });
-    const files = result?.files || [];
-    if (files.length > 0) { driveFileId = files[0].id; return files[0].id; }
-  } catch(e) { console.warn('findSyncFile error:', e); }
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files?q=name='${SYNC_FILENAME}'+and+trashed=false&fields=files(id,name,modifiedTime)`,
+      { headers: { Authorization: 'Bearer ' + driveAccessToken } }
+    );
+    if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — please sign in again'); return null; }
+    const data = await res.json();
+    if (data.files && data.files.length > 0) {
+      driveFileId = data.files[0].id;
+      localStorage.setItem('il_drive_file_id', driveFileId);
+      return driveFileId;
+    }
+  } catch(e) { console.error('findDriveFile:', e); }
   return null;
 }
 
 async function syncNow() {
+  if (!driveAccessToken) { setSyncStatus('idle', 'Tap Sign In with Google first'); return; }
   if (syncInProgress) return;
   syncInProgress = true;
-  setSyncStatus('syncing', 'Saving to Google Drive...');
+  setSyncStatus('syncing', 'Saving to Google Drive…');
   try {
-    const data = {
+    const payload = JSON.stringify({
       history, game, nutrData, suppData, bwLog, stepsLog, energyLog,
       restDays, cardioLog, macroTargets: MACRO_TARGETS, suppConfig,
       daySummaryLog, foodLibrary, exLibrary, bibleLog, bibleChapters,
-      _syncedAt: new Date().toISOString(), _version: 2
-    };
-    const content = JSON.stringify(data, null, 2);
+      _syncedAt: new Date().toISOString(), _version: 3
+    });
 
-    // Look for existing file if we don't have an ID yet
-    if (!driveFileId) await findSyncFile();
+    if (!driveFileId) await findDriveFile();
 
     if (driveFileId) {
-      // Update existing file by creating a new one with same name (overwrite pattern)
-      await callDriveMCP('create_file', {
-        title: SYNC_FILENAME,
-        textContent: content,
-        contentMimeType: 'application/json',
-        disableConversionToGoogleType: true
-      });
+      // Update existing file
+      const res = await fetch(
+        `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,
+        { method: 'PATCH', headers: { Authorization: 'Bearer ' + driveAccessToken, 'Content-Type': 'application/json' }, body: payload }
+      );
+      if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — sign in again'); syncInProgress = false; return; }
     } else {
-      // Create fresh
-      const result = await callDriveMCP('create_file', {
-        title: SYNC_FILENAME,
-        textContent: content,
-        contentMimeType: 'application/json',
-        disableConversionToGoogleType: true
-      });
-      driveFileId = result?.id || null;
+      // Create new file
+      const meta = JSON.stringify({ name: SYNC_FILENAME, mimeType: 'application/json' });
+      const boundary = 'ironlog_boundary';
+      const body = `--${boundary}
+Content-Type: application/json
+
+${meta}
+--${boundary}
+Content-Type: application/json
+
+${payload}
+--${boundary}--`;
+      const res = await fetch(
+        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
+        { method: 'POST', headers: { Authorization: 'Bearer ' + driveAccessToken, 'Content-Type': `multipart/related; boundary=${boundary}` }, body }
+      );
+      if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — sign in again'); syncInProgress = false; return; }
+      const data = await res.json();
+      driveFileId = data.id;
+      localStorage.setItem('il_drive_file_id', driveFileId);
     }
 
     const timeStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
     localStorage.setItem('il_last_sync', timeStr);
     setSyncStatus('ok', '✓ Saved to Google Drive', timeStr);
   } catch(e) {
-    console.error('syncNow error:', e);
+    console.error('syncNow:', e);
     setSyncStatus('error', '✗ Sync failed — check connection');
   }
   syncInProgress = false;
 }
 
 async function loadFromDrive() {
+  if (!driveAccessToken) { setSyncStatus('idle', 'Tap Sign In with Google first'); return; }
   if (syncInProgress) return;
   syncInProgress = true;
-  setSyncStatus('syncing', 'Loading from Google Drive...');
+  setSyncStatus('syncing', 'Loading from Google Drive…');
   try {
-    if (!driveFileId) await findSyncFile();
-    if (!driveFileId) {
-      setSyncStatus('idle', 'No sync file found in Drive yet. Tap Sync Now to create one.');
-      syncInProgress = false; return;
-    }
-    const result = await callDriveMCP('download_file_content', { fileId: driveFileId });
-    // result may be base64 or raw text depending on MCP response
-    let text = '';
-    if (typeof result === 'string') { text = result; }
-    else if (result?.content) { text = atob(result.content); }
-    else if (result?.text) { text = result.text; }
-    else { throw new Error('Unexpected response format'); }
+    if (!driveFileId) await findDriveFile();
+    if (!driveFileId) { setSyncStatus('idle', 'No sync file found — tap Save to Drive first'); syncInProgress = false; return; }
 
-    const d = JSON.parse(text);
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,
+      { headers: { Authorization: 'Bearer ' + driveAccessToken } }
+    );
+    if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — sign in again'); syncInProgress = false; return; }
+
+    const d = await res.json();
     if (d.history) history = d.history;
     if (d.game) game = { ...game, ...d.game };
     if (d.nutrData) nutrData = d.nutrData;
@@ -2396,34 +2603,51 @@ async function loadFromDrive() {
     if (d.exLibrary) exLibrary = d.exLibrary;
     if (d.bibleLog) bibleLog = d.bibleLog;
     if (d.bibleChapters) bibleChapters = d.bibleChapters;
-
     saveStorage(); saveSC();
     updateStats(); renderAchievements(); switchDay(currentDay);
-
-    const syncedAt = d._syncedAt ? new Date(d._syncedAt).toLocaleString('en-US', { month:'short', day:'numeric', hour:'2-digit', minute:'2-digit' }) : '—';
-    setSyncStatus('ok', '✓ Loaded from Google Drive', 'Drive file: ' + syncedAt);
+    const syncedAt = d._syncedAt ? new Date(d._syncedAt).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }) : '';
+    setSyncStatus('ok', '✓ Loaded from Google Drive', syncedAt);
   } catch(e) {
-    console.error('loadFromDrive error:', e);
-    setSyncStatus('error', '✗ Could not load from Drive — check connection');
+    console.error('loadFromDrive:', e);
+    setSyncStatus('error', '✗ Could not load — check connection');
   }
   syncInProgress = false;
 }
 
-// Auto-sync after every save (debounced 3s)
-let autoSyncTimer = null;
 function scheduleAutoSync() {
+  if (!driveAccessToken) return; // not signed in, skip silently
   clearTimeout(autoSyncTimer);
-  autoSyncTimer = setTimeout(() => { syncNow(); }, 3000);
+  autoSyncTimer = setTimeout(() => {
+    try { syncNow(); } catch(e) { console.warn('Auto-sync error:', e); }
+  }, 5000); // 5 second delay so it never interferes with UI
 }
 
-// Patch saveStorage to trigger auto-sync
+// Patch saveStorage to trigger auto-sync in background — never blocks UI
 const _origSaveStorage = saveStorage;
 function saveStorage() {
-  _origSaveStorage();
-  scheduleAutoSync();
+  try { _origSaveStorage(); } catch(e) { console.error('saveStorage error:',e); }
+  if (driveAccessToken) {
+    clearTimeout(autoSyncTimer);
+    autoSyncTimer = setTimeout(() => { try { syncNow(); } catch(e){} }, 5000);
+  }
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────
+// Check if returning from Google OAuth redirect
+(function handleOAuthReturn(){
+  const hash = window.location.hash;
+  if (hash && hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.replace('#',''));
+    const token = params.get('access_token');
+    if (token) {
+      localStorage.setItem('il_drive_token', token);
+      driveAccessToken = token;
+      // Clean up URL
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }
+})();
+
 try {
   loadStorage();
 
@@ -2432,11 +2656,17 @@ try {
   switchDay('chest');
   updateStats();renderAchievements();setQuote();
   // Restore last sync time display
-  const lastSync = localStorage.getItem('il_last_sync');
-  if (lastSync) setSyncStatus('ok', '✓ Google Drive sync active', lastSync);
-  else setSyncStatus('idle', 'Tap Sync Now to back up to Google Drive');
-  // Auto-push to Drive on first open
-  setTimeout(() => syncNow(), 2000);
+  // Restore Google sign-in token if previously signed in
+  const savedToken = localStorage.getItem('il_drive_token');
+  if (savedToken) {
+    driveAccessToken = savedToken;
+    const lastSync = localStorage.getItem('il_last_sync');
+    setSyncStatus('ok', '✓ Signed in to Google Drive', lastSync || '');
+    // Auto-load from Drive on startup if signed in
+    setTimeout(() => loadFromDrive(), 1500);
+  } else {
+    setSyncStatus('idle', 'Tap Sign In with Google to enable sync');
+  }
 } catch(e) { console.error('Init error:',e); }
 startClock();
 
