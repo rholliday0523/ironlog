@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>IronLog Widget</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0D0D0F;font-family:'Arial Black',Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:12px}
+.widget{width:100%;max-width:380px;background:#0D0D0F;border-radius:20px;padding:14px 16px;border:1px solid #222}
+.hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.logo{font-size:20px;font-weight:900;letter-spacing:2px;color:#E8380D;line-height:1}
+.logo span{color:#D4A843}
+.logo-sub{font-size:9px;color:#555;letter-spacing:2px;margin-top:1px;text-transform:uppercase;font-family:Arial,sans-serif;font-weight:400}
+.sync{text-align:right}
+.sync-dot{font-size:10px;letter-spacing:1px}
+.sync-dot.ok{color:#22B05A}
+.sync-dot.err{color:#E8380D}
+.sync-dot.idle{color:#555}
+.sync-date{font-size:10px;color:#555;margin-top:2px;font-family:Arial,sans-serif;font-weight:400}
+.divider{height:1px;background:#222;margin-bottom:10px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.tile{background:#111;border-radius:10px;padding:10px 12px;border:1px solid #1a1a1a}
+.tile-lbl{font-size:9px;color:#555;letter-spacing:2px;text-transform:uppercase;margin-bottom:3px;font-family:Arial,sans-serif;font-weight:400}
+.tile-val{font-size:22px;font-weight:900;line-height:1;letter-spacing:0}
+.tile-val.blue{color:#378ADD}
+.tile-val.red{color:#E8380D}
+.tile-val.gold{color:#D4A843}
+.tile-val.green{color:#22B05A}
+.tile-val.sm{font-size:14px;line-height:1.2}
+.tile-sub{font-size:9px;margin-top:5px;font-family:Arial,sans-serif;font-weight:400}
+.tile-sub.blue{color:#378ADD}
+.tile-sub.green{color:#22B05A}
+.tile-sub.muted{color:#555}
+.tile-sub.gold{color:#D4A843}
+.progress{margin-top:5px;height:3px;background:#1a1a1a;border-radius:2px;overflow:hidden}
+.progress-fill{height:3px;border-radius:2px;transition:width .4s}
+.push{background:#111;border-radius:10px;padding:8px 12px;border-left:3px solid #E8380D;border-top:1px solid #1a1a1a;border-right:1px solid #1a1a1a;border-bottom:1px solid #1a1a1a}
+.push-lbl{font-size:9px;color:#555;letter-spacing:2px;margin-bottom:3px;font-family:Arial,sans-serif;font-weight:400;text-transform:uppercase}
+.push-txt{font-size:11px;color:#aaa;line-height:1.4;font-family:Arial,sans-serif;font-weight:400}
+.tap-hint{font-size:9px;color:#333;text-align:center;margin-top:8px;font-family:Arial,sans-serif}
+</style>
+</head>
+<body>
+<div class="widget" onclick="window.location.href='https://rholliday0523.github.io/ironlog/ironlog.html'">
+
+  <div class="hdr">
+    <div>
+      <div class="logo">IRON<span>LOG</span></div>
+      <div class="logo-sub">Today's Stats</div>
+    </div>
+    <div class="sync">
+      <div class="sync-dot idle" id="sync-dot">● Loading</div>
+      <div class="sync-date" id="sync-date"></div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="grid2">
+    <div class="tile">
+      <div class="tile-lbl">Steps</div>
+      <div class="tile-val blue" id="steps-val">—</div>
+      <div class="progress"><div class="progress-fill" id="steps-bar" style="width:0%;background:#378ADD"></div></div>
+      <div class="tile-sub" id="steps-sub"></div>
+    </div>
+    <div class="tile">
+      <div class="tile-lbl">Streak</div>
+      <div class="tile-val red" id="streak-val">—</div>
+      <div class="tile-sub muted" id="streak-sub"></div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <div class="tile">
+      <div class="tile-lbl">Cal Burned</div>
+      <div class="tile-val gold" id="cal-val">—</div>
+      <div class="tile-sub" id="cal-sub"></div>
+    </div>
+    <div class="tile">
+      <div class="tile-lbl">Today</div>
+      <div class="tile-val green sm" id="today-val">—</div>
+      <div class="tile-sub muted" id="today-sub"></div>
+    </div>
+  </div>
+
+  <div class="push">
+    <div class="push-lbl">Daily Push</div>
+    <div class="push-txt" id="push-txt">Loading...</div>
+  </div>
+
+  <div class="tap-hint">Tap to open IronLog</div>
+</div>
+
+<script>
+const STEP_GOAL = 12000;
+const MACRO_TARGETS = {cal:1765, protein:240, carbs:121, fat:30};
+const MOTIVATIONS = [
+  {txt:"Protein is king. Hit 240g today and protect every pound of muscle."},
+  {txt:"Small steps every day. 12,000 steps is a pound of fat per week."},
+  {txt:"You are not in a rush. You are building forever."},
+  {txt:"The best workout is the one you actually show up for."},
+  {txt:"Progressive overload. Add weight, add reps, keep moving forward."},
+  {txt:"Rest is training. Sleep hard, recover harder."},
+  {txt:"Consistency beats intensity every single time."},
+  {txt:"You are 61 lbs from your goal. Every rep counts."},
+  {txt:"Stay in the deficit. Trust the process."},
+  {txt:"Strength of body and strength of spirit. Train both."},
+  {txt:"Your BMR works for you 24/7. Let it."},
+  {txt:"Log everything. The data tells the story of your transformation."},
+];
+
+function localKey(d){
+  const t=d||new Date();
+  return t.getFullYear()+'-'+String(t.getMonth()+1).padStart(2,'0')+'-'+String(t.getDate()).padStart(2,'0');
+}
+
+function calcBMR(weightLbs){
+  const kg=weightLbs*0.453592;
+  return Math.round(10*kg+6.25*187.96-5*36+5);
+}
+
+function loadData(){
+  try {
+    const today = localKey();
+    const stepsLog = JSON.parse(localStorage.getItem('il_steps')||'{}');
+    const bwLog = JSON.parse(localStorage.getItem('il_bw')||'{}');
+    const game = JSON.parse(localStorage.getItem('il_game')||'{}');
+    const history = JSON.parse(localStorage.getItem('il_hist')||'[]');
+    const lastSync = localStorage.getItem('il_last_sync');
+
+    // Steps
+    const steps = stepsLog[today]||0;
+    const stepPct = Math.min(100,Math.round(steps/STEP_GOAL*100));
+    document.getElementById('steps-val').textContent = steps>=1000?(steps/1000).toFixed(1)+'k':steps||'—';
+    document.getElementById('steps-bar').style.width = stepPct+'%';
+    document.getElementById('steps-sub').textContent = steps>=STEP_GOAL ? 'Goal hit!' : stepPct+'% of goal';
+    document.getElementById('steps-sub').className = 'tile-sub '+(steps>=STEP_GOAL?'blue':'muted');
+
+    // Streak
+    const streak = game.streak||0;
+    document.getElementById('streak-val').innerHTML = streak+' <span style="font-size:14px">days</span>';
+    document.getElementById('streak-sub').textContent = streak>=7?'Unstoppable!':streak>=3?'On a roll!':'Keep going!';
+
+    // Calorie burn
+    const bwEntries = Object.entries(bwLog).sort((a,b)=>b[0].localeCompare(a[0]));
+    const currentBW = bwEntries.length?bwEntries[0][1]:286;
+    const bmr = calcBMR(currentBW);
+    const stepBurn = Math.round(steps*0.045);
+    const todaySess = history.find(h=>h.dateISO===today&&h.day!=='cardio-day');
+    const workoutBurn = todaySess ? Math.round(((todaySess.duration||0)/60)*5+(todaySess.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0)*0.001) : 0;
+    const totalBurn = bmr+stepBurn+workoutBurn;
+    const deficit = totalBurn-MACRO_TARGETS.cal;
+    document.getElementById('cal-val').textContent = totalBurn.toLocaleString();
+    document.getElementById('cal-sub').textContent = deficit>0?'+'+deficit+' deficit':'on target';
+    document.getElementById('cal-sub').className = 'tile-sub '+(deficit>0?'green':'gold');
+
+    // Today workout
+    const DAY_LABELS={chest:'CHEST DAY',back:'BACK DAY',shoulders:'SHOULDER',legs:'LEG DAY',arms:'ARM DAY','cardio-day':'CARDIO'};
+    if(todaySess){
+      const vol = Math.round((todaySess.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0));
+      document.getElementById('today-val').textContent = DAY_LABELS[todaySess.day]||todaySess.day.toUpperCase();
+      document.getElementById('today-sub').textContent = vol?(vol/1000).toFixed(1)+'k lbs vol':'Logged';
+    } else {
+      document.getElementById('today-val').textContent = 'REST';
+      document.getElementById('today-val').className = 'tile-val muted sm';
+      document.getElementById('today-sub').textContent = 'Recovery day';
+    }
+
+    // Daily push
+    const day = Math.floor(Date.now()/86400000);
+    document.getElementById('push-txt').textContent = MOTIVATIONS[day%MOTIVATIONS.length].txt;
+
+    // Sync status
+    const dot = document.getElementById('sync-dot');
+    const dateEl = document.getElementById('sync-date');
+    if(lastSync){
+      dot.textContent = '● Synced '+lastSync;
+      dot.className = 'sync-dot ok';
+    } else {
+      dot.textContent = '● Not synced';
+      dot.className = 'sync-dot idle';
+    }
+    const now = new Date();
+    dateEl.textContent = now.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'});
+
+  } catch(e){ console.error(e); }
+}
+
+loadData();
+// Refresh every 30 seconds
+setInterval(loadData, 30000);
+</script>
+</body>
+</html>
