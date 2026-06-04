@@ -523,6 +523,60 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 .bible-reader-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:1rem 1.25rem;border-top:1px solid rgba(245,158,11,.12);background:rgba(245,158,11,.04)}
 .bible-reader-actions .bible-mark-btn{flex:1;padding:13px;font-size:18px}
 
+/* ── RECORDS TAB ── */
+.pr-wall-card{background:var(--dark3);border:1px solid var(--border2);border-radius:2px;padding:.85rem;text-align:center;position:relative;overflow:hidden}
+.pr-wall-card.has-pr{border-color:rgba(245,158,11,.4);background:linear-gradient(135deg,rgba(245,158,11,.06),transparent)}
+.pr-wall-exname{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;color:var(--mid);text-transform:uppercase;margin-bottom:4px}
+.pr-wall-val{font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--gold);line-height:1;letter-spacing:2px}
+.pr-wall-sub{font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);margin-top:2px}
+.pr-wall-1rm{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--accent);margin-top:4px;letter-spacing:.5px}
+.overload-row{display:flex;align-items:center;gap:10px;padding:.65rem 0;border-bottom:1px solid var(--border);flex-wrap:wrap}
+.overload-row:last-child{border-bottom:none}
+.overload-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--white);flex:1;min-width:120px}
+.overload-hist{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid);min-width:80px}
+.overload-badge{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;padding:3px 8px;border-radius:2px;text-transform:uppercase;font-weight:700;white-space:nowrap}
+.overload-badge.push{background:rgba(52,211,153,.15);color:var(--green2);border:1px solid rgba(52,211,153,.3)}
+.overload-badge.hold{background:rgba(245,158,11,.1);color:var(--gold);border:1px solid rgba(245,158,11,.25)}
+.overload-badge.deload{background:rgba(239,68,68,.1);color:#F87171;border:1px solid rgba(239,68,68,.25)}
+.overload-trend{font-family:'Bebas Neue',sans-serif;font-size:18px;min-width:50px;text-align:right}
+.notes-day-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;background:var(--dark3);border:1px solid var(--border2);color:var(--mid);padding:5px 12px;cursor:pointer;border-radius:2px;text-transform:uppercase}
+.notes-day-btn.active{background:var(--accent);border-color:var(--accent);color:var(--white)}
+.notes-session{background:var(--dark3);border:1px solid var(--border2);border-left:3px solid var(--accent);border-radius:2px;padding:.85rem 1rem;margin-bottom:.6rem}
+.notes-sess-date{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;color:var(--mid);margin-bottom:4px;text-transform:uppercase}
+.notes-sess-txt{font-family:'Barlow',sans-serif;font-size:13px;color:var(--light);font-style:italic;line-height:1.5}
+.notes-sess-vol{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--gold);margin-top:4px}
+/* ── MOTIVATION CARD ── */
+.motiv-card{background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(245,158,11,.05));border:1px solid rgba(239,68,68,.25);border-left:4px solid #EF4444;border-radius:4px;padding:1.25rem 1.5rem}
+.motiv-tag{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:3px;color:#EF4444;text-transform:uppercase;margin-bottom:.5rem}
+.motiv-txt{font-family:'Barlow',sans-serif;font-size:15px;color:var(--white);line-height:1.6;margin-bottom:.75rem}
+.motiv-challenge{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;color:var(--gold)}
+/* ── MONTHLY TAB ── */
+.month-btn{font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;background:var(--dark3);border:1px solid var(--border2);color:var(--mid);padding:5px 12px;cursor:pointer;border-radius:2px;text-transform:uppercase}
+.month-btn.active{background:var(--gold);border-color:var(--gold);color:var(--black);font-weight:700}
+.month-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:1rem}
+.msc{background:var(--dark2);padding:.85rem .6rem;text-align:center}
+.msc-lbl{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;margin-bottom:3px}
+.msc-val{font-family:'Bebas Neue',sans-serif;font-size:26px;line-height:1;color:var(--white)}
+.msc-sub{font-family:'Barlow Condensed',sans-serif;font-size:9px;color:var(--mid);margin-top:2px;letter-spacing:1px}
+.month-best-lift{background:var(--dark3);border:1px solid var(--border2);border-left:3px solid var(--gold);border-radius:2px;padding:.75rem 1rem;margin-bottom:.5rem;display:flex;justify-content:space-between;align-items:center}
+.mbl-name{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;letter-spacing:1px;color:var(--white)}
+.mbl-val{font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--gold);letter-spacing:1px}
+/* ── NUTRITION ADVISOR ── */
+.nutr-advisor{background:var(--dark2);border:1px solid var(--border2);border-radius:2px;padding:1rem 1.25rem;margin-bottom:1rem}
+.nutr-advisor-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.nutr-adv-title{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--white)}
+.nutr-adv-status{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;padding:3px 8px;border-radius:2px;text-transform:uppercase}
+.nutr-adv-status.losing{background:rgba(52,211,153,.15);color:var(--green2);border:1px solid rgba(52,211,153,.3)}
+.nutr-adv-status.plateau{background:rgba(245,158,11,.15);color:var(--gold);border:1px solid rgba(245,158,11,.3)}
+.nutr-adv-status.gaining{background:rgba(239,68,68,.15);color:#F87171;border:1px solid rgba(239,68,68,.3)}
+.nutr-adv-status.nodata{background:var(--dark3);color:var(--mid);border:1px solid var(--border)}
+.nutr-adv-row{display:flex;justify-content:space-between;align-items:center;padding:.4rem 0;border-bottom:1px solid var(--border)}
+.nutr-adv-row:last-child{border-bottom:none}
+.nutr-adv-lbl{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.5px;color:var(--mid)}
+.nutr-adv-val{font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;color:var(--white)}
+.nutr-advice-box{background:linear-gradient(135deg,rgba(42,154,212,.08),transparent);border:1px solid rgba(42,154,212,.25);border-left:3px solid var(--blue2);border-radius:2px;padding:.85rem 1rem;margin-top:.75rem}
+.nutr-advice-txt{font-family:'Barlow',sans-serif;font-size:13px;color:var(--light);line-height:1.6}
+
 </style>
 </head>
 <body>
@@ -568,7 +622,6 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 </div>
 <div class="main-nav">
   <button class="nav-tab active" onclick="showTab('workout')">&#x26A1; Workout</button>
-  <button class="nav-tab" onclick="showTab('cardio')">&#x1F3C3; Cardio</button>
   <button class="nav-tab" onclick="showTab('nutrition')">&#x1F957; Nutrition</button>
   <button class="nav-tab" onclick="showTab('supps')">&#x1F48A; Supps</button>
   <button class="nav-tab" onclick="showTab('body')">&#x2696; Body</button>
@@ -578,6 +631,9 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
   <button class="nav-tab" onclick="showTab('achievements')">&#x1F3C5; Goals</button>
   <button class="nav-tab" onclick="showTab('week')">&#x1F4C5; Week</button>
   <button class="nav-tab" onclick="showTab('bible')">&#x271F; Bible</button>
+  <button class="nav-tab" onclick="showTab('advisor')">&#x1F9E0; Advisor</button>
+  <button class="nav-tab" onclick="showTab('records')">&#x1F3AF; Records</button>
+  <button class="nav-tab" onclick="showTab('monthly')">&#x1F4CA; Monthly</button>
 </div>
 
 <div id="tab-workout">
@@ -762,6 +818,39 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
     <div class="settings-row"><button class="settings-btn exp" onclick="exportData()">&#x1F4E4; Export File</button><button class="settings-btn imp" onclick="document.getElementById('import-input').click()">&#x1F4E5; Import File</button><input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)"></div>
     <div class="settings-note">Export saves a local JSON file as a manual backup.</div>
   </div>
+</div>
+
+<!-- ADVISOR TAB -->
+<div id="tab-advisor" style="display:none">
+  <div class="sec-lbl" style="margin-top:0">&#x1F9E0; Nutrition Advisor</div>
+  <div id="advisor-main-content"></div>
+</div>
+
+<!-- RECORDS TAB -->
+<div id="tab-records" style="display:none">
+  <div class="sec-lbl" style="margin-top:0">🎯 Daily Motivation</div>
+  <div id="daily-motivation-card" class="card" style="margin-bottom:1.25rem"></div>
+  <div class="sec-lbl">🏆 Personal Records Wall</div>
+  <div class="card" style="margin-bottom:1.25rem">
+    <div id="pr-wall-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:8px"></div>
+  </div>
+  <div class="sec-lbl">📈 Progressive Overload Tracker</div>
+  <div class="card" style="margin-bottom:1.25rem">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1px;color:var(--mid);margin-bottom:.75rem">Based on your last 3 sessions per exercise — green means you can push more weight.</div>
+    <div id="overload-grid"></div>
+  </div>
+  <div class="sec-lbl">📝 Workout Notes History</div>
+  <div class="card">
+    <div style="display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap" id="notes-day-filter"></div>
+    <div id="notes-history-list"></div>
+  </div>
+</div>
+
+<!-- MONTHLY TAB -->
+<div id="tab-monthly" style="display:none">
+  <div class="sec-lbl" style="margin-top:0">📊 Monthly Summary</div>
+  <div style="display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap" id="monthly-picker"></div>
+  <div id="monthly-content"></div>
 </div>
 
 <!-- BIBLE TAB -->
@@ -999,8 +1088,8 @@ const DEFAULT_SUPPS=[
 const BADGE_CLS={chest:'b-chest',tri:'b-tri',legs:'b-legs',back:'b-back',bi:'b-bi',shoulder:'b-shoulder',core:'b-core'};
 const BADGE_LBL={chest:'Chest',tri:'Triceps',legs:'Legs',back:'Back',bi:'Biceps',shoulder:'Shoulder',core:'Core'};
 const DAY_LABEL={chest:'Chest + Triceps',back:'Back + Biceps',shoulders:'Shoulders + Triceps',legs:'Leg Day',arms:'Arm Day','cardio-day':'Cardio'};
-const ALL_TABS=['workout','cardio','nutrition','supps','body','prs','progress','history','achievements','week','bible'];
-const DAILY_TABS=['nutrition','supps','body','cardio','bible'];
+const ALL_TABS=['workout','nutrition','supps','body','prs','progress','history','achievements','week','bible','advisor','records','monthly'];
+const DAILY_TABS=['nutrition','supps','body','bible'];
 
 const VERSES=[
   {t:"I can do all things through Christ who strengthens me.",r:"Philippians 4:13"},
@@ -2212,6 +2301,451 @@ function showBadgeUnlockNotif(a){
   setTimeout(()=>notif.remove(),3500);
 }
 
+// ── RECORDS TAB ──────────────────────────────────────────────────────────
+
+// ── DAILY MOTIVATION ──
+const MOTIVATIONS = [
+  {tag:"Recomp Focus",txt:"You're building muscle and burning fat at the same time. Stay in the slight deficit, hit your protein, and trust the process.",challenge:"Beat last week's total step count today."},
+  {tag:"Protein Is King",txt:"At 240g protein per day, you're protecting every pound of muscle while in a deficit. That's the foundation of your transformation.",challenge:"Hit your protein goal today. No excuses."},
+  {tag:"Progressive Overload",txt:"Adding even 2.5 lbs to a lift is progress. Small increases compound into massive strength over months. Never skip the small wins.",challenge:"Pick one exercise today and add weight, even just 5 lbs."},
+  {tag:"The Long Game",txt:"Getting from 286 to 225 is a 61-pound journey. At 0.5 lbs per week done right, you are building a body that lasts forever.",challenge:"Log every meal today. Awareness is half the battle."},
+  {tag:"Rest Is Training",txt:"Your muscles grow when you rest, not when you lift. Sleep, recovery, and rest days are not weakness. They are part of the program.",challenge:"Get to bed 30 minutes earlier tonight."},
+  {tag:"Steps Add Up",txt:"12,000 steps burns roughly 500 extra calories. Over a week that is 3,500 calories — a full pound of fat — just from walking.",challenge:"Park farther away today. Every step counts."},
+  {tag:"Consistency Wins",txt:"The best workout plan is the one you actually do. You do not need perfect — you need consistent. Show up, even on bad days.",challenge:"Complete today's planned workout, no matter what."},
+  {tag:"Mind Your Deficit",txt:"For recomp, a 300-500 calorie daily deficit is your sweet spot. Too aggressive and you lose muscle. Too small and progress stalls.",challenge:"Check your calorie target vs what you have eaten today."},
+  {tag:"Muscle Memory",txt:"Once you have built muscle it comes back faster than the first time. Every rep you do now is an investment that pays dividends for life.",challenge:"Log your workout with full detail — weights, reps, RPE."},
+  {tag:"Bible and Iron",txt:"Strength of body and strength of spirit — you are training both. That is rare. Keep showing up for both.",challenge:"Read a chapter of the Bible today before training."},
+  {tag:"Hydration Matters",txt:"Even mild dehydration reduces strength output by up to 5-8%. If your lifts feel off, drink water first.",challenge:"Drink a full glass of water before your workout today."},
+  {tag:"Track Everything",txt:"The data you are logging is a goldmine. Body weight, steps, workouts, nutrition — it tells a story. The story of you getting stronger.",challenge:"Log your body weight first thing tomorrow morning."},
+]
+
+function getDailyMotivation(){
+  const day = Math.floor(Date.now()/86400000);
+  const m = MOTIVATIONS[day % MOTIVATIONS.length];
+  // Personalized challenge based on recent data
+  const recentSteps = Object.entries(stepsLog).sort((a,b)=>b[0].localeCompare(a[0])).slice(0,7).map(e=>e[1]||0);
+  const avgSteps = recentSteps.length ? Math.round(recentSteps.reduce((a,v)=>a+v,0)/recentSteps.length) : 0;
+  const lastBW = Object.entries(bwLog).sort((a,b)=>b[0].localeCompare(a[0]))[0];
+  let extra = '';
+  if(avgSteps>0) extra = `Your 7-day step average is <strong style="color:var(--blue2)">${avgSteps.toLocaleString()}</strong>. `;
+  if(lastBW) extra += `Last logged weight: <strong style="color:var(--gold)">${lastBW[1]} lbs</strong>.`;
+  return {m, extra};
+}
+
+function renderDailyMotivation(){
+  const el = document.getElementById('daily-motivation-card'); if(!el)return;
+  const {m, extra} = getDailyMotivation();
+  el.innerHTML = `<div class="motiv-card"><div class="motiv-tag">💪 Today's Focus — ${m.tag}</div><div class="motiv-txt">${m.txt}</div>${extra?`<div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--mid);margin-bottom:.75rem">${extra}</div>`:''}<div class="motiv-challenge">⚡ Challenge: ${m.challenge}</div></div>`;
+}
+
+// ── PERSONAL RECORDS WALL ──
+function calc1RM(weight, reps){ return Math.round(weight * (1 + reps/30)); }
+
+function renderPRWall(){
+  const grid = document.getElementById('pr-wall-grid'); if(!grid)return;
+  // Build best set per exercise from all history
+  const bests = {};
+  history.forEach(sess=>{
+    (sess.exercises||[]).forEach(e=>{
+      if(!e.weight||!e.reps)return;
+      const key = e.name;
+      const vol = e.weight * e.reps;
+      const orm = calc1RM(e.weight, e.reps);
+      if(!bests[key] || orm > bests[key].orm){
+        bests[key] = {weight:e.weight, reps:e.reps, orm, date:sess.date||sess.dateISO};
+      }
+    });
+  });
+  const entries = Object.entries(bests).sort((a,b)=>b[1].orm-a[1].orm);
+  if(!entries.length){
+    grid.innerHTML = '<div class="empty" style="padding:1.5rem;grid-column:1/-1">Log workouts to see your PRs here!</div>';
+    return;
+  }
+  grid.innerHTML = entries.map(([name,b])=>`
+    <div class="pr-wall-card has-pr">
+      <div class="pr-wall-exname">${name}</div>
+      <div class="pr-wall-val">${b.weight}<span style="font-size:14px;color:var(--mid)">lbs</span></div>
+      <div class="pr-wall-sub">${b.reps} reps · ${b.date}</div>
+      <div class="pr-wall-1rm">Est. 1RM: ${b.orm} lbs</div>
+    </div>`).join('');
+}
+
+// ── PROGRESSIVE OVERLOAD TRACKER ──
+function renderOverloadTracker(){
+  const el = document.getElementById('overload-grid'); if(!el)return;
+  // Get all exercises from last 10 sessions
+  const recentSessions = history.slice(0,10);
+  const exMap = {}; // name -> array of {weight, reps, date}
+  recentSessions.forEach(sess=>{
+    const sessDate = sess.dateISO||'';
+    const seen = new Set();
+    (sess.exercises||[]).forEach(e=>{
+      if(!e.weight||!e.reps||!e.done)return;
+      const key = e.name;
+      if(!exMap[key]) exMap[key]=[];
+      // Only keep the best set per session per exercise
+      const existing = exMap[key].find(x=>x.date===sessDate);
+      const orm = calc1RM(e.weight,e.reps);
+      if(!existing || orm > existing.orm){
+        if(existing){ exMap[key].splice(exMap[key].indexOf(existing),1); }
+        exMap[key].push({weight:e.weight,reps:e.reps,orm,date:sessDate});
+      }
+    });
+  });
+  const entries = Object.entries(exMap).filter(([k,v])=>v.length>=2).sort((a,b)=>b[1].length-a[1].length);
+  if(!entries.length){
+    el.innerHTML='<div class="empty" style="padding:1rem">Log at least 2 sessions to see overload recommendations.</div>';
+    return;
+  }
+  el.innerHTML = entries.map(([name, sessions])=>{
+    const sorted = sessions.sort((a,b)=>b.date.localeCompare(a.date));
+    const latest = sorted[0];
+    const prev = sorted[1];
+    const trend = latest.orm - prev.orm;
+    const pct = prev.orm > 0 ? Math.round((trend/prev.orm)*100) : 0;
+    let badge, trendColor, rec;
+    if(trend > 0){
+      badge='hold'; rec=`Hold at ${latest.weight}lbs — great progress (+${pct}%)`;
+      if(sessions.length>=3 && sorted[1].orm>=sorted[2].orm){
+        badge='push'; rec=`Try ${latest.weight+2.5}lbs next session — you're ready!`;
+      }
+    } else if(trend === 0){
+      badge='push'; rec=`Push to ${latest.weight+2.5}lbs next session — you've stalled here.`;
+    } else {
+      badge='hold'; rec=`Stay at ${latest.weight}lbs — focus on clean reps before adding weight.`;
+      if(pct < -10){ badge='deload'; rec=`Consider ${latest.weight-5}lbs to rebuild form and confidence.`; }
+    }
+    const trendStr = trend>0?`+${trend}`:`${trend}`;
+    const trendClr = trend>0?'var(--green2)':trend<0?'#F87171':'var(--mid)';
+    return `<div class="overload-row">
+      <div class="overload-name">${name}</div>
+      <div class="overload-hist">${latest.weight}lbs × ${latest.reps}<br><span style="font-size:10px;color:var(--steel2)">${sorted.slice(0,3).map(s=>s.weight+'lb').join(' → ')}</span></div>
+      <div style="flex:1;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid)">${rec}</div>
+      <div class="overload-trend" style="color:${trendClr}">${trendStr}</div>
+      <div class="overload-badge ${badge}">${badge==='push'?'⬆ Push':badge==='hold'?'✓ Hold':'⬇ Deload'}</div>
+    </div>`;
+  }).join('');
+}
+
+// ── WORKOUT NOTES HISTORY ──
+let notesFilterDay = 'all';
+function renderNotesHistory(){
+  const filterEl = document.getElementById('notes-day-filter');
+  const listEl = document.getElementById('notes-history-list');
+  if(!filterEl||!listEl)return;
+  const days = ['all','chest','back','shoulders','legs','arms','cardio-day'];
+  const labels = {all:'All',chest:'Chest',back:'Back',shoulders:'Shoulders',legs:'Legs',arms:'Arms','cardio-day':'Cardio'};
+  filterEl.innerHTML = days.map(d=>`<button class="notes-day-btn${notesFilterDay===d?' active':''}" onclick="notesFilterDay='${d}';renderNotesHistory()">${labels[d]}</button>`).join('');
+  const sessions = history.filter(s=>(notesFilterDay==='all'||s.day===notesFilterDay)&&s.notes&&s.notes.trim());
+  if(!sessions.length){
+    listEl.innerHTML='<div class="empty" style="padding:1rem">No notes found. Add notes when saving workouts!</div>';
+    return;
+  }
+  listEl.innerHTML = sessions.slice(0,20).map(s=>{
+    const vol = Math.round((s.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0));
+    return `<div class="notes-session">
+      <div class="notes-sess-date">${s.date||s.dateISO} · ${(s.day||'').toUpperCase()}</div>
+      <div class="notes-sess-txt">"${s.notes}"</div>
+      ${vol?`<div class="notes-sess-vol">Volume: ${vol.toLocaleString()} lbs</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function renderRecordsTab(){
+  renderDailyMotivation();
+  renderPRWall();
+  renderOverloadTracker();
+  renderNotesHistory();
+}
+
+// ── MONTHLY SUMMARY ──────────────────────────────────────────────────────
+let monthlyViewKey = null;
+
+function renderMonthlyTab(){
+  const picker = document.getElementById('monthly-picker'); if(!picker)return;
+  // Get last 6 months
+  const months = [];
+  const now = new Date();
+  for(let i=0;i<6;i++){
+    const d = new Date(now.getFullYear(), now.getMonth()-i, 1);
+    const key = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    const label = d.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+    months.push({key,label});
+  }
+  if(!monthlyViewKey) monthlyViewKey = months[0].key;
+  picker.innerHTML = months.map(m=>`<button class="month-btn${monthlyViewKey===m.key?' active':''}" onclick="monthlyViewKey='${m.key}';renderMonthlyContent()">${m.label}</button>`).join('');
+  renderMonthlyContent();
+}
+
+function renderMonthlyContent(){
+  const el = document.getElementById('monthly-content'); if(!el)return;
+  const ym = monthlyViewKey;
+  const [yr,mo] = ym.split('-').map(Number);
+  const monthName = new Date(yr,mo-1,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});
+
+  // Gather data for this month
+  const mHistory = history.filter(h=>h.dateISO&&h.dateISO.startsWith(ym));
+  const mSteps = Object.entries(stepsLog).filter(([k])=>k.startsWith(ym));
+  const mBW = Object.entries(bwLog).filter(([k])=>k.startsWith(ym)).sort((a,b)=>a[0].localeCompare(b[0]));
+  const mNutr = Object.entries(nutrData).filter(([k])=>k.startsWith(ym));
+  const mSupp = Object.entries(suppData).filter(([k])=>k.startsWith(ym));
+  const mBible = Object.entries(bibleLog).filter(([k,v])=>k.startsWith(ym)&&v.read);
+  const mCardio = Object.entries(cardioLog).filter(([k])=>k.startsWith(ym));
+
+  const totalWorkouts = mHistory.filter(h=>h.day!=='cardio-day').length;
+  const totalCardio = mCardio.reduce((a,[k,v])=>a+(v||[]).length,0);
+  const totalSteps = mSteps.reduce((a,[k,v])=>a+(v||0),0);
+  const avgSteps = mSteps.length ? Math.round(totalSteps/mSteps.length) : 0;
+  const totalVol = mHistory.reduce((a,s)=>a+Math.round((s.exercises||[]).filter(e=>e.done).reduce((b,e)=>b+e.vol,0)),0);
+  const suppDays = mSupp.filter(([k,v])=>(v?.checked||[]).length>0).length;
+  const bibleDays = mBible.length;
+  const bwStart = mBW[0]?mBW[0][1]:null;
+  const bwEnd = mBW[mBW.length-1]?mBW[mBW.length-1][1]:null;
+  const bwChange = bwStart&&bwEnd ? (bwEnd-bwStart).toFixed(1) : null;
+
+  // Best lifts this month
+  const bestLifts = {};
+  mHistory.forEach(sess=>{
+    (sess.exercises||[]).forEach(e=>{
+      if(!e.weight||!e.reps||!e.done)return;
+      const orm = calc1RM(e.weight,e.reps);
+      if(!bestLifts[e.name]||orm>bestLifts[e.name].orm) bestLifts[e.name]={weight:e.weight,reps:e.reps,orm,date:sess.date||sess.dateISO};
+    });
+  });
+  const topLifts = Object.entries(bestLifts).sort((a,b)=>b[1].orm-a[1].orm).slice(0,5);
+
+  // Weight trend analysis + nutrition advice
+  const nutrAdvice = getNutritionAdvice(ym);
+
+  el.innerHTML = `
+    <div class="sec-lbl" style="margin-top:0">${monthName} — Overview</div>
+    <div class="month-stat-grid">
+      <div class="msc"><div class="msc-lbl">Workouts</div><div class="msc-val acc">${totalWorkouts}</div><div class="msc-sub">sessions</div></div>
+      <div class="msc"><div class="msc-lbl">Cardio</div><div class="msc-val" style="color:var(--teal)">${totalCardio}</div><div class="msc-sub">sessions</div></div>
+      <div class="msc"><div class="msc-lbl">Volume</div><div class="msc-val gold">${totalVol>0?(totalVol/1000).toFixed(0)+'K':'0'}</div><div class="msc-sub">lbs lifted</div></div>
+      <div class="msc"><div class="msc-lbl">Avg Steps</div><div class="msc-val" style="color:var(--blue2)">${avgSteps>0?avgSteps.toLocaleString():'—'}</div><div class="msc-sub">per day</div></div>
+      <div class="msc"><div class="msc-lbl">Supp Days</div><div class="msc-val" style="color:var(--accent2)">${suppDays}</div><div class="msc-sub">days logged</div></div>
+      <div class="msc"><div class="msc-lbl">Bible Days</div><div class="msc-val" style="color:rgba(167,139,250,1)">${bibleDays}</div><div class="msc-sub">readings</div></div>
+    </div>
+    ${bwChange!==null?`
+    <div class="card" style="margin-bottom:1rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px">
+      <div><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;margin-bottom:4px">Weight This Month</div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--white)">${bwStart} → ${bwEnd} lbs</div></div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:36px;color:${parseFloat(bwChange)<0?'var(--green2)':parseFloat(bwChange)>0?'#F87171':'var(--mid)'}">${parseFloat(bwChange)>0?'+':''}${bwChange} lbs</div>
+    </div>`:''}
+    ${nutrAdvice}
+    ${topLifts.length?`
+    <div class="sec-lbl">🏆 Best Lifts This Month</div>
+    <div class="card" style="margin-bottom:1rem">
+      ${topLifts.map(([name,b])=>`<div class="month-best-lift"><div class="mbl-name">${name}</div><div class="mbl-val">${b.weight}lbs × ${b.reps} <span style="font-size:12px;color:var(--mid)">1RM≈${b.orm}</span></div></div>`).join('')}
+    </div>`:''}
+    ${mHistory.filter(s=>s.notes&&s.notes.trim()).length?`
+    <div class="sec-lbl">📝 Notes This Month</div>
+    <div class="card">
+      ${mHistory.filter(s=>s.notes&&s.notes.trim()).map(s=>`<div class="notes-session"><div class="notes-sess-date">${s.date||s.dateISO} · ${(s.day||'').toUpperCase()}</div><div class="notes-sess-txt">"${s.notes}"</div></div>`).join('')}
+    </div>`:''}
+  `;
+}
+
+// ── NUTRITION ADVISOR ──────────────────────────────────────────────────
+function getNutritionAdvice(ym){
+  // Get all body weight entries sorted
+  const allBW = Object.entries(bwLog).filter(([k,v])=>v>0).sort((a,b)=>a[0].localeCompare(b[0]));
+  if(allBW.length < 3) return `<div class="nutr-advisor"><div class="nutr-advisor-hdr"><div class="nutr-adv-title">🥗 Nutrition Advisor</div><div class="nutr-adv-status nodata">Need More Data</div></div><div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--mid)">Log your weight at least 3 times to get personalized nutrition advice.</div></div>`;
+
+  const recent7 = allBW.slice(-7);
+  const recent30 = allBW.slice(-30);
+  const first = recent30[0][1];
+  const last = recent30[recent30.length-1][1];
+  const change30 = last - first;
+  const weeklyRate = recent7.length>=2 ? (recent7[recent7.length-1][1]-recent7[0][1]) : change30/4;
+
+  // Determine trend
+  let trend, status, advice;
+  const GOAL_RATE = -0.5; // lbs per week target
+
+  if(weeklyRate < -1.5){
+    trend='losing-fast'; status='losing';
+    advice=`⚠️ You're losing weight too fast (${weeklyRate.toFixed(1)} lbs/week). At this rate you risk losing muscle mass. <strong>Increase calories by 200-300/day</strong> and make sure you're hitting ${MACRO_TARGETS.protein}g protein. Target 0.5-0.75 lbs/week for recomp.`;
+  } else if(weeklyRate <= -0.25){
+    trend='losing-good'; status='losing';
+    advice=`✅ Perfect rate! You're losing ${Math.abs(weeklyRate).toFixed(1)} lbs/week — ideal for preserving muscle during recomp. Keep your protein at ${MACRO_TARGETS.protein}g and calories at ${MACRO_TARGETS.cal}. You're ${Math.round(Math.abs(last-225))} lbs from your goal.`;
+  } else if(weeklyRate > 0.25){
+    trend='gaining'; status='gaining';
+    advice=`📈 You're gaining weight (${weeklyRate.toFixed(1)} lbs/week). For recomp, <strong>reduce calories by 200-300/day</strong> — try ${MACRO_TARGETS.cal-250} calories. Keep protein high to preserve muscle. This may be water weight, so track for another week before adjusting.`;
+  } else {
+    trend='plateau'; status='plateau';
+    advice=`⚡ Weight has been stable for a while — this is a plateau. Options: <strong>(1)</strong> Reduce calories by 150-200/day (try ${MACRO_TARGETS.cal-175}), <strong>(2)</strong> Add 2,000 more steps per day, or <strong>(3)</strong> Try a 1-week diet break at maintenance then cut again. Plateaus are normal — adjust and push through.`;
+  }
+
+  // Estimate calorie burn from steps + workouts
+  const burn = calcDailyBurn(ym.slice(0,10)+'-01');
+  const totalBurn = burn.total;
+
+  const statusLabels = {losing:'📉 Losing',gaining:'📈 Gaining','losing-fast':'⚠️ Too Fast',plateau:'⏸ Plateau'};
+
+  return `
+    <div class="nutr-advisor">
+      <div class="nutr-advisor-hdr">
+        <div class="nutr-adv-title">🥗 Nutrition Advisor</div>
+        <div class="nutr-adv-status ${status}">${statusLabels[trend]||status}</div>
+      </div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Current Weight</div><div class="nutr-adv-val">${last} lbs</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Goal Weight</div><div class="nutr-adv-val">225-230 lbs</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">To Goal</div><div class="nutr-adv-val">${Math.max(0,last-227.5).toFixed(1)} lbs</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">7-Day Rate</div><div class="nutr-adv-val" style="color:${weeklyRate<0?'var(--green2)':'#F87171'}">${weeklyRate>0?'+':''}${weeklyRate.toFixed(2)} lbs/wk</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Est. Calorie Burn Today</div><div class="nutr-adv-val">${totalBurn.toLocaleString()} cal</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Calorie Target</div><div class="nutr-adv-val">${MACRO_TARGETS.cal} cal</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Est. Daily Deficit</div><div class="nutr-adv-val" style="color:var(--green2)">~${Math.max(0,totalBurn-MACRO_TARGETS.cal).toLocaleString()} cal</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">At Current Rate, Goal By</div><div class="nutr-adv-val">${weeklyRate<-0.1?estimateGoalDate(last,weeklyRate):'Adjust to accelerate'}</div></div>
+      <div class="nutr-advice-box"><div class="nutr-advice-txt">${advice}</div></div>
+    </div>`;
+}
+
+function estimateGoalDate(currentWeight, weeklyRate){
+  if(weeklyRate >= 0) return '—';
+  const weeksNeeded = Math.abs((currentWeight - 227.5) / weeklyRate);
+  const d = new Date();
+  d.setDate(d.getDate() + Math.round(weeksNeeded * 7));
+  return d.toLocaleDateString('en-US',{month:'short',year:'numeric'});
+}
+
+// ── ADVISOR TAB ──────────────────────────────────────────────────────────
+// Mifflin-St Jeor BMR: Male, 36yo, 6'2" (188cm)
+// BMR = 10*weight_kg + 6.25*height_cm - 5*age + 5
+function calcBMR(weightLbs) {
+  const weightKg = weightLbs * 0.453592;
+  const heightCm = 187.96; // 6'2"
+  const age = 36;
+  return Math.round(10 * weightKg + 6.25 * heightCm - 5 * age + 5);
+}
+
+function calcDailyBurn(dateKey) {
+  // Get body weight — use most recent available
+  const bwEntries = Object.entries(bwLog).filter(([k,v])=>v>0).sort((a,b)=>b[0].localeCompare(a[0]));
+  const currentBW = bwEntries.length ? bwEntries[0][1] : 286;
+  const bmr = calcBMR(currentBW);
+
+  // Step burn: ~0.04 cal per step (accounts for body weight)
+  const steps = stepsLog[dateKey] || 0;
+  const stepBurn = Math.round(steps * 0.045);
+
+  // Workout burn: estimate from volume lifted + duration
+  const todaySession = history.find(h => h.dateISO === dateKey && h.day !== 'cardio-day');
+  let workoutBurn = 0;
+  if (todaySession) {
+    const vol = (todaySession.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0);
+    const durMins = (todaySession.duration||0) / 60;
+    // ~5 cal per min of lifting + ~0.001 cal per lb lifted
+    workoutBurn = Math.round(durMins * 5 + vol * 0.001);
+  }
+
+  const cardioSession = history.find(h => h.dateISO === dateKey && h.day === 'cardio-day');
+  let cardioBurn = 0;
+  if (cardioSession) {
+    cardioBurn = Math.round((cardioSession.cardioMinutes||0) * 8); // ~8 cal/min moderate cardio
+  }
+
+  return { bmr, stepBurn, workoutBurn, cardioBurn, total: bmr + stepBurn + workoutBurn + cardioBurn, currentBW };
+}
+
+function renderAdvisorTab() {
+  const el = document.getElementById('advisor-main-content'); if(!el)return;
+  const burn = calcDailyBurn(TODAY_KEY);
+  const allBW = Object.entries(bwLog).filter(([k,v])=>v>0).sort((a,b)=>a[0].localeCompare(b[0]));
+
+  if(allBW.length < 3) {
+    el.innerHTML = `<div class="nutr-advisor">
+      <div class="nutr-advisor-hdr"><div class="nutr-adv-title">Nutrition Advisor</div><div class="nutr-adv-status nodata">Need More Data</div></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--mid);margin-bottom:1rem">Log your weight at least 3 times to unlock personalized advice.</div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Estimated BMR</div><div class="nutr-adv-val">${burn.bmr.toLocaleString()} cal</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Steps Burn Today</div><div class="nutr-adv-val">${burn.stepBurn.toLocaleString()} cal</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Workout Burn Today</div><div class="nutr-adv-val">${burn.workoutBurn.toLocaleString()} cal</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Total Burn Today</div><div class="nutr-adv-val" style="color:var(--accent)">${burn.total.toLocaleString()} cal</div></div>
+    </div>`;
+    return;
+  }
+
+  const recent7 = allBW.slice(-7);
+  const weeklyRate = recent7.length >= 2 ? (recent7[recent7.length-1][1] - recent7[0][1]) / Math.max(1,(recent7.length-1)/7) : 0;
+  const last = allBW[allBW.length-1][1];
+  const deficit = burn.total - MACRO_TARGETS.cal;
+  const weeksToGoal = weeklyRate < -0.1 ? Math.abs((last - 227.5) / weeklyRate) : null;
+  const goalDate = weeksToGoal ? estimateGoalDate(last, weeklyRate) : null;
+
+  let trend, status, advice, adjCal = null;
+  if (weeklyRate < -1.5) {
+    trend = 'losing-fast'; status = 'losing';
+    adjCal = MACRO_TARGETS.cal + 250;
+    advice = `You are losing weight too fast at ${Math.abs(weeklyRate).toFixed(2)} lbs/week. At this rate you risk losing muscle. Increase to ${adjCal} calories/day and keep protein at ${MACRO_TARGETS.protein}g. Target 0.5-0.75 lbs/week for clean recomp.`;
+  } else if (weeklyRate <= -0.25) {
+    trend = 'losing-good'; status = 'losing';
+    advice = `Perfect rate at ${Math.abs(weeklyRate).toFixed(2)} lbs/week — ideal for preserving muscle. Keep calories at ${MACRO_TARGETS.cal} and protein at ${MACRO_TARGETS.protein}g. You are ${Math.round(last - 227.5)} lbs from your goal weight.`;
+  } else if (weeklyRate > 0.5) {
+    trend = 'gaining'; status = 'gaining';
+    adjCal = MACRO_TARGETS.cal - 300;
+    advice = `You are gaining weight at ${weeklyRate.toFixed(2)} lbs/week. Reduce to ${adjCal} calories/day. This may be water retention — track for another full week before making a change.`;
+  } else {
+    trend = 'plateau'; status = 'plateau';
+    adjCal = MACRO_TARGETS.cal - 175;
+    advice = `Weight has been stable — a plateau. Three options: (1) Drop to ${adjCal} cal/day, (2) Add 2,000 steps per day to increase your burn, or (3) Take a 1-week diet break at ${burn.bmr + 200} cal then resume the cut. Plateaus are normal — adjust and push through.`;
+  }
+
+  const statusLabels = {'losing-fast':'⚠️ Losing Fast','losing-good':'📉 On Track','gaining':'📈 Gaining','plateau':'⏸ Plateau'};
+
+  el.innerHTML = `
+    <div class="nutr-advisor">
+      <div class="nutr-advisor-hdr">
+        <div class="nutr-adv-title">Calorie Burn Breakdown</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid)">Based on Mifflin-St Jeor · Male · 36yo · 6'2"</div>
+      </div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Current Weight</div><div class="nutr-adv-val">${burn.currentBW} lbs</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">BMR (Base Metabolism)</div><div class="nutr-adv-val">${burn.bmr.toLocaleString()} cal</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Step Burn (${(stepsLog[TODAY_KEY]||0).toLocaleString()} steps)</div><div class="nutr-adv-val">+ ${burn.stepBurn.toLocaleString()} cal</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Workout Burn</div><div class="nutr-adv-val">+ ${burn.workoutBurn.toLocaleString()} cal</div></div>
+      ${burn.cardioBurn ? `<div class="nutr-adv-row"><div class="nutr-adv-lbl">Cardio Burn</div><div class="nutr-adv-val">+ ${burn.cardioBurn.toLocaleString()} cal</div></div>` : ''}
+      <div class="nutr-adv-row" style="border-top:2px solid var(--border2);padding-top:.75rem;margin-top:.25rem">
+        <div class="nutr-adv-lbl" style="color:var(--white);font-weight:700">Total Burn Today</div>
+        <div class="nutr-adv-val" style="color:var(--accent);font-size:18px">${burn.total.toLocaleString()} cal</div>
+      </div>
+      <div class="nutr-adv-row">
+        <div class="nutr-adv-lbl">Calorie Target</div>
+        <div class="nutr-adv-val">${MACRO_TARGETS.cal.toLocaleString()} cal</div>
+      </div>
+      <div class="nutr-adv-row">
+        <div class="nutr-adv-lbl">Estimated Deficit Today</div>
+        <div class="nutr-adv-val" style="color:${deficit>0?'var(--green2)':'#F87171'}">${deficit>0?'+':''}${deficit.toLocaleString()} cal</div>
+      </div>
+    </div>
+
+    <div class="nutr-advisor" style="margin-top:.75rem">
+      <div class="nutr-advisor-hdr">
+        <div class="nutr-adv-title">Weight Trend Analysis</div>
+        <div class="nutr-adv-status ${status}">${statusLabels[trend]||status}</div>
+      </div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Current Weight</div><div class="nutr-adv-val">${last} lbs</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Goal Weight</div><div class="nutr-adv-val">225–230 lbs</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Pounds to Goal</div><div class="nutr-adv-val">${Math.max(0,last-227.5).toFixed(1)} lbs</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">7-Day Rate</div><div class="nutr-adv-val" style="color:${weeklyRate<0?'var(--green2)':'#F87171'}">${weeklyRate>0?'+':''}${weeklyRate.toFixed(2)} lbs/wk</div></div>
+      ${goalDate?`<div class="nutr-adv-row"><div class="nutr-adv-lbl">Estimated Goal Date</div><div class="nutr-adv-val" style="color:var(--gold)">${goalDate}</div></div>`:''}
+      ${adjCal?`<div class="nutr-adv-row"><div class="nutr-adv-lbl">Suggested Calories</div><div class="nutr-adv-val" style="color:var(--blue2)">${adjCal.toLocaleString()} cal/day</div></div>`:''}
+      <div class="nutr-advice-box"><div class="nutr-advice-txt">${advice}</div></div>
+    </div>
+
+    <div class="nutr-advisor" style="margin-top:.75rem">
+      <div class="nutr-adv-title" style="margin-bottom:.75rem">Macro Targets</div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Calories</div><div class="nutr-adv-val">${MACRO_TARGETS.cal} cal</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Protein</div><div class="nutr-adv-val">${MACRO_TARGETS.protein}g <span style="color:var(--mid);font-size:11px">(${Math.round(MACRO_TARGETS.protein/last*100*10)/10}g per lb bodyweight)</span></div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Carbs</div><div class="nutr-adv-val">${MACRO_TARGETS.carbs}g</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Fat</div><div class="nutr-adv-val">${MACRO_TARGETS.fat}g</div></div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);margin-top:.75rem;line-height:1.5">Targets can be adjusted in the Nutrition tab. Protein should stay at 0.8-1g per lb bodyweight to protect muscle during your recomp.</div>
+    </div>`;
+}
+
+function renderNutritionAdvisor(){
+  // Legacy — no longer needed
+}
+
 // ── WEEKLY ────────────────────────────────────────────────────────────────
 function toggleRestDay(key){if(restDays[key])delete restDays[key];else restDays[key]=true;saveStorage();renderWeekly();}
 function renderWeekly(){renderWeekGrid('week-now',0);renderWeekGrid('week-last',-7);}
@@ -2252,6 +2786,9 @@ function showTab(tab){
   else if(tab==='achievements')renderAchievements();
   else if(tab==='week')renderWeekly();
   else if(tab==='bible')renderBibleTab();
+  else if(tab==='advisor')renderAdvisorTab();
+  else if(tab==='records')renderRecordsTab();
+  else if(tab==='monthly')renderMonthlyTab();
 }
 
 // ── BIBLE TAB ─────────────────────────────────────────────────────────────
