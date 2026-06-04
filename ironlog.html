@@ -4,11 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="512x512" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronLog">
 <meta name="theme-color" content="#0D0D0F">
 <meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" sizes="512x512" href="icon.png">
+<link rel="apple-touch-icon" href="icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="IronLog">
@@ -548,7 +554,29 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 .bible-reader-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:1rem 1.25rem;border-top:1px solid rgba(245,158,11,.12);background:rgba(245,158,11,.04)}
 .bible-reader-actions .bible-mark-btn{flex:1;padding:13px;font-size:18px}
 
-/* ── RECORDS TAB ── */
+/* ── EDIT MODAL ── */
+.edit-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:1000;display:flex;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.edit-modal{background:var(--dark2);border:1px solid var(--border2);border-radius:4px;width:100%;max-width:600px;padding:1.5rem;position:relative}
+.edit-modal-title{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--white);margin-bottom:1.25rem}
+.edit-field{margin-bottom:.85rem}
+.edit-field label{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;display:block;margin-bottom:4px}
+.edit-field input,.edit-field select,.edit-field textarea{width:100%;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:14px;padding:8px 10px;border-radius:2px;outline:none}
+.edit-field input:focus,.edit-field select:focus,.edit-field textarea:focus{border-color:var(--accent)}
+.edit-field textarea{height:70px;resize:none;font-family:'Barlow',sans-serif;font-size:13px}
+.edit-set-row{display:grid;grid-template-columns:2fr 80px 80px 70px 40px;gap:6px;align-items:center;margin-bottom:5px}
+.edit-set-lbl{font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid);letter-spacing:1px}
+.edit-set-inp{background:var(--dark3);border:1px solid var(--steel2);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:13px;padding:6px 8px;border-radius:2px;outline:none;width:100%;text-align:center}
+.edit-set-inp:focus{border-color:var(--accent)}
+.edit-del-set{background:none;border:1px solid rgba(239,68,68,.3);color:#F87171;font-size:14px;cursor:pointer;border-radius:2px;padding:4px 8px}
+.edit-del-set:hover{background:rgba(239,68,68,.1)}
+.edit-modal-actions{display:flex;gap:8px;margin-top:1.25rem;flex-wrap:wrap}
+.edit-save-btn{flex:1;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;background:var(--accent);border:none;color:var(--white);cursor:pointer;border-radius:2px}
+.edit-delete-btn{padding:13px 20px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;background:none;border:1px solid rgba(239,68,68,.4);color:#F87171;cursor:pointer;border-radius:2px}
+.edit-cancel-btn{padding:13px 20px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;background:none;border:1px solid var(--border2);color:var(--mid);cursor:pointer;border-radius:2px}
+.hist-edit-btn{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;background:none;border:1px solid var(--border2);color:var(--mid);padding:4px 10px;cursor:pointer;border-radius:2px;text-transform:uppercase;margin-left:8px}
+.hist-edit-btn:hover{border-color:var(--accent);color:var(--accent)}
+.hist-del-btn{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;background:none;border:1px solid rgba(239,68,68,.3);color:#F87171;padding:4px 10px;cursor:pointer;border-radius:2px;text-transform:uppercase;margin-left:4px}
+.hist-del-btn:hover{background:rgba(239,68,68,.1)}
 .pr-wall-card{background:var(--dark3);border:1px solid var(--border2);border-radius:2px;padding:.85rem;text-align:center;position:relative;overflow:hidden}
 .pr-wall-card.has-pr{border-color:rgba(245,158,11,.4);background:linear-gradient(135deg,rgba(245,158,11,.06),transparent)}
 .pr-wall-exname{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;color:var(--mid);text-transform:uppercase;margin-bottom:4px}
@@ -2111,6 +2139,7 @@ function renderHistory(){
   el.innerHTML='';
   [...allDates].sort((a,b)=>b.localeCompare(a)).forEach((dateISO,idx2)=>{
     const entry=filtH.find(e=>e.dateISO===dateISO);
+    const histIdx=entry?history.indexOf(entry):-1;
     const cSessions=cFilter?(cardioLog[dateISO]||[]):[];
     if(!entry&&!cSessions.length)return;
     const displayDate=entry?entry.date:fmtDisplay(dateISO);
@@ -2125,6 +2154,8 @@ function renderHistory(){
     if(tv>0)inner+=`<div class="hist-meta">${tv.toLocaleString()} lbs</div>`;
     inner+=`<div class="hist-date">${displayDate}</div><div class="hist-arrow" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid)">${isFirst?'\u25BC':'\u25B6'}</div></div></div>`;
     inner+=`<div id="${panelId}" style="display:${isFirst?'':'none'}">`;
+    // Edit/delete buttons
+    if(histIdx>=0)inner+=`<div style="padding:8px 13px;border-bottom:1px solid var(--border);display:flex;gap:6px"><button class="hist-edit-btn" onclick="event.stopPropagation();openEditModal(${histIdx})">✏️ Edit</button><button class="hist-del-btn" onclick="event.stopPropagation();deleteSession(${histIdx})">🗑 Delete</button></div>`;
     if(entry?.notes)inner+=`<div class="hist-note">"${entry.notes}"</div>`;
     if(cSessions.length){inner+=`<div class="hist-exn">Cardio sessions</div>`;cSessions.forEach(c=>{inner+=`<div class="hist-cardio-item"><div class="hist-cardio-type">${c.type}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--teal)">${c.duration}min</div>${c.intensity?`<div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid)">${c.intensity}</div>`:''}</div>`;});}
     if(entry){
@@ -2143,33 +2174,210 @@ function renderHistory(){
 }
 function renderDayLog(){
   const el=document.getElementById('daylog-list');if(!el)return;
-  const allKeys=new Set([...Object.keys(daySummaryLog),...Object.keys(stepsLog).filter(k=>stepsLog[k]>0),...Object.keys(nutrData).filter(k=>(nutrData[k]?.checked||[]).length>0),...history.map(e=>e.dateISO).filter(Boolean),...Object.keys(cardioLog).filter(k=>(cardioLog[k]||[]).length>0),...Object.keys(bwLog),TODAY_KEY]);
+  const allKeys=new Set([
+    ...Object.keys(daySummaryLog),
+    ...Object.keys(stepsLog).filter(k=>stepsLog[k]>0),
+    ...Object.keys(nutrData).filter(k=>(nutrData[k]?.checked||[]).length>0||(nutrData[k]?.custom||[]).length>0),
+    ...Object.keys(suppData).filter(k=>(suppData[k]?.checked||[]).length>0),
+    ...Object.keys(bwLog).filter(k=>bwLog[k]>0),
+    ...Object.keys(energyLog).filter(k=>energyLog[k]>0),
+    ...Object.keys(bibleLog).filter(k=>bibleLog[k]?.read),
+    ...history.map(e=>e.dateISO).filter(Boolean),
+    TODAY_KEY
+  ]);
   const sorted=[...allKeys].filter(Boolean).sort((a,b)=>b.localeCompare(a));
   if(!sorted.length){el.innerHTML='<div class="empty">No daily data yet.</div>';return;}
   el.innerHTML='';
   sorted.forEach(key=>{
-    const snap=daySummaryLog[key];
-    const steps=snap?.steps||(stepsLog[key]||0);
+    const isToday=key===TODAY_KEY;
+    const displayDate=fmtDisplay(key);
+    const steps=stepsLog[key]||0;
+    const bw=bwLog[key]||null;
+    const energy=energyLog[key]||null;
     const nd=nutrData[key]||{checked:[],custom:[]};
-    let nt={cal:0,protein:0};
-    MEAL_PLAN.forEach(m=>m.items.forEach(i=>{if((nd.checked||[]).includes(i.id)){nt.cal+=i.cal;nt.protein+=i.protein;}}));
-    (nd.custom||[]).forEach(f=>{nt.cal+=f.cal||0;nt.protein+=f.protein||0;});
-    const sd=suppData[key]||{checked:[]};const cfg=suppConfig||DEFAULT_SUPPS;const allIds=cfg.flatMap(g=>g.items.map(i=>i.id));const suppDone=(sd.checked||[]).filter(id=>allIds.includes(id)).length;const suppPct=allIds.length>0?Math.round(suppDone/allIds.length*100):0;
-    const energy=snap?.energy||(energyLog[key]||null);const bw=snap?.bodyWeight||(bwLog[key]||null);
-    const workout=history.find(e=>e.dateISO===key);const cardioMin=(cardioLog[key]||[]).reduce((a,c)=>a+c.duration,0);
-    const stepGoal=steps>=STEP_GOAL;const isToday=key===TODAY_KEY;
-    const displayDate=snap?.displayDate||fmtDisplay(key);
+    const sd=suppData[key]||{checked:[]};
+    const bl=bibleLog[key]||null;
+    const workout=history.find(e=>e.dateISO===key);
+    const histIdx=workout?history.indexOf(workout):-1;
+    const cfg=suppConfig||DEFAULT_SUPPS;
+    const allSuppIds=cfg.flatMap(g=>g.items.map(i=>i.id));
+    const suppDone=(sd.checked||[]).filter(id=>allSuppIds.includes(id)).length;
+    const panelId='dl-'+key.replace(/-/g,'');
+
+    // Nutrition totals
+    let nt={cal:0,protein:0,carbs:0,fat:0};
+    MEAL_PLAN.forEach(m=>m.items.forEach(i=>{if((nd.checked||[]).includes(i.id)){nt.cal+=i.cal||0;nt.protein+=i.protein||0;nt.carbs+=i.carbs||0;nt.fat+=i.fat||0;}}));
+    (nd.custom||[]).forEach(f=>{nt.cal+=f.cal||0;nt.protein+=f.protein||0;nt.carbs+=f.carbs||0;nt.fat+=f.fat||0;});
+
+    const stepGoal=steps>=STEP_GOAL;
+    const tv=workout?Math.round((workout.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0)):0;
+
+    // Status tags
     let tags='';
     if(workout)tags+=`<span class="dl-tag wt">${DAY_LABEL[workout.day]||workout.day}</span>`;
-    if(cardioMin>0)tags+=`<span class="dl-tag ct">&#x1F3C3; ${cardioMin}min</span>`;
-    if(!workout&&cardioMin===0)tags+=`<span class="dl-tag rest">Rest</span>`;
-    if(stepGoal)tags+=`<span class="dl-tag goal">&#x1F463; Goal</span>`;
+    if(stepGoal)tags+=`<span class="dl-tag goal">✓ Steps</span>`;
+    if(bl?.read)tags+=`<span class="dl-tag" style="background:rgba(167,139,250,.15);color:rgba(167,139,250,1);border:1px solid rgba(167,139,250,.3)">✝ Bible</span>`;
+    if(suppDone===allSuppIds.length&&allSuppIds.length>0)tags+=`<span class="dl-tag" style="background:rgba(52,211,153,.1);color:var(--green2);border:1px solid rgba(52,211,153,.3)">💊 Supps</span>`;
+
     const div=document.createElement('div');div.className='dl-card';
-    let inner=`<div class="dl-hdr"><div><div class="dl-date">${isToday?'TODAY &mdash; ':''}${displayDate}</div></div><div class="dl-tags">${tags}</div></div>`;
-    inner+=`<div class="dl-stats"><div class="dl-stat"><div class="dl-stat-lbl">Steps</div><div class="dl-stat-val ${stepGoal?'grn':'bl'}">${steps.toLocaleString()}</div></div><div class="dl-stat"><div class="dl-stat-lbl">Calories</div><div class="dl-stat-val acc">${Math.round(nt.cal)||0}</div></div><div class="dl-stat"><div class="dl-stat-lbl">Protein</div><div class="dl-stat-val grn">${Math.round(nt.protein)||0}g</div></div><div class="dl-stat"><div class="dl-stat-lbl">Supps</div><div class="dl-stat-val gld">${suppPct}%</div></div>${energy?`<div class="dl-stat"><div class="dl-stat-lbl">Energy</div><div class="dl-stat-val">${energy}/10</div></div>`:''} ${bw?`<div class="dl-stat"><div class="dl-stat-lbl">Weight</div><div class="dl-stat-val">${bw}lbs</div></div>`:''} ${workout?`<div class="dl-stat"><div class="dl-stat-lbl">Volume</div><div class="dl-stat-val">${Math.round((workout.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0)).toLocaleString()}</div></div>`:''}</div>`;
-    inner+=`<div class="dl-bar-row"><div class="dl-bar-lbl">Steps</div><div class="dl-bar-track"><div class="dl-bar-fill" style="width:${Math.min(100,Math.round(steps/STEP_GOAL*100))}%;background:linear-gradient(90deg,var(--blue2),var(--green2))"></div></div><div class="dl-bar-val">${Math.min(100,Math.round(steps/STEP_GOAL*100))}%</div></div>`;
+    let inner=`<div class="dl-hdr" onclick="toggleDlPanel('${panelId}')">
+      <div><div class="dl-date">${isToday?'TODAY — ':''}${displayDate}</div></div>
+      <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap">${tags}<div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid)">▶</div></div>
+    </div>`;
+
+    // Quick stats strip
+    inner+=`<div class="dl-stats">
+      <div class="dl-stat"><div class="dl-stat-lbl">Steps</div><div class="dl-stat-val ${stepGoal?'grn':'bl'}">${steps>0?steps.toLocaleString():'—'}</div></div>
+      <div class="dl-stat"><div class="dl-stat-lbl">Cal</div><div class="dl-stat-val acc">${nt.cal>0?Math.round(nt.cal):'—'}</div></div>
+      <div class="dl-stat"><div class="dl-stat-lbl">Protein</div><div class="dl-stat-val grn">${nt.protein>0?Math.round(nt.protein)+'g':'—'}</div></div>
+      <div class="dl-stat"><div class="dl-stat-lbl">Supps</div><div class="dl-stat-val gld">${allSuppIds.length>0?suppDone+'/'+allSuppIds.length:'—'}</div></div>
+      ${bw?`<div class="dl-stat"><div class="dl-stat-lbl">Weight</div><div class="dl-stat-val">${bw}lbs</div></div>`:''}
+      ${energy?`<div class="dl-stat"><div class="dl-stat-lbl">Energy</div><div class="dl-stat-val">${energy}/10</div></div>`:''}
+      ${tv>0?`<div class="dl-stat"><div class="dl-stat-lbl">Volume</div><div class="dl-stat-val">${(tv/1000).toFixed(1)}K</div></div>`:''}
+    </div>`;
+
+    // Expandable detail panel
+    inner+=`<div id="${panelId}" style="display:none">`;
+
+    // Steps edit
+    inner+=`<div style="padding:10px 13px;border-top:1px solid var(--border)">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;margin-bottom:6px">👟 Steps</div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input id="dl-steps-${key}" type="number" value="${steps||''}" placeholder="Step count" style="background:var(--dark3);border:1px solid var(--steel2);color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:20px;padding:6px 10px;border-radius:2px;outline:none;width:160px">
+        <button onclick="saveDlSteps('${key}')" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;background:var(--blue2);border:none;color:var(--white);padding:8px 14px;cursor:pointer;border-radius:2px;text-transform:uppercase">Save</button>
+      </div>
+    </div>`;
+
+    // Body weight + energy edit
+    inner+=`<div style="padding:10px 13px;border-top:1px solid var(--border)">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;margin-bottom:6px">⚖️ Body</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center">
+        <input id="dl-bw-${key}" type="number" step="0.1" value="${bw||''}" placeholder="Weight (lbs)" style="background:var(--dark3);border:1px solid var(--steel2);color:var(--white);font-family:'Bebas Neue',sans-serif;font-size:20px;padding:6px 10px;border-radius:2px;outline:none;width:160px">
+        <select id="dl-energy-${key}" style="background:var(--dark3);border:1px solid var(--steel2);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:13px;padding:6px 10px;border-radius:2px;outline:none">
+          <option value="">Energy...</option>
+          ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}"${energy==n?' selected':''}>${n}/10</option>`).join('')}
+        </select>
+        <button onclick="saveDlBody('${key}')" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;background:var(--green2);border:none;color:var(--black);padding:8px 14px;cursor:pointer;border-radius:2px;text-transform:uppercase">Save</button>
+      </div>
+    </div>`;
+
+    // Nutrition
+    const mealItems = MEAL_PLAN.flatMap(m=>m.items);
+    const checkedIds = nd.checked||[];
+    inner+=`<div style="padding:10px 13px;border-top:1px solid var(--border)">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;margin-bottom:6px">🥗 Nutrition</div>
+      ${mealItems.map(item=>`
+        <label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer">
+          <input type="checkbox" id="dl-nutr-${key}-${item.id}" ${checkedIds.includes(item.id)?'checked':''} onchange="saveDlNutr('${key}')">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--light)">${item.name}</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid)">${item.cal}cal / ${item.protein}g P</span>
+        </label>`).join('')}
+      ${(nd.custom||[]).length>0?`<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);margin-top:6px;letter-spacing:1px">CUSTOM FOODS:</div>`:''}
+      ${(nd.custom||[]).map((f,fi)=>`
+        <div style="display:flex;align-items:center;gap:8px;padding:4px 0">
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--gold);flex:1">${f.name}</span>
+          <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid)">${f.cal}cal / ${f.protein}g P</span>
+          <button onclick="deleteDlCustomFood('${key}',${fi})" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;background:none;border:1px solid rgba(239,68,68,.3);color:#F87171;padding:3px 8px;cursor:pointer;border-radius:2px">✕</button>
+        </div>`).join('')}
+    </div>`;
+
+    // Supplements
+    inner+=`<div style="padding:10px 13px;border-top:1px solid var(--border)">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;margin-bottom:6px">💊 Supplements</div>
+      ${cfg.map(group=>`
+        <div style="margin-bottom:8px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;margin-bottom:4px">${group.label}</div>
+          ${group.items.map(item=>`
+            <label style="display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer">
+              <input type="checkbox" id="dl-supp-${key}-${item.id}" ${(sd.checked||[]).includes(item.id)?'checked':''} onchange="saveDlSupp('${key}')">
+              <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--light)">${item.name}</span>
+            </label>`).join('')}
+        </div>`).join('')}
+    </div>`;
+
+    // Bible reading
+    inner+=`<div style="padding:10px 13px;border-top:1px solid var(--border)">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;margin-bottom:6px">✝️ Bible</div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-bottom:6px">
+        <input type="checkbox" id="dl-bible-${key}" ${bl?.read?'checked':''} onchange="saveDlBible('${key}')">
+        <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--light)">Read the Bible</span>
+      </label>
+      ${bl?.read?`<div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:rgba(167,139,250,.8)">${bl.book||''}${bl.chapter?' Ch.'+bl.chapter:''}</div>`:''}
+    </div>`;
+
+    // Workout section
+    if(workout){
+      inner+=`<div style="padding:10px 13px;border-top:1px solid var(--border)">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--mid);text-transform:uppercase">🏋️ ${DAY_LABEL[workout.day]||workout.day}</div>
+          <div style="display:flex;gap:6px">
+            <button class="hist-edit-btn" onclick="openEditModal(${histIdx})">✏️ Edit</button>
+            <button class="hist-del-btn" onclick="deleteSession(${histIdx});renderDayLog()">🗑 Delete</button>
+          </div>
+        </div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid)">Volume: ${tv.toLocaleString()} lbs · ${(workout.exercises||[]).filter(e=>e.done).length} sets</div>
+      </div>`;
+    }
+
+    inner+=`</div>`;
     div.innerHTML=inner;el.appendChild(div);
   });
+}
+
+function toggleDlPanel(id){
+  const el=document.getElementById(id);if(!el)return;
+  el.style.display=el.style.display==='none'?'block':'none';
+}
+
+function saveDlSteps(key){
+  const inp=document.getElementById('dl-steps-'+key);if(!inp)return;
+  const val=parseInt(inp.value)||0;
+  stepsLog[key]=val;
+  try{localStorage.setItem('wl_steps'||'il_steps', JSON.stringify(stepsLog));localStorage.setItem('il_steps',JSON.stringify(stepsLog));}catch(e){}
+  _origSaveStorage();scheduleAutoSync();
+  renderDayLog();
+}
+
+function saveDlBody(key){
+  const bwInp=document.getElementById('dl-bw-'+key);
+  const enInp=document.getElementById('dl-energy-'+key);
+  if(bwInp?.value)bwLog[key]=parseFloat(bwInp.value)||0;
+  if(enInp?.value)energyLog[key]=parseInt(enInp.value)||0;
+  _origSaveStorage();scheduleAutoSync();
+  renderDayLog();
+}
+
+function saveDlNutr(key){
+  const items=MEAL_PLAN.flatMap(m=>m.items);
+  const checked=items.filter(i=>{const el=document.getElementById('dl-nutr-'+key+'-'+i.id);return el&&el.checked;}).map(i=>i.id);
+  if(!nutrData[key])nutrData[key]={checked:[],custom:[]};
+  nutrData[key].checked=checked;
+  _origSaveStorage();scheduleAutoSync();
+}
+
+function deleteDlCustomFood(key,idx){
+  if(!nutrData[key]?.custom)return;
+  nutrData[key].custom.splice(idx,1);
+  _origSaveStorage();scheduleAutoSync();
+  renderDayLog();
+}
+
+function saveDlSupp(key){
+  const cfg2=suppConfig||DEFAULT_SUPPS;
+  const allItems=cfg2.flatMap(g=>g.items);
+  const checked=allItems.filter(i=>{const el=document.getElementById('dl-supp-'+key+'-'+i.id);return el&&el.checked;}).map(i=>i.id);
+  if(!suppData[key])suppData[key]={checked:[]};
+  suppData[key].checked=checked;
+  _origSaveStorage();scheduleAutoSync();
+}
+
+function saveDlBible(key){
+  const cb=document.getElementById('dl-bible-'+key);
+  if(!bibleLog[key])bibleLog[key]={read:false};
+  bibleLog[key].read=cb?.checked||false;
+  try{localStorage.setItem('il_bible',JSON.stringify(bibleLog));}catch(e){}
+  scheduleAutoSync();
+  renderDayLog();
 }
 
 // ── ACHIEVEMENTS ──────────────────────────────────────────────────────────
@@ -2771,6 +2979,92 @@ function renderNutritionAdvisor(){
   // Legacy — no longer needed
 }
 
+// ── HISTORY EDIT / DELETE ─────────────────────────────────────────────────
+function deleteSession(idx){
+  if(!confirm('Delete this workout session? This cannot be undone.'))return;
+  history.splice(idx,1);
+  _origSaveStorage();scheduleAutoSync();
+  renderHistory();updateStats();renderAchievements();
+}
+
+function openEditModal(idx){
+  const sess = history[idx];
+  if(!sess)return;
+  const DAY_OPTS = ['chest','back','shoulders','legs','arms','cardio-day'].map(d=>`<option value="${d}"${sess.day===d?' selected':''}>${d}</option>`).join('');
+  // Build set rows
+  const exGroups = {};
+  (sess.exercises||[]).forEach((e,i)=>{
+    if(!exGroups[e.name])exGroups[e.name]=[];
+    exGroups[e.name].push({...e, origIdx:i});
+  });
+  const setsHtml = Object.entries(exGroups).map(([name,sets])=>`
+    <div style="margin-bottom:1rem">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;color:var(--gold);margin-bottom:6px;text-transform:uppercase">${name}</div>
+      ${sets.map((s,si)=>`
+        <div class="edit-set-row" id="set-row-${idx}-${s.origIdx}">
+          <div class="edit-set-lbl">Set ${s.set||si+1}</div>
+          <input class="edit-set-inp" id="ew-${idx}-${s.origIdx}" type="number" value="${s.weight||0}" placeholder="lbs">
+          <input class="edit-set-inp" id="er-${idx}-${s.origIdx}" type="number" value="${s.reps||0}" placeholder="reps">
+          <input class="edit-set-inp" id="erpe-${idx}-${s.origIdx}" type="text" value="${s.rpe||''}" placeholder="RPE">
+          <button class="edit-del-set" onclick="deleteSet(${idx},${s.origIdx})">✕</button>
+        </div>`).join('')}
+    </div>`).join('');
+
+  const modal = document.createElement('div');
+  modal.className='edit-modal-overlay';
+  modal.id='edit-modal';
+  modal.innerHTML=`<div class="edit-modal">
+    <div class="edit-modal-title">✏️ Edit Session</div>
+    <div class="edit-field"><label>Date (YYYY-MM-DD)</label><input id="edit-date" value="${sess.dateISO||''}"></div>
+    <div class="edit-field"><label>Workout Type</label><select id="edit-day">${DAY_OPTS}</select></div>
+    <div class="edit-field"><label>Notes</label><textarea id="edit-notes">${sess.notes||''}</textarea></div>
+    <div class="sec-lbl" style="margin:1rem 0 .5rem">Sets</div>
+    <div id="edit-sets-container">${setsHtml}</div>
+    <div class="edit-modal-actions">
+      <button class="edit-save-btn" onclick="saveEditedSession(${idx})">✓ Save Changes</button>
+      <button class="edit-delete-btn" onclick="deleteSession(${idx});closeEditModal()">🗑 Delete</button>
+      <button class="edit-cancel-btn" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+function deleteSet(sessIdx, setIdx){
+  const row = document.getElementById(`set-row-${sessIdx}-${setIdx}`);
+  if(row) row.remove();
+}
+
+function saveEditedSession(idx){
+  const sess = history[idx];
+  if(!sess)return;
+  sess.dateISO = document.getElementById('edit-date')?.value || sess.dateISO;
+  sess.day = document.getElementById('edit-day')?.value || sess.day;
+  sess.notes = document.getElementById('edit-notes')?.value || '';
+  sess.date = new Date(sess.dateISO+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  // Update set weights/reps from inputs
+  (sess.exercises||[]).forEach((e,i)=>{
+    const wEl=document.getElementById(`ew-${idx}-${i}`);
+    const rEl=document.getElementById(`er-${idx}-${i}`);
+    const rpeEl=document.getElementById(`erpe-${idx}-${i}`);
+    const row=document.getElementById(`set-row-${idx}-${i}`);
+    if(!row){sess.exercises[i]=null;return;} // deleted
+    if(wEl)e.weight=parseFloat(wEl.value)||0;
+    if(rEl)e.reps=parseFloat(rEl.value)||0;
+    if(rpeEl)e.rpe=rpeEl.value;
+    e.vol=e.weight*e.reps;
+  });
+  sess.exercises=(sess.exercises||[]).filter(e=>e!==null);
+  history.sort((a,b)=>b.dateISO.localeCompare(a.dateISO));
+  _origSaveStorage();scheduleAutoSync();
+  closeEditModal();
+  renderHistory();updateStats();renderAchievements();
+}
+
+function closeEditModal(){
+  const m=document.getElementById('edit-modal');
+  if(m)m.remove();
+}
+
 // ── WEEKLY ────────────────────────────────────────────────────────────────
 function toggleRestDay(key){if(restDays[key])delete restDays[key];else restDays[key]=true;saveStorage();renderWeekly();}
 function renderWeekly(){renderWeekGrid('week-now',0);renderWeekGrid('week-last',-7);}
@@ -3149,26 +3443,35 @@ async function loadFromDrive() {
     if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — sign in again'); syncInProgress = false; return; }
 
     const d = await res.json();
-    if (d.history) history = d.history;
-    if (d.game) game = { ...game, ...d.game };
-    if (d.nutrData) nutrData = d.nutrData;
-    if (d.suppData) suppData = d.suppData;
-    if (d.bwLog) bwLog = d.bwLog;
-    if (d.stepsLog) stepsLog = d.stepsLog;
-    if (d.energyLog) energyLog = d.energyLog;
-    if (d.restDays) restDays = d.restDays;
-    if (d.cardioLog) cardioLog = d.cardioLog;
+    // SAFE MERGE — never overwrite newer local data with older Drive data
+    // History: add Drive sessions not already in local
+    if (d.history) {
+      d.history.forEach(s => {
+        if (!history.find(x => x.dateISO === s.dateISO && x.day === s.day)) history.push(s);
+      });
+      history.sort((a,b) => b.dateISO.localeCompare(a.dateISO));
+    }
+    // Game: take whichever has more workouts
+    if (d.game && (d.game.totalWorkouts||0) >= (game.totalWorkouts||0)) game = { ...game, ...d.game };
+    // Date-keyed logs: Drive fills in missing dates, local wins for dates that exist in both
+    if (d.nutrData) Object.entries(d.nutrData).forEach(([k,v])=>{ if(!nutrData[k]||(nutrData[k].checked||[]).length===0) nutrData[k]=v; });
+    if (d.suppData) Object.entries(d.suppData).forEach(([k,v])=>{ if(!suppData[k]||(suppData[k].checked||[]).length===0) suppData[k]=v; });
+    if (d.bwLog) Object.entries(d.bwLog).forEach(([k,v])=>{ if(!bwLog[k]) bwLog[k]=v; });
+    if (d.stepsLog) Object.entries(d.stepsLog).forEach(([k,v])=>{ if(!stepsLog[k]) stepsLog[k]=v; });
+    if (d.energyLog) Object.entries(d.energyLog).forEach(([k,v])=>{ if(!energyLog[k]) energyLog[k]=v; });
+    if (d.restDays) Object.entries(d.restDays).forEach(([k,v])=>{ if(!restDays[k]) restDays[k]=v; });
+    if (d.cardioLog) Object.entries(d.cardioLog).forEach(([k,v])=>{ if(!cardioLog[k]) cardioLog[k]=v; });
+    if (d.daySummaryLog) Object.entries(d.daySummaryLog).forEach(([k,v])=>{ if(!daySummaryLog[k]) daySummaryLog[k]=v; });
     if (d.macroTargets) MACRO_TARGETS = { ...MACRO_TARGETS, ...d.macroTargets };
-    if (d.suppConfig) suppConfig = d.suppConfig;
-    if (d.daySummaryLog) daySummaryLog = d.daySummaryLog;
-    if (d.foodLibrary) foodLibrary = d.foodLibrary;
-    if (d.exLibrary) exLibrary = d.exLibrary;
-    if (d.bibleLog) bibleLog = d.bibleLog;
-    if (d.bibleChapters) bibleChapters = d.bibleChapters;
+    if (d.suppConfig && !suppConfig) suppConfig = d.suppConfig;
+    if (d.foodLibrary && !foodLibrary.length) foodLibrary = d.foodLibrary;
+    if (d.exLibrary && d.exLibrary.length > exLibrary.length) exLibrary = d.exLibrary;
+    if (d.bibleLog) Object.entries(d.bibleLog).forEach(([k,v])=>{ if(!bibleLog[k]) bibleLog[k]=v; });
+    if (d.bibleChapters) Object.entries(d.bibleChapters).forEach(([k,v])=>{ if(!bibleChapters[k]) bibleChapters[k]=v; });
     saveStorage(); saveSC();
     updateStats(); renderAchievements(); switchDay(currentDay);
     const syncedAt = d._syncedAt ? new Date(d._syncedAt).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }) : '';
-    setSyncStatus('ok', '✓ Loaded from Google Drive', syncedAt);
+    setSyncStatus('ok', '✓ Synced with Google Drive', syncedAt);
   } catch(e) {
     console.error('loadFromDrive:', e);
     setSyncStatus('error', '✗ Could not load — check connection');
@@ -3224,8 +3527,7 @@ try {
     driveAccessToken = savedToken;
     const lastSync = localStorage.getItem('il_last_sync');
     setSyncStatus('ok', '✓ Signed in to Google Drive', lastSync || '');
-    // Auto-load from Drive on startup if signed in
-    setTimeout(() => loadFromDrive(), 1500);
+    // NOTE: Auto-load removed — use 'Load from Drive' button manually to avoid overwriting newer local data
   } else {
     setSyncStatus('idle', 'Tap Sign In with Google to enable sync');
   }
