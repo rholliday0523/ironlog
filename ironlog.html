@@ -642,6 +642,10 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
   <div class="hdr-mid">
     <div class="lifted-wrap"><div><div class="lifted-lbl">Total Lifted</div><div class="lifted-val" id="h-lifted">0 lbs</div><div class="lifted-track"><div class="lifted-bar" id="h-lifted-fill" style="width:0%"></div></div><div class="lifted-goal">to 1,000,000 lbs</div></div></div>
     <div id="sess-timer" class="sess-timer" style="display:none">00:00</div>
+    <a href="https://www.pandora.com" target="_blank" title="Open Pandora" style="display:flex;align-items:center;gap:5px;background:var(--dark3);border:1px solid rgba(0,150,255,.3);border-radius:20px;padding:4px 10px;cursor:pointer;text-decoration:none;margin-left:8px">
+      <span style="font-size:14px">🎵</span>
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:#00B0FF;white-space:nowrap">Pandora</span>
+    </a>
   </div>
   <div class="hdr-right">
     <div id="hdr-sync-pill" onclick="showTab('week')" title="Google Drive Sync — tap to manage" style="display:flex;align-items:center;gap:5px;background:var(--dark3);border:1px solid var(--border2);border-radius:20px;padding:4px 10px;cursor:pointer;margin-bottom:3px;transition:border-color .2s">
@@ -1403,14 +1407,43 @@ function pickCalDay(k){const ov=document.getElementById('cal-overlay');if(ov)ov.
 function dingBell(){
   try{
     const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    [[0,880],[0.18,1046],[0.36,1318]].forEach(([delay,freq])=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.connect(g);g.connect(ctx.destination);o.type='sine';
-      const t=ctx.currentTime+delay;
-      o.frequency.setValueAtTime(freq,t);g.gain.setValueAtTime(0,t);
-      g.gain.linearRampToValueAtTime(0.35,t+0.02);g.gain.exponentialRampToValueAtTime(0.001,t+0.8);
-      o.start(t);o.stop(t+0.85);
-    });
+    // HULK SMASH — deep powerful impact sound
+    // Layer 1: Sub bass thud
+    const sub=ctx.createOscillator(),subG=ctx.createGain();
+    sub.connect(subG);subG.connect(ctx.destination);
+    sub.type='sine';sub.frequency.setValueAtTime(60,ctx.currentTime);
+    sub.frequency.exponentialRampToValueAtTime(30,ctx.currentTime+0.4);
+    subG.gain.setValueAtTime(0,ctx.currentTime);
+    subG.gain.linearRampToValueAtTime(1.2,ctx.currentTime+0.01);
+    subG.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
+    sub.start(ctx.currentTime);sub.stop(ctx.currentTime+0.5);
+    // Layer 2: Mid crunch
+    const mid=ctx.createOscillator(),midG=ctx.createGain();
+    mid.connect(midG);midG.connect(ctx.destination);
+    mid.type='sawtooth';mid.frequency.setValueAtTime(120,ctx.currentTime);
+    mid.frequency.exponentialRampToValueAtTime(40,ctx.currentTime+0.3);
+    midG.gain.setValueAtTime(0,ctx.currentTime);
+    midG.gain.linearRampToValueAtTime(0.8,ctx.currentTime+0.005);
+    midG.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.35);
+    mid.start(ctx.currentTime);mid.stop(ctx.currentTime+0.4);
+    // Layer 3: High crack/impact
+    const buf=ctx.createBuffer(1,ctx.sampleRate*0.15,ctx.sampleRate);
+    const data=buf.getChannelData(0);
+    for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,0.5);
+    const noise=ctx.createBufferSource(),noiseG=ctx.createGain();
+    noise.buffer=buf;noise.connect(noiseG);noiseG.connect(ctx.destination);
+    noiseG.gain.setValueAtTime(0.6,ctx.currentTime);
+    noiseG.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);
+    noise.start(ctx.currentTime);
+    // Layer 4: Roar — short bassy growl
+    const roar=ctx.createOscillator(),roarG=ctx.createGain();
+    roar.connect(roarG);roarG.connect(ctx.destination);
+    roar.type='square';roar.frequency.setValueAtTime(80,ctx.currentTime+0.05);
+    roar.frequency.exponentialRampToValueAtTime(55,ctx.currentTime+0.4);
+    roarG.gain.setValueAtTime(0,ctx.currentTime+0.05);
+    roarG.gain.linearRampToValueAtTime(0.5,ctx.currentTime+0.08);
+    roarG.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.45);
+    roar.start(ctx.currentTime+0.05);roar.stop(ctx.currentTime+0.5);
   }catch(e){}
 }
 function startTimer(sec){
@@ -1421,7 +1454,7 @@ function startTimer(sec){
   timerInt=setInterval(()=>{
     rem--;cnt.textContent=rem;fill.style.width=Math.round((rem/sec)*100)+'%';
     if(rem<=10){cnt.className='timer-cnt urg';lbl.textContent='Almost time...';}
-    if(rem<=0){stopTimer();dingBell();cnt.textContent='GO!';lbl.textContent='Get after it!';bar.style.display='flex';setTimeout(()=>bar.style.display='none',2500);}
+    if(rem<=0){stopTimer();dingBell();cnt.textContent='💪';lbl.textContent='HULK SMASH!';bar.style.display='flex';setTimeout(()=>bar.style.display='none',2500);}
   },1000);
 }
 function stopTimer(){clearInterval(timerInt);timerInt=null;const b=document.getElementById('timer-bar');if(b)b.style.display='none';}
@@ -2155,7 +2188,8 @@ function renderHistory(){
     inner+=`<div class="hist-date">${displayDate}</div><div class="hist-arrow" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid)">${isFirst?'\u25BC':'\u25B6'}</div></div></div>`;
     inner+=`<div id="${panelId}" style="display:${isFirst?'':'none'}">`;
     // Edit/delete buttons
-    if(histIdx>=0)inner+=`<div style="padding:8px 13px;border-bottom:1px solid var(--border);display:flex;gap:6px"><button class="hist-edit-btn" onclick="event.stopPropagation();openEditModal(${histIdx})">✏️ Edit</button><button class="hist-del-btn" onclick="event.stopPropagation();deleteSession(${histIdx})">🗑 Delete</button></div>`;
+    if(histIdx>=0)inner+=`<div style="padding:8px 13px;border-bottom:1px solid var(--border);display:flex;gap:6px"><button class="hist-edit-btn" onclick="event.stopPropagation();openEditModal(${histIdx})">✏️ Edit Session</button><button class="hist-del-btn" onclick="event.stopPropagation();deleteSession(${histIdx})">🗑 Delete</button></div>`;
+    else inner+=`<div style="padding:8px 13px;border-bottom:1px solid var(--border)"><button onclick="openAddWorkoutModal('${dateISO}')" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;background:none;border:1px dashed var(--border2);color:var(--mid);padding:8px 14px;cursor:pointer;border-radius:2px;text-transform:uppercase;width:100%">+ Add Workout for This Day</button></div>`;
     if(entry?.notes)inner+=`<div class="hist-note">"${entry.notes}"</div>`;
     if(cSessions.length){inner+=`<div class="hist-exn">Cardio sessions</div>`;cSessions.forEach(c=>{inner+=`<div class="hist-cardio-item"><div class="hist-cardio-type">${c.type}</div><div style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--teal)">${c.duration}min</div>${c.intensity?`<div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid)">${c.intensity}</div>`:''}</div>`;});}
     if(entry){
@@ -2316,6 +2350,10 @@ function renderDayLog(){
           </div>
         </div>
         <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid)">Volume: ${tv.toLocaleString()} lbs · ${(workout.exercises||[]).filter(e=>e.done).length} sets</div>
+      </div>`;
+    } else {
+      inner+=`<div style="padding:10px 13px;border-top:1px solid var(--border)">
+        <button onclick="openAddWorkoutModal('${key}')" style="width:100%;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;background:none;border:1px dashed var(--border2);color:var(--mid);padding:10px;cursor:pointer;border-radius:2px;text-transform:uppercase">+ Add Workout for This Day</button>
       </div>`;
     }
 
@@ -2985,6 +3023,71 @@ function deleteSession(idx){
   history.splice(idx,1);
   _origSaveStorage();scheduleAutoSync();
   renderHistory();updateStats();renderAchievements();
+}
+
+function openAddWorkoutModal(dateISO){
+  const DAY_OPTS = Object.keys(DAYS).map(d=>`<option value="${d}">${DAY_LABEL[d]||d}</option>`).join('');
+  const modal = document.createElement('div');
+  modal.className='edit-modal-overlay';
+  modal.id='edit-modal';
+  modal.innerHTML=`<div class="edit-modal">
+    <div class="edit-modal-title">➕ Add Workout</div>
+    <div class="edit-field"><label>Date</label><input id="add-date" value="${dateISO}" readonly style="opacity:.6"></div>
+    <div class="edit-field"><label>Workout Type</label><select id="add-day">${DAY_OPTS}</select></div>
+    <div class="edit-field"><label>Notes (optional)</label><textarea id="add-notes" placeholder="How did it go?"></textarea></div>
+    <div class="sec-lbl" style="margin:.75rem 0 .5rem">Add Sets</div>
+    <div id="add-sets-container"></div>
+    <button onclick="addSetRow()" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;background:none;border:1px solid var(--border2);color:var(--mid);padding:7px 14px;cursor:pointer;border-radius:2px;text-transform:uppercase;margin-bottom:1rem;width:100%">+ Add Exercise Set</button>
+    <div class="edit-modal-actions">
+      <button class="edit-save-btn" onclick="saveNewSession('${dateISO}')">✓ Save Workout</button>
+      <button class="edit-cancel-btn" onclick="closeEditModal()">Cancel</button>
+    </div>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+let addSetCounter = 0;
+function addSetRow(){
+  const container = document.getElementById('add-sets-container');if(!container)return;
+  const id = addSetCounter++;
+  const exOpts = ['', ...exLibrary].map(e=>`<option value="${e}">${e||'Select exercise...'}</option>`).join('');
+  const row = document.createElement('div');
+  row.className='edit-set-row';
+  row.style.cssText='grid-template-columns:2fr 80px 80px 60px 36px;gap:6px;margin-bottom:6px';
+  row.id='add-set-'+id;
+  row.innerHTML=`
+    <input list="ex-list-${id}" class="edit-set-inp" id="aex-${id}" placeholder="Exercise name" style="text-align:left;font-size:12px">
+    <datalist id="ex-list-${id}">${exLibrary.map(e=>`<option value="${e}">`).join('')}</datalist>
+    <input class="edit-set-inp" id="aw-${id}" type="number" placeholder="lbs">
+    <input class="edit-set-inp" id="ar-${id}" type="number" placeholder="reps">
+    <input class="edit-set-inp" id="arpe-${id}" type="text" placeholder="RPE">
+    <button class="edit-del-set" onclick="document.getElementById('add-set-${id}').remove()">✕</button>`;
+  container.appendChild(row);
+}
+
+function saveNewSession(dateISO){
+  const day = document.getElementById('add-day')?.value||'chest';
+  const notes = document.getElementById('add-notes')?.value||'';
+  const exercises = [];
+  let setNum = 1;
+  document.querySelectorAll('[id^="add-set-"]').forEach(row=>{
+    const id = row.id.replace('add-set-','');
+    const name = document.getElementById('aex-'+id)?.value?.trim();
+    const weight = parseFloat(document.getElementById('aw-'+id)?.value)||0;
+    const reps = parseFloat(document.getElementById('ar-'+id)?.value)||0;
+    const rpe = document.getElementById('arpe-'+id)?.value||'';
+    if(name && (weight||reps)){
+      exercises.push({id:day+'-custom',name,set:setNum++,weight,reps,rpe,done:true,vol:weight*reps});
+      if(!exLibrary.includes(name))exLibrary.push(name);
+    }
+  });
+  const displayDate = new Date(dateISO+'T12:00:00').toLocaleDateString('en-US',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const newSess = {date:displayDate, dateISO, day, exercises, notes, duration:0};
+  history.push(newSess);
+  history.sort((a,b)=>(b.dateISO||'').localeCompare(a.dateISO||''));
+  _origSaveStorage();scheduleAutoSync();
+  closeEditModal();
+  renderHistory();renderDayLog();updateStats();renderAchievements();
 }
 
 function openEditModal(idx){
