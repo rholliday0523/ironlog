@@ -4007,8 +4007,7 @@ function driveSignIn() {
     client_id: GAPI_CLIENT_ID,
     redirect_uri: REDIRECT_URI,
     response_type: 'token',
-    scope: GAPI_SCOPE,
-    prompt: 'select_account'
+    scope: GAPI_SCOPE
   });
   const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
   // Save current state so we can restore after redirect
