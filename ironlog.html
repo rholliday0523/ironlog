@@ -2139,6 +2139,7 @@ function finalizeSave(xpE,prevLvl,volStr,durStr){
     });
   }catch(e){}
   updateStats();renderAchievements();
+  try{checkNewBadgesAfterSave();}catch(e){}
 }
 
 
@@ -2889,13 +2890,8 @@ function renderBadgeSidebars(){
   const mob=document.getElementById('badge-mobile');
   if(!left||!right||!mob)return;
 
-  // Only show new-badge notifications after startup is complete
-  if(_appReady){
-    const newlyUnlocked=unlocked.filter(a=>!_prevUnlocked.has(a.id));
-    newlyUnlocked.forEach(a => showBadgeUnlockNotif(a));
-  }
+  // Update seen set — notifications only fire from checkNewBadgesAfterSave()
   unlocked.forEach(a=>_prevUnlocked.add(a.id));
-  try{localStorage.setItem('il_seen_badges', JSON.stringify([..._prevUnlocked]));}catch(e){}
 
   // Split left/right by category
   const leftCats=['lift','streak','game'];
@@ -2930,6 +2926,19 @@ function renderBadgeSidebars(){
   }
 }
 
+
+// Only called after saving a workout — the ONLY time badge notifications should appear
+function checkNewBadgesAfterSave(){
+  try{
+    const unlocked = getUnlocked();
+    const newlyUnlocked = unlocked.filter(a => !_prevUnlocked.has(a.id));
+    newlyUnlocked.forEach(a => {
+      _prevUnlocked.add(a.id);
+      showBadgeUnlockNotif(a);
+    });
+    unlocked.forEach(a => _prevUnlocked.add(a.id));
+  }catch(e){}
+}
 function showBadgeUnlockNotif(a){
   const notif=document.createElement('div');
   notif.style.cssText='position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:var(--dark2);border:1px solid var(--gold);border-radius:4px;padding:12px 20px;display:flex;align-items:center;gap:12px;z-index:999;animation:badgePop .4s ease;box-shadow:0 4px 20px rgba(0,0,0,.5)';
@@ -4084,6 +4093,7 @@ ${payload}
     const isoStr = new Date().toISOString();
     localStorage.setItem('il_last_sync', timeStr);
     localStorage.setItem('il_last_sync_iso', isoStr);
+    localStorage.setItem('il_device_last_save', isoStr); // stamp when THIS device last wrote Drive
     setSyncStatus('ok', '✓ Saved to Google Drive', timeStr);
   } catch(e) {
     console.error('syncNow:', e);
@@ -4108,26 +4118,37 @@ async function loadFromDrive() {
     if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — sign in again'); syncInProgress = false; return; }
 
     const d = await res.json();
-    // SAFE ADDITIVE MERGE — local data is NEVER overwritten by Drive.
-    // Drive only ADDS data for dates/sessions not already on this device.
-    // This prevents any deploy or sync from wiping freshly logged data.
+    // TIMESTAMP-BASED MERGE
+    // Drive._syncedAt = when Drive file was last written (by any device)
+    // il_device_last_save = when THIS device last wrote to Drive
+    // If Drive is newer than our last save → another device updated it → Drive wins
+    // If Drive is older → we are the newest → local wins
+    const driveTime = d._syncedAt ? new Date(d._syncedAt).getTime() : 0;
+    const ourLastSave = localStorage.getItem('il_device_last_save') ? new Date(localStorage.getItem('il_device_last_save')).getTime() : 0;
+    const driveHasNewerData = driveTime > ourLastSave;
 
-    // History: always union — Drive can only ADD sessions, never remove or replace
+    // History: always union — never lose sessions from either device
     if (d.history) {
       d.history.forEach(s => {
         if (!history.find(x => x.dateISO === s.dateISO && x.day === s.day)) history.push(s);
       });
       history.sort((a,b) => b.dateISO.localeCompare(a.dateISO));
     }
-    // Game: take whichever has MORE progress (higher workouts/XP)
+    // Game: take whichever has MORE total workouts
     if (d.game && (d.game.totalWorkouts||0) > (game.totalWorkouts||0)) game = { ...game, ...d.game };
 
-    // Date-keyed logs: LOCAL ALWAYS WINS if the date exists here.
-    // Drive only fills in dates this device has never seen.
+    // Date-keyed logs:
+    // If Drive has newer data (another device synced after us) → Drive wins for all dates
+    // If we are newer → only fill gaps (add dates we don't have locally)
     const mergeLog = (local, remote) => {
       if (!remote) return;
       Object.entries(remote).forEach(([k,v]) => {
-        if (local[k] === undefined || local[k] === null) local[k] = v; // only fill gaps
+        if (local[k] === undefined || local[k] === null) {
+          local[k] = v; // always fill gaps
+        } else if (driveHasNewerData) {
+          local[k] = v; // Drive is from another device that saved after us
+        }
+        // else: local is newer (we saved after Drive was written) → keep local
       });
     };
     mergeLog(nutrData, d.nutrData);
@@ -4139,12 +4160,12 @@ async function loadFromDrive() {
     mergeLog(daySummaryLog, d.daySummaryLog);
     mergeLog(bibleLog, d.bibleLog);
     mergeLog(bibleChapters, d.bibleChapters);
-    // Steps: always take higher (running daily total — can't un-walk steps)
+    // Steps: always take higher (can't un-walk steps)
     if (d.stepsLog) Object.entries(d.stepsLog).forEach(([k,v])=>{ if(!stepsLog[k] || v > stepsLog[k]) stepsLog[k]=v; });
-    // Settings: only apply from Drive if nothing set locally
-    if (d.macroTargets && !localStorage.getItem('il_macros')) MACRO_TARGETS = { ...MACRO_TARGETS, ...d.macroTargets };
-    if (d.suppConfig && !suppConfig) suppConfig = d.suppConfig;
-    if (d.foodLibrary && !foodLibrary.length) foodLibrary = d.foodLibrary;
+    // Settings: Drive wins if it has newer data, else keep local
+    if (d.macroTargets && driveHasNewerData) MACRO_TARGETS = { ...MACRO_TARGETS, ...d.macroTargets };
+    if (d.suppConfig && (driveHasNewerData || !suppConfig)) suppConfig = d.suppConfig;
+    if (d.foodLibrary && (driveHasNewerData || !foodLibrary.length)) foodLibrary = d.foodLibrary;
     if (d.exLibrary && d.exLibrary.length > exLibrary.length) exLibrary = d.exLibrary;
     saveStorage(); saveSC();
     updateStats(); renderAchievements(); switchDay(currentDay);
