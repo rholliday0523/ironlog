@@ -4059,7 +4059,9 @@ ${payload}
     }
 
     const timeStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const isoStr = new Date().toISOString();
     localStorage.setItem('il_last_sync', timeStr);
+    localStorage.setItem('il_last_sync_iso', isoStr);
     setSyncStatus('ok', '✓ Saved to Google Drive', timeStr);
   } catch(e) {
     console.error('syncNow:', e);
@@ -4084,31 +4086,44 @@ async function loadFromDrive() {
     if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — sign in again'); syncInProgress = false; return; }
 
     const d = await res.json();
-    // SAFE MERGE — never overwrite newer local data with older Drive data
-    // History: add Drive sessions not already in local
+    // MOST-RECENT WINS MERGE
+    // Compare Drive _syncedAt vs last time this device saved to Drive
+    const driveTime = d._syncedAt ? new Date(d._syncedAt).getTime() : 0;
+    const localSyncTime = localStorage.getItem('il_last_sync_iso') ? new Date(localStorage.getItem('il_last_sync_iso')).getTime() : 0;
+    const driveIsNewer = driveTime > localSyncTime;
+    // History: always union — add any Drive sessions not already local
     if (d.history) {
       d.history.forEach(s => {
         if (!history.find(x => x.dateISO === s.dateISO && x.day === s.day)) history.push(s);
       });
       history.sort((a,b) => b.dateISO.localeCompare(a.dateISO));
     }
-    // Game: take whichever has more workouts
+    // Game: take whichever has more total workouts
     if (d.game && (d.game.totalWorkouts||0) >= (game.totalWorkouts||0)) game = { ...game, ...d.game };
-    // Date-keyed logs: Drive fills in missing dates, local wins for dates that exist in both
-    if (d.nutrData) Object.entries(d.nutrData).forEach(([k,v])=>{ if(!nutrData[k]||(nutrData[k].checked||[]).length===0) nutrData[k]=v; });
-    if (d.suppData) Object.entries(d.suppData).forEach(([k,v])=>{ if(!suppData[k]||(suppData[k].checked||[]).length===0) suppData[k]=v; });
-    if (d.bwLog) Object.entries(d.bwLog).forEach(([k,v])=>{ if(!bwLog[k]) bwLog[k]=v; });
-    if (d.stepsLog) Object.entries(d.stepsLog).forEach(([k,v])=>{ if(!stepsLog[k]) stepsLog[k]=v; });
-    if (d.energyLog) Object.entries(d.energyLog).forEach(([k,v])=>{ if(!energyLog[k]) energyLog[k]=v; });
-    if (d.restDays) Object.entries(d.restDays).forEach(([k,v])=>{ if(!restDays[k]) restDays[k]=v; });
-    if (d.cardioLog) Object.entries(d.cardioLog).forEach(([k,v])=>{ if(!cardioLog[k]) cardioLog[k]=v; });
-    if (d.daySummaryLog) Object.entries(d.daySummaryLog).forEach(([k,v])=>{ if(!daySummaryLog[k]) daySummaryLog[k]=v; });
-    if (d.macroTargets) MACRO_TARGETS = { ...MACRO_TARGETS, ...d.macroTargets };
-    if (d.suppConfig && !suppConfig) suppConfig = d.suppConfig;
-    if (d.foodLibrary && !foodLibrary.length) foodLibrary = d.foodLibrary;
+    // Date-keyed logs: Drive wins for any date if Drive is newer, else only fill missing dates
+    const mergeLog = (local, remote) => {
+      if (!remote) return;
+      Object.entries(remote).forEach(([k,v]) => {
+        if (!local[k]) local[k] = v;
+        else if (driveIsNewer) local[k] = v;
+      });
+    };
+    mergeLog(nutrData, d.nutrData);
+    mergeLog(suppData, d.suppData);
+    mergeLog(bwLog, d.bwLog);
+    mergeLog(energyLog, d.energyLog);
+    mergeLog(restDays, d.restDays);
+    mergeLog(cardioLog, d.cardioLog);
+    mergeLog(daySummaryLog, d.daySummaryLog);
+    mergeLog(bibleLog, d.bibleLog);
+    mergeLog(bibleChapters, d.bibleChapters);
+    // Steps: always take higher value (running daily total)
+    if (d.stepsLog) Object.entries(d.stepsLog).forEach(([k,v])=>{ if(!stepsLog[k] || v > stepsLog[k]) stepsLog[k]=v; });
+    // Settings: Drive wins if newer, else keep local
+    if (d.macroTargets && driveIsNewer) MACRO_TARGETS = { ...MACRO_TARGETS, ...d.macroTargets };
+    if (d.suppConfig && (driveIsNewer || !suppConfig)) suppConfig = d.suppConfig;
+    if (d.foodLibrary && (driveIsNewer || !foodLibrary.length)) foodLibrary = d.foodLibrary;
     if (d.exLibrary && d.exLibrary.length > exLibrary.length) exLibrary = d.exLibrary;
-    if (d.bibleLog) Object.entries(d.bibleLog).forEach(([k,v])=>{ if(!bibleLog[k]) bibleLog[k]=v; });
-    if (d.bibleChapters) Object.entries(d.bibleChapters).forEach(([k,v])=>{ if(!bibleChapters[k]) bibleChapters[k]=v; });
     saveStorage(); saveSC();
     updateStats(); renderAchievements(); switchDay(currentDay);
     const syncedAt = d._syncedAt ? new Date(d._syncedAt).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }) : '';
