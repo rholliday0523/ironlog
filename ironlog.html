@@ -1684,43 +1684,68 @@ function pickCalDay(k){const ov=document.getElementById('cal-overlay');if(ov)ov.
 function dingBell(){
   try{
     const ctx=new(window.AudioContext||window.webkitAudioContext)();
-    // HULK SMASH — deep powerful impact sound
-    // Layer 1: Sub bass thud
-    const sub=ctx.createOscillator(),subG=ctx.createGain();
-    sub.connect(subG);subG.connect(ctx.destination);
-    sub.type='sine';sub.frequency.setValueAtTime(60,ctx.currentTime);
-    sub.frequency.exponentialRampToValueAtTime(30,ctx.currentTime+0.4);
-    subG.gain.setValueAtTime(0,ctx.currentTime);
-    subG.gain.linearRampToValueAtTime(1.2,ctx.currentTime+0.01);
-    subG.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.5);
-    sub.start(ctx.currentTime);sub.stop(ctx.currentTime+0.5);
-    // Layer 2: Mid crunch
-    const mid=ctx.createOscillator(),midG=ctx.createGain();
-    mid.connect(midG);midG.connect(ctx.destination);
-    mid.type='sawtooth';mid.frequency.setValueAtTime(120,ctx.currentTime);
-    mid.frequency.exponentialRampToValueAtTime(40,ctx.currentTime+0.3);
-    midG.gain.setValueAtTime(0,ctx.currentTime);
-    midG.gain.linearRampToValueAtTime(0.8,ctx.currentTime+0.005);
-    midG.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.35);
-    mid.start(ctx.currentTime);mid.stop(ctx.currentTime+0.4);
-    // Layer 3: High crack/impact
-    const buf=ctx.createBuffer(1,ctx.sampleRate*0.15,ctx.sampleRate);
+    const t=ctx.currentTime;
+
+    // ── MASSIVE SUB THUD ──────────────────────────────────────────
+    const sub=ctx.createOscillator();
+    const subGain=ctx.createGain();
+    sub.connect(subGain);subGain.connect(ctx.destination);
+    sub.type='sine';
+    sub.frequency.setValueAtTime(80,t);
+    sub.frequency.exponentialRampToValueAtTime(25,t+0.5);
+    subGain.gain.setValueAtTime(0,t);
+    subGain.gain.linearRampToValueAtTime(2.0,t+0.005);
+    subGain.gain.exponentialRampToValueAtTime(0.001,t+0.6);
+    sub.start(t);sub.stop(t+0.65);
+
+    // ── CRUNCH LAYER (sawtooth distortion) ────────────────────────
+    const crunch=ctx.createOscillator();
+    const crunchDist=ctx.createWaveShaper();
+    const crunchGain=ctx.createGain();
+    // Hard clip distortion curve
+    const curve=new Float32Array(256);
+    for(let i=0;i<256;i++){const x=(i*2/255)-1;curve[i]=Math.max(-0.7,Math.min(0.7,x*8));}
+    crunchDist.curve=curve;
+    crunch.connect(crunchDist);crunchDist.connect(crunchGain);crunchGain.connect(ctx.destination);
+    crunch.type='sawtooth';
+    crunch.frequency.setValueAtTime(55,t);
+    crunch.frequency.exponentialRampToValueAtTime(20,t+0.4);
+    crunchGain.gain.setValueAtTime(0,t);
+    crunchGain.gain.linearRampToValueAtTime(1.2,t+0.004);
+    crunchGain.gain.exponentialRampToValueAtTime(0.001,t+0.45);
+    crunch.start(t);crunch.stop(t+0.5);
+
+    // ── IMPACT NOISE BURST ────────────────────────────────────────
+    const bufLen=Math.floor(ctx.sampleRate*0.18);
+    const buf=ctx.createBuffer(1,bufLen,ctx.sampleRate);
     const data=buf.getChannelData(0);
-    for(let i=0;i<data.length;i++)data[i]=(Math.random()*2-1)*Math.pow(1-i/data.length,0.5);
-    const noise=ctx.createBufferSource(),noiseG=ctx.createGain();
-    noise.buffer=buf;noise.connect(noiseG);noiseG.connect(ctx.destination);
-    noiseG.gain.setValueAtTime(0.6,ctx.currentTime);
-    noiseG.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.15);
-    noise.start(ctx.currentTime);
-    // Layer 4: Roar — short bassy growl
-    const roar=ctx.createOscillator(),roarG=ctx.createGain();
-    roar.connect(roarG);roarG.connect(ctx.destination);
-    roar.type='square';roar.frequency.setValueAtTime(80,ctx.currentTime+0.05);
-    roar.frequency.exponentialRampToValueAtTime(55,ctx.currentTime+0.4);
-    roarG.gain.setValueAtTime(0,ctx.currentTime+0.05);
-    roarG.gain.linearRampToValueAtTime(0.5,ctx.currentTime+0.08);
-    roarG.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+0.45);
-    roar.start(ctx.currentTime+0.05);roar.stop(ctx.currentTime+0.5);
+    for(let i=0;i<bufLen;i++){
+      const env=Math.pow(1-(i/bufLen),0.3);
+      data[i]=(Math.random()*2-1)*env*1.5;
+    }
+    const noise=ctx.createBufferSource();
+    const noiseFilt=ctx.createBiquadFilter();
+    const noiseGain=ctx.createGain();
+    noise.buffer=buf;
+    noiseFilt.type='lowpass';
+    noiseFilt.frequency.value=800;
+    noise.connect(noiseFilt);noiseFilt.connect(noiseGain);noiseGain.connect(ctx.destination);
+    noiseGain.gain.setValueAtTime(1.8,t);
+    noiseGain.gain.exponentialRampToValueAtTime(0.001,t+0.18);
+    noise.start(t);
+
+    // ── AFTERSHOCK RUMBLE ─────────────────────────────────────────
+    const rumble=ctx.createOscillator();
+    const rumbleGain=ctx.createGain();
+    rumble.connect(rumbleGain);rumbleGain.connect(ctx.destination);
+    rumble.type='square';
+    rumble.frequency.setValueAtTime(40,t+0.08);
+    rumble.frequency.exponentialRampToValueAtTime(20,t+0.55);
+    rumbleGain.gain.setValueAtTime(0,t+0.08);
+    rumbleGain.gain.linearRampToValueAtTime(0.6,t+0.1);
+    rumbleGain.gain.exponentialRampToValueAtTime(0.001,t+0.6);
+    rumble.start(t+0.08);rumble.stop(t+0.65);
+
   }catch(e){}
 }
 function startTimer(sec){
@@ -3395,8 +3420,9 @@ function renderNutritionAdvisor(){
 function deleteSession(idx){
   if(!confirm('Delete this workout session? This cannot be undone.'))return;
   history.splice(idx,1);
-  _origSaveStorage();scheduleAutoSync();
-  renderHistory();updateStats();renderAchievements();
+  recalcGameStats();
+  scheduleAutoSync();
+  renderHistory();renderDayLog();
 }
 
 function openAddWorkoutModal(dateISO){
@@ -3516,6 +3542,27 @@ function addCustomExRow(){
   container.appendChild(row);
 }
 
+// ── RECALC GAME STATS FROM FULL HISTORY ──────────────────────────────────
+function recalcGameStats(){
+  let totalSets=0, totalLifted=0, totalWorkouts=0;
+  history.forEach(sess=>{
+    if(sess.day==='cardio-day') return;
+    totalWorkouts++;
+    const doneSets=(sess.exercises||[]).filter(e=>e.done);
+    totalSets+=doneSets.length;
+    totalLifted+=Math.round(doneSets.reduce((a,e)=>a+e.vol,0));
+  });
+  game.totalWorkouts=totalWorkouts;
+  game.totalSets=totalSets;
+  game.totalLifted=totalLifted;
+  // Recalc XP and level
+  const xpTotal=totalSets*10+(game.totalPRs||0)*25;
+  game.level=1; game.xp=xpTotal;
+  while(game.xp>=game.level*100){game.xp-=game.level*100;game.level++;}
+  _origSaveStorage();
+  updateStats();renderAchievements();
+}
+
 function saveNewSession(dateISO){
   const day = document.getElementById('add-day')?.value||'chest';
   const notes = document.getElementById('add-notes')?.value||'';
@@ -3540,9 +3587,10 @@ function saveNewSession(dateISO){
   if(existingIdx>=0) history.splice(existingIdx,1);
   history.push(newSess);
   history.sort((a,b)=>(b.dateISO||'').localeCompare(a.dateISO||''));
-  _origSaveStorage();scheduleAutoSync();
+  recalcGameStats();
+  scheduleAutoSync();
   closeEditModal();
-  renderHistory();renderDayLog();updateStats();renderAchievements();
+  renderHistory();renderDayLog();
 }
 
 function openEditModal(idx){
@@ -3613,9 +3661,10 @@ function saveEditedSession(idx){
   });
   sess.exercises=(sess.exercises||[]).filter(e=>e!==null);
   history.sort((a,b)=>b.dateISO.localeCompare(a.dateISO));
-  _origSaveStorage();scheduleAutoSync();
+  recalcGameStats();
+  scheduleAutoSync();
   closeEditModal();
-  renderHistory();updateStats();renderAchievements();
+  renderHistory();renderDayLog();
 }
 
 function closeEditModal(){
