@@ -3931,6 +3931,7 @@ function driveSignOut() {
   driveAccessToken = null;
   driveFileId = null;
   localStorage.removeItem('il_drive_token');
+  localStorage.removeItem('il_drive_token_expiry');
   localStorage.removeItem('il_drive_file_id');
   setSyncStatus('idle', 'Signed out');
 }
@@ -4299,14 +4300,36 @@ function markNearUnlockBadges(){
   if (hash && hash.includes('access_token')) {
     const params = new URLSearchParams(hash.replace('#',''));
     const token = params.get('access_token');
+    const expiresIn = parseInt(params.get('expires_in') || '3600', 10);
     if (token) {
+      const expiresAt = Date.now() + (expiresIn * 1000);
       localStorage.setItem('il_drive_token', token);
+      localStorage.setItem('il_drive_token_expiry', String(expiresAt));
       driveAccessToken = token;
       // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }
 })();
+
+function isTokenExpired() {
+  const expiry = localStorage.getItem('il_drive_token_expiry');
+  if (!expiry) return true; // no expiry stored — treat as expired to be safe
+  return Date.now() > parseInt(expiry, 10);
+}
+
+function clearExpiredToken() {
+  driveAccessToken = null;
+  localStorage.removeItem('il_drive_token');
+  localStorage.removeItem('il_drive_token_expiry');
+  setSyncStatus('idle', 'Session expired — tap Sign In to re-connect');
+}
+
+// Called every 5 min by the poll interval to silently re-check token validity
+function checkTokenExpiry() {
+  if (!localStorage.getItem('il_drive_token')) return;
+  if (isTokenExpired()) { clearExpiredToken(); }
+}
 
 try {
   loadStorage();
@@ -4315,19 +4338,22 @@ try {
   ACTIVE_DATE=localKey();lastCheckedDate=localKey();cardioDateKey=localKey();
   switchDay('chest');
   updateStats();renderAchievements();setQuote();
-  // Restore last sync time display
-  // Restore Google sign-in token if previously signed in
+  // Restore Google sign-in token if previously signed in and not expired
   const savedToken = localStorage.getItem('il_drive_token');
-  if (savedToken) {
+  if (savedToken && !isTokenExpired()) {
     driveAccessToken = savedToken;
     const lastSync = localStorage.getItem('il_last_sync');
     setSyncStatus('ok', '✓ Signed in to Google Drive', lastSync || '');
     // Auto-load from Drive on startup so latest data from any device is pulled in
     setTimeout(() => { try { loadFromDrive(); } catch(e) {} }, 1500);
-    // Poll Drive every 5 minutes to pick up changes made on other devices
-    setInterval(() => { if (driveAccessToken) { try { loadFromDrive(); } catch(e) {} } }, 5 * 60 * 1000);
+    // Poll Drive every 5 minutes; also checks token expiry
+    setInterval(() => {
+      checkTokenExpiry();
+      if (driveAccessToken) { try { loadFromDrive(); } catch(e) {} }
+    }, 5 * 60 * 1000);
   } else {
-    setSyncStatus('idle', 'Tap Sign In with Google to enable sync');
+    if (savedToken) clearExpiredToken(); // had a token but it expired
+    else setSyncStatus('idle', 'Tap Sign In with Google to enable sync');
   }
 } catch(e) { console.error('Init error:',e); }
 startClock();
