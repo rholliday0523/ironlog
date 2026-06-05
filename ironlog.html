@@ -4007,7 +4007,8 @@ function driveSignIn() {
     client_id: GAPI_CLIENT_ID,
     redirect_uri: REDIRECT_URI,
     response_type: 'token',
-    scope: GAPI_SCOPE
+    scope: GAPI_SCOPE,
+    prompt: 'consent'
   });
   const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
   // Save current state so we can restore after redirect
@@ -4762,61 +4763,6 @@ function populateSettingsTab(){
     if(txt2&&txt){txt2.textContent=txt.textContent;}
   }catch(e){}
 }
-
-// ── SILENT OAUTH REFRESH ─────────────────────────────────────────────────
-// Automatically renews the Google token without interrupting the user.
-// Uses a hidden iframe with prompt=none — works when the user is still
-// signed into Google in their browser (which is almost always).
-function silentTokenRefresh() {
-  if (!localStorage.getItem('il_drive_token')) return; // not signed in
-  const REDIRECT_URI = 'https://rholliday0523.github.io/ironlog/ironlog.html';
-  const params = new URLSearchParams({
-    client_id: GAPI_CLIENT_ID,
-    redirect_uri: REDIRECT_URI,
-    response_type: 'token',
-    scope: GAPI_SCOPE,
-    prompt: 'none' // silent — no user interaction required
-  });
-  const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
-  const iframe = document.createElement('iframe');
-  iframe.style.cssText = 'display:none;position:absolute;width:1px;height:1px';
-  iframe.src = authUrl;
-  document.body.appendChild(iframe);
-  // Listen for the iframe to redirect back with a new token
-  const checkInterval = setInterval(() => {
-    try {
-      const hash = iframe.contentWindow?.location?.hash;
-      if (hash && hash.includes('access_token')) {
-        const p = new URLSearchParams(hash.replace('#', ''));
-        const token = p.get('access_token');
-        const expiresIn = parseInt(p.get('expires_in') || '3600', 10);
-        if (token) {
-          driveAccessToken = token;
-          const expiresAt = Date.now() + (expiresIn * 1000);
-          localStorage.setItem('il_drive_token', token);
-          localStorage.setItem('il_drive_token_expiry', String(expiresAt));
-          setSyncStatus('ok', '✓ Signed in to Google Drive', localStorage.getItem('il_last_sync') || '');
-        }
-        clearInterval(checkInterval);
-        iframe.remove();
-      }
-    } catch(e) {
-      // Cross-origin error means Google hasn't redirected yet — keep waiting
-    }
-  }, 500);
-  // Give up after 15 seconds if no response
-  setTimeout(() => { clearInterval(checkInterval); iframe.remove(); }, 15000);
-}
-
-// Check every 10 minutes — refresh token if within 15 minutes of expiry
-setInterval(() => {
-  const expiry = localStorage.getItem('il_drive_token_expiry');
-  if (!expiry || !driveAccessToken) return;
-  const msLeft = parseInt(expiry) - Date.now();
-  if (msLeft < 15 * 60 * 1000 && msLeft > 0) { // less than 15 min left
-    silentTokenRefresh();
-  }
-}, 10 * 60 * 1000);
 
 </script>
 
