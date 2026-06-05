@@ -4367,7 +4367,10 @@ try {
     driveAccessToken = savedToken;
     const lastSync = localStorage.getItem('il_last_sync');
     setSyncStatus('ok', '✓ Signed in to Google Drive', lastSync || '');
-    // NOTE: Auto-load removed — use 'Load from Drive' button manually to avoid overwriting newer local data
+    // Auto-load from Drive on startup so latest data from any device is pulled in
+    setTimeout(() => { try { loadFromDrive(); } catch(e) {} }, 1500);
+    // Poll Drive every 5 minutes to pick up changes made on other devices
+    setInterval(() => { if (driveAccessToken) { try { loadFromDrive(); } catch(e) {} } }, 5 * 60 * 1000);
   } else {
     setSyncStatus('idle', 'Tap Sign In with Google to enable sync');
   }
