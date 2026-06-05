@@ -764,13 +764,13 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   <div class="hdr-mid">
     <div class="lifted-wrap"><div><div class="lifted-lbl">Total Lifted</div><div class="lifted-val" id="h-lifted">0 lbs</div><div class="lifted-track"><div class="lifted-bar" id="h-lifted-fill" style="width:0%"></div></div><div class="lifted-goal">to 1,000,000 lbs</div></div></div>
     <div id="sess-timer" class="sess-timer" style="display:none">00:00</div>
-    <a href="https://www.pandora.com" target="_blank" title="Open Pandora" style="display:flex;align-items:center;gap:5px;background:var(--dark3);border:1px solid rgba(0,150,255,.3);border-radius:20px;padding:4px 10px;cursor:pointer;text-decoration:none;margin-left:8px">
+    <a href="https://www.pandora.com" target="_blank" data-music-link title="Open Music" style="display:flex;align-items:center;gap:5px;background:var(--dark3);border:1px solid rgba(0,150,255,.3);border-radius:20px;padding:4px 10px;cursor:pointer;text-decoration:none;margin-left:8px">
       <span style="font-size:14px">🎵</span>
-      <span style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:#00B0FF;white-space:nowrap">Pandora</span>
+      <span class="music-lbl" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:#00B0FF;white-space:nowrap">Pandora</span>
     </a>
   </div>
   <div class="hdr-right">
-    <div id="hdr-sync-pill" onclick="showTab('week')" title="Google Drive Sync — tap to manage" style="display:flex;align-items:center;gap:5px;background:var(--dark3);border:1px solid var(--border2);border-radius:20px;padding:4px 10px;cursor:pointer;margin-bottom:3px;transition:border-color .2s">
+    <div id="hdr-sync-pill" onclick="showTab('settings')" title="Tap to open Settings & Sync" style="display:flex;align-items:center;gap:5px;background:var(--dark3);border:1px solid var(--border2);border-radius:20px;padding:4px 10px;cursor:pointer;margin-bottom:3px;transition:border-color .2s">
       <div id="hdr-sync-dot" style="width:7px;height:7px;border-radius:50%;background:var(--steel2);flex-shrink:0;transition:background .4s"></div>
       <div id="hdr-sync-lbl" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid);white-space:nowrap">Not synced</div>
     </div>
@@ -808,7 +808,7 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
     </div>
     <div class="sc-sub"><span id="h-streak">0</span> sessions</div>
   </div>
-  <div class="sc"><div class="sc-lbl">Steps</div><div id="s-steps" class="sc-val blue">0</div><div class="steps-bar"><div id="s-steps-bar" class="steps-fill" style="width:0%"></div></div><div class="sc-sub">of 12,000</div></div>
+  <div class="sc"><div class="sc-lbl">Steps</div><div id="s-steps" class="sc-val blue">0</div><div class="steps-bar"><div id="s-steps-bar" class="steps-fill" style="width:0%"></div></div><div class="sc-sub">of <span id="step-goal-display">12,000</span></div></div>
   <div class="sc"><div class="sc-lbl">Sets Done</div><div id="s-done" class="sc-val">0</div><div id="s-total-lbl" class="sc-sub">of 0</div></div>
   <div class="sc"><div class="sc-lbl">Volume</div><div id="s-vol" class="sc-val gold">0</div><div class="sc-sub">lbs today</div></div>
   <div class="sc"><div class="sc-lbl">PRs Today</div><div id="s-prs" class="sc-val acc">0</div><div class="sc-sub">new records</div></div>
@@ -825,6 +825,7 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   <button class="nav-tab" data-tab="week" onclick="showTab('week')">&#x1F4C5; Week</button>
   <button class="nav-tab" data-tab="bible" onclick="showTab('bible')">&#x271F; Bible</button>
   <button class="nav-tab" data-tab="advisor" onclick="showTab('advisor')">&#x1F9E0; Advisor</button>
+<button class="nav-tab" data-tab="settings" onclick="showTab('settings')">&#x2699; Settings</button>
 </div>
 
 <div id="tab-workout">
@@ -847,10 +848,11 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   <div id="prewkt-fire" style="display:none" class="motiv-fire-bar"></div>
   <div id="prev-session-container"></div>
   <div id="exercise-list"></div>
+  <button onclick="openAddExercise()" id="add-ex-btn" style="display:none;width:100%;margin-top:.75rem;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:2px;text-transform:uppercase;background:none;border:1px dashed var(--steel2);color:var(--mid);cursor:pointer;border-radius:2px;transition:all .2s" onmouseenter="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" onmouseleave="this.style.borderColor='var(--steel2)';this.style.color='var(--mid)'">+ Add Exercise</button>
   <div style="margin-top:1.25rem"><div class="sec-lbl">Session Notes</div><textarea class="notes-ta" id="sess-notes" placeholder="Optional notes about this session..."></textarea></div>
   <div style="display:flex;gap:8px;margin-top:1.25rem">
   <button class="save-btn" id="save-btn" onclick="saveWorkout()" style="flex:1">SAVE WORKOUT + EARN XP</button>
-  <button onclick="copyLastSession()" style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;background:none;border:1px solid var(--border2);color:var(--mid);padding:14px 16px;cursor:pointer;border-radius:2px;white-space:nowrap" title="Load weights from last session">&#x21BA; Copy Last</button>
+  <button id="copy-last-btn" onclick="copyLastSession()" style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;background:none;border:1px solid var(--border2);color:var(--mid);padding:14px 16px;cursor:pointer;border-radius:2px;white-space:nowrap" title="Load weights from last session">&#x21BA; Copy Last</button>
 </div>
   <div class="save-success" id="save-success" style="display:none">
     <div class="ss-hdr"><div><div id="ss-title" class="ss-title">SESSION LOCKED IN</div><div id="ss-sub" class="ss-sub">Here is what you earned</div></div></div>
@@ -886,7 +888,7 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
 <div id="tab-fuel" style="display:none">
   <div class="sec-lbl" style="margin-top:0">&#x1F957; Nutrition</div>
   <div class="past-banner" id="nutr-banner" style="display:none"><div class="past-banner-txt">Viewing past data</div><button class="past-banner-btn" onclick="goToToday()">Back to Today</button></div>
-  <div class="macro-hdr"><div class="macro-title">Nutrition</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div class="tdee-badge">TDEE ~2,765 cal</div><button class="edit-btn" onclick="toggleTargetsEditor()">&#x270E; Targets</button></div></div>
+  <div class="macro-hdr"><div class="macro-title">Nutrition</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div class="tdee-badge" id="tdee-badge-lbl">TDEE ~2,765 cal</div><button class="edit-btn" onclick="toggleTargetsEditor()">&#x270E; Targets</button></div></div>
   <div class="targets-ed" id="targets-ed" style="display:none"><div class="tg-grid"><div><div class="tg-lbl">Calories</div><input type="number" class="tg-inp" id="tg-cal" value="1765"></div><div><div class="tg-lbl">Protein (g)</div><input type="number" class="tg-inp" id="tg-pro" value="240"></div><div><div class="tg-lbl">Carbs (g)</div><input type="number" class="tg-inp" id="tg-carb" value="121"></div><div><div class="tg-lbl">Fat (g)</div><input type="number" class="tg-inp" id="tg-fat" value="30"></div></div><button class="tg-save" onclick="saveTargets()">Save Targets</button></div>
   <div class="card" style="margin-bottom:1.25rem"><div id="macro-bars" class="macro-bars"></div></div>
   <div class="sec-lbl">Meal Plan</div>
@@ -919,7 +921,7 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   <div class="sec-lbl" style="margin-top:0">Daily Steps</div>
   <div class="card">
     <div id="steps-big" class="steps-big">0</div>
-    <div class="steps-goal-lbl">Goal: 12,000 steps &mdash; enter your total for the day</div>
+    <div class="steps-goal-lbl" id="steps-goal-lbl">Goal: 12,000 steps — enter your total for the day</div>
     <div class="steps-big-track"><div id="steps-big-fill" class="steps-big-fill" style="width:0%"></div></div>
     <div id="steps-pct-lbl" class="steps-pct-lbl">0% of goal</div>
     <div style="font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;margin:.85rem 0 .4rem">Quick set</div>
@@ -1008,39 +1010,16 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   <div class="week-grid" id="week-now"></div>
   <div class="sec-lbl">Last Week</div>
   <div class="week-grid" id="week-last"></div>
-  <div class="sec-lbl">&#x2601; Google Drive Sync</div>
-  <div class="card" id="sync-card">
-    <div id="sync-status-bar" style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding:.65rem .9rem;border-radius:2px;background:var(--dark3);border:1px solid var(--border2)">
-      <div id="sync-dot" style="width:8px;height:8px;border-radius:50%;background:var(--steel2);flex-shrink:0;transition:background .4s"></div>
-      <div id="sync-status-txt" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--mid);flex:1">Not signed in</div>
-      <div id="sync-last" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--steel2)"></div>
-    </div>
-    <div id="sync-signin-row" style="margin-bottom:.75rem">
-      <button onclick="driveSignIn()" style="width:100%;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:3px;background:linear-gradient(135deg,#4285F4,#34A853);border:none;color:#fff;cursor:pointer;border-radius:2px">&#x1F511; Sign In with Google</button>
-    </div>
-    <div id="sync-action-row" style="display:none;margin-bottom:.75rem">
-      <div class="settings-row">
-        <button class="settings-btn" onclick="syncNow()" style="border-color:rgba(42,154,212,.4);color:var(--blue2)">&#x2191; Save to Drive</button>
-        <button class="settings-btn" onclick="loadFromDrive()" style="border-color:rgba(42,154,212,.4);color:var(--blue2)">&#x2193; Load from Drive</button>
-        <button class="settings-btn" onclick="driveSignOut()" style="border-color:rgba(255,255,255,.15);color:var(--mid)">Sign Out</button>
-      </div>
-    </div>
-    <div class="settings-note" style="margin-bottom:1rem">Sign in once on each device. Your data saves to <strong style="color:var(--light)">ironlog-sync.json</strong> in Google Drive and auto-syncs every time you log something.</div>
-    <div style="height:1px;background:var(--border2);margin-bottom:1rem"></div>
-    <div class="sec-lbl" style="margin:0 0 .6rem">&#x1F3A8; Theme</div>
-    <div style="display:flex;gap:8px;align-items:center;margin-bottom:.75rem;flex-wrap:wrap">
-      <div class="theme-swatch active" style="background:#E8380D" onclick="setAccentColor('#E8380D','#FF5733')" title="Red"></div>
-      <div class="theme-swatch" style="background:#2A9AD4" onclick="setAccentColor('#2A9AD4','#4AB0EA')" title="Blue"></div>
-      <div class="theme-swatch" style="background:#22B05A" onclick="setAccentColor('#22B05A','#3ACC6A')" title="Green"></div>
-      <div class="theme-swatch" style="background:#A855F7" onclick="setAccentColor('#A855F7','#C084FC')" title="Purple"></div>
-      <div class="theme-swatch" style="background:#F59E0B" onclick="setAccentColor('#F59E0B','#FBBF24')" title="Gold"></div>
-      <div class="theme-swatch" style="background:#14B8A6" onclick="setAccentColor('#14B8A6','#2DD4BF')" title="Teal"></div>
-      <button id="mode-toggle-btn" onclick="toggleLightMode()" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;background:none;border:1px solid var(--border2);color:var(--mid);padding:6px 12px;cursor:pointer;border-radius:2px;text-transform:uppercase">&#x2600; Light Mode</button>
-    </div>
-    <div style="height:1px;background:var(--border2);margin-bottom:1rem"></div>
-    <div class="sec-lbl" style="margin:0 0 .6rem">Local Backup</div>
-    <div class="settings-row"><button class="settings-btn exp" onclick="exportData()">&#x1F4E4; Export File</button><button class="settings-btn imp" onclick="document.getElementById('import-input').click()">&#x1F4E5; Import File</button><input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)"></div>
-    <div class="settings-note">Export saves a local JSON file as a manual backup.</div>
+  <!-- Sync status dots (hidden elements kept for JS compatibility) -->
+  <div style="display:none">
+    <div id="sync-dot"></div>
+    <div id="sync-status-txt"></div>
+    <div id="sync-last"></div>
+    <div id="sync-signin-row"></div>
+    <div id="sync-action-row"></div>
+    <button id="mode-toggle-btn"></button>
+    <input type="file" id="import-input" accept=".json" style="display:none" onchange="importData(event)">
+    <div id="sync-card"></div>
   </div>
 </div>
 
@@ -1143,7 +1122,7 @@ function fmtDisplay(k) {
 }
 
 // ── STATE ───────────────────────────────────────────────────────────────
-const STEP_GOAL = 12000, DEFAULT_REST = 70;
+const STEP_GOAL = 12000, DEFAULT_REST = 70; // legacy — use STEP_GOAL_LIVE and DEFAULT_REST_LIVE
 let TODAY_KEY = localKey();
 let ACTIVE_DATE = TODAY_KEY;
 let lastCheckedDate = TODAY_KEY;
@@ -1162,22 +1141,29 @@ let fsFood=null, histView='sessions';
 let bibleLog={}, bibleChapters={};
 let bibleCurrentBook='', bibleCurrentChapter=1;
 
-// ── SEED DATA FROM BACKUP ─────────────────────────────────────────────────
-// This runs before loadStorage so localStorage always wins for newer data,
-// but the backup fills in anything missing (new device, cleared storage, etc.)
-history=[{"date":"Tuesday, June 2, 2026","dateISO":"2026-06-02","day":"back","exercises":[{"id":"bent-row","name":"Bent Over Rows","set":1,"weight":70,"reps":12,"rpe":"2","done":true,"vol":840},{"id":"bent-row","name":"Bent Over Rows","set":2,"weight":90,"reps":12,"rpe":"5","done":true,"vol":1080},{"id":"bent-row","name":"Bent Over Rows","set":3,"weight":100,"reps":11,"rpe":"6","done":true,"vol":1100},{"id":"bent-row","name":"Bent Over Rows","set":4,"weight":105,"reps":8,"rpe":"9","done":true,"vol":840},{"id":"lat-pull","name":"Lat Pulldowns","set":1,"weight":160,"reps":15,"rpe":"4","done":true,"vol":2400},{"id":"lat-pull","name":"Lat Pulldowns","set":2,"weight":215,"reps":11,"rpe":"8","done":true,"vol":2365},{"id":"lat-pull","name":"Lat Pulldowns","set":3,"weight":235,"reps":8,"rpe":"8","done":false,"vol":1880},{"id":"seated-row","name":"Seated Rows","set":1,"weight":160,"reps":12,"rpe":"4","done":true,"vol":1920},{"id":"seated-row","name":"Seated Rows","set":2,"weight":180,"reps":12,"rpe":"5","done":true,"vol":2160},{"id":"seated-row","name":"Seated Rows","set":3,"weight":200,"reps":10,"rpe":"8","done":true,"vol":2000},{"id":"seated-row","name":"Seated Rows","set":4,"weight":210,"reps":8,"rpe":"8","done":true,"vol":1680},{"id":"close-row","name":"Standing Close Rows","set":1,"weight":70,"reps":15,"rpe":"3","done":true,"vol":1050},{"id":"close-row","name":"Standing Close Rows","set":2,"weight":80,"reps":12,"rpe":"2","done":true,"vol":960},{"id":"close-row","name":"Standing Close Rows","set":3,"weight":90,"reps":15,"rpe":"2","done":true,"vol":1350},{"id":"straight-pull","name":"Straight Arm Pulldowns","set":1,"weight":90,"reps":12,"rpe":"5","done":true,"vol":1080},{"id":"straight-pull","name":"Straight Arm Pulldowns","set":2,"weight":90,"reps":12,"rpe":"8","done":true,"vol":1080},{"id":"straight-pull","name":"Straight Arm Pulldowns","set":3,"weight":90,"reps":11,"rpe":"9","done":true,"vol":990},{"id":"hammer-b","name":"Hammer Curls","set":1,"weight":30,"reps":13,"rpe":"3","done":true,"vol":390},{"id":"hammer-b","name":"Hammer Curls","set":2,"weight":35,"reps":12,"rpe":"5","done":true,"vol":420},{"id":"hammer-b","name":"Hammer Curls","set":3,"weight":40,"reps":9,"rpe":"","done":true,"vol":360},{"id":"cable-curl-b","name":"Cable Curls","set":1,"weight":30,"reps":13,"rpe":"5","done":true,"vol":390},{"id":"cable-curl-b","name":"Cable Curls","set":2,"weight":35,"reps":12,"rpe":"6","done":true,"vol":420},{"id":"cable-curl-b","name":"Cable Curls","set":3,"weight":40,"reps":10,"rpe":"8","done":true,"vol":400},{"id":"cable-crunch","name":"Cable Crunches","set":1,"weight":80,"reps":15,"rpe":"2","done":true,"vol":1200},{"id":"cable-crunch","name":"Cable Crunches","set":2,"weight":100,"reps":15,"rpe":"3","done":true,"vol":1500},{"id":"cable-crunch","name":"Cable Crunches","set":3,"weight":120,"reps":15,"rpe":"4","done":true,"vol":1800},{"id":"leg-raise","name":"Lying Leg Raises","set":1,"weight":0,"reps":10,"rpe":"9","done":true,"vol":0},{"id":"leg-raise","name":"Lying Leg Raises","set":2,"weight":0,"reps":12,"rpe":"4","done":true,"vol":0},{"id":"leg-raise","name":"Lying Leg Raises","set":3,"weight":0,"reps":12,"rpe":"4","done":true,"vol":0}],"notes":"","duration":4052},{"date":"Monday, June 1, 2026","dateISO":"2026-06-01","day":"cardio-day","exercises":[],"notes":"","duration":0,"cardioMinutes":45},{"date":"Sunday, May 31, 2026","dateISO":"2026-05-31","day":"chest","notes":"","duration":0,"exercises":[{"id":"incline","name":"Incline Dumbbell Press","set":1,"weight":50,"reps":12,"rpe":"4","done":true,"vol":600},{"id":"incline","name":"Incline Dumbbell Press","set":2,"weight":55,"reps":12,"rpe":"4","done":true,"vol":660},{"id":"incline","name":"Incline Dumbbell Press","set":3,"weight":65,"reps":10,"rpe":"7","done":true,"vol":650},{"id":"incline","name":"Incline Dumbbell Press","set":4,"weight":65,"reps":8,"rpe":"8","done":true,"vol":520},{"id":"cable-press","name":"Seated Cable Press","set":1,"weight":120,"reps":12,"rpe":"9","done":true,"vol":1440},{"id":"cable-press","name":"Seated Cable Press","set":2,"weight":125,"reps":10,"rpe":"8","done":true,"vol":1250},{"id":"cable-press","name":"Seated Cable Press","set":3,"weight":130,"reps":8,"rpe":"8","done":true,"vol":1040},{"id":"low-fly","name":"Low-to-High Cable Fly","set":1,"weight":30,"reps":15,"rpe":"3","done":true,"vol":450},{"id":"low-fly","name":"Low-to-High Cable Fly","set":2,"weight":35,"reps":12,"rpe":"4","done":true,"vol":420},{"id":"low-fly","name":"Low-to-High Cable Fly","set":3,"weight":40,"reps":12,"rpe":"5","done":true,"vol":480},{"id":"high-fly","name":"High-to-Low Cable Fly","set":1,"weight":30,"reps":15,"rpe":"3","done":true,"vol":450},{"id":"high-fly","name":"High-to-Low Cable Fly","set":2,"weight":35,"reps":12,"rpe":"5","done":true,"vol":420},{"id":"high-fly","name":"High-to-Low Cable Fly","set":3,"weight":40,"reps":12,"rpe":"6","done":true,"vol":480},{"id":"pullover","name":"Dumbbell Pullovers","set":1,"weight":40,"reps":12,"rpe":"2","done":true,"vol":480},{"id":"pullover","name":"Dumbbell Pullovers","set":2,"weight":50,"reps":14,"rpe":"2","done":true,"vol":700},{"id":"pullover","name":"Dumbbell Pullovers","set":3,"weight":60,"reps":12,"rpe":"5","done":true,"vol":720},{"id":"pushdown-c","name":"Tricep Pushdowns","set":1,"weight":50,"reps":15,"rpe":"3","done":true,"vol":750},{"id":"pushdown-c","name":"Tricep Pushdowns","set":2,"weight":60,"reps":15,"rpe":"5","done":true,"vol":900},{"id":"pushdown-c","name":"Tricep Pushdowns","set":3,"weight":70,"reps":13,"rpe":"6","done":true,"vol":910},{"id":"overhead-c","name":"Tricep Overhead Press","set":1,"weight":60,"reps":15,"rpe":"6","done":true,"vol":900},{"id":"overhead-c","name":"Tricep Overhead Press","set":2,"weight":60,"reps":15,"rpe":"2","done":true,"vol":900},{"id":"overhead-c","name":"Tricep Overhead Press","set":3,"weight":70,"reps":15,"rpe":"5","done":true,"vol":1050}]}];
-game={xp:105,level:5,streak:3,lastSaved:"2026-06-02T20:16:46.432Z",totalSets:50,totalWorkouts:3,totalPRs:15,totalLifted:45755,mseen:[]};
-nutrData={"2026-06-01":{"checked":["i4","i5","i6","i7","i3","i9","i10","i11","i12"],"custom":[]},"2026-06-02":{"checked":["i3","i4","i5","i6","i7","i8"],"custom":[{"id":"cf-1780446936202","name":"Beef, steak, ribeye, lean and fat eaten (170g)","cal":491,"protein":39.9,"carbs":0,"fat":36.7},{"id":"cf-1780447001407","name":"100g cooked jasmine rice","cal":130,"protein":3,"carbs":28,"fat":0},{"id":"cf-1780453638073","name":"Protein Shake","cal":130,"protein":24,"carbs":3,"fat":2}]},"2026-05-31":{"checked":["i1","i2","i3","i4","i5","i8","i7","i6","i9","i10","i12","i11"],"custom":[]},"2026-06-03":{"checked":["i1","i2"],"custom":[]}};
-suppData={"2026-06-01":{"checked":["creatine","fishoil","vitd","zinc","multi","pwpowder","electro","magnesium"]},"2026-06-02":{"checked":["creatine","fishoil","vitd","zinc","multi","electro","pwpowder","magnesium"]},"2026-05-31":{"checked":["creatine","fishoil","vitd","zinc","multi","electro","pwpowder","magnesium"]},"2026-06-03":{"checked":["creatine","fishoil","vitd","zinc","multi"]}};
-bwLog={"2026-06-01":287,"2026-06-02":285.6,"2026-06-03":286};
-stepsLog={"2026-06-02":15213,"2026-06-01":15552,"2026-05-31":17626,"2026-06-03":3506};
-energyLog={"2026-06-01":7,"2026-06-02":6,"2026-05-31":8};
-daySummaryLog={"2026-06-02":{"date":"2026-06-02","displayDate":"Tuesday, June 2, 2026","steps":14343,"stepGoalHit":true,"nutrition":{"cal":1621,"protein":192.9,"carbs":93,"fat":50.7},"supplements":{"done":8,"total":8,"pct":100},"energy":6,"bodyWeight":285.6,"workoutDay":"back","workoutVol":29775,"cardioMinutes":0}};
-foodLibrary=[{"id":"fl-1780446936202","name":"Beef, steak, ribeye, lean and fat eaten","cal":289,"protein":23.5,"carbs":0,"fat":21.6},{"id":"fl-1780447001407","name":"100g cooked jasmine rice","cal":130,"protein":3,"carbs":28,"fat":0},{"id":"fl-1780453638074","name":"Protein Shake","cal":130,"protein":24,"carbs":3,"fat":2}];
-exLibrary=["Bent Over Rows","Lat Pulldowns","Seated Rows","Standing Close Rows","Straight Arm Pulldowns","Hammer Curls","Cable Curls","Cable Crunches","Lying Leg Raises","Incline Dumbbell Press","Seated Cable Press","Low-to-High Cable Fly","High-to-Low Cable Fly","Dumbbell Pullovers","Tricep Pushdowns","Tricep Overhead Press"];
-suppConfig=[{"id":"morning","label":"Morning -- with food","color":"var(--gold)","items":[{"id":"creatine","name":"Creatine monohydrate (5g)"},{"id":"fishoil","name":"Fish Oil / Omega-3"},{"id":"vitd","name":"Vitamin D3 + K2"},{"id":"zinc","name":"Zinc"},{"id":"multi","name":"Multivitamin"}]},{"id":"prewkt","label":"Pre-workout","color":"var(--accent)","items":[{"id":"pwpowder","name":"Pre-workout powder (optional)"}]},{"id":"wkt","label":"During / post workout","color":"var(--accent2)","items":[{"id":"electro","name":"Electrolytes"}]},{"id":"night","label":"Night -- before bed","color":"var(--blue2)","items":[{"id":"magnesium","name":"Magnesium glycinate (30-60 min before bed)"}]}];
-MACRO_TARGETS={cal:1765,protein:240,carbs:121,fat:30};
+// ── SEED DATA (new-device bootstrap only) ──────────────────────────────
+// This data only applies if localStorage is completely empty (new device/browser).
+// loadStorage() will overwrite these with real localStorage data immediately after.
+// This is NOT a source of truth — Drive and localStorage always win.
+(function applySeedIfNeeded(){
+  try {
+    // Only seed if no history in localStorage at all
+    if (localStorage.getItem('il_hist')) return;
+    history=[{"date":"Tuesday, June 2, 2026","dateISO":"2026-06-02","day":"back","exercises":[{"id":"bent-row","name":"Bent Over Rows","set":1,"weight":70,"reps":12,"rpe":"2","done":true,"vol":840},{"id":"bent-row","name":"Bent Over Rows","set":2,"weight":90,"reps":12,"rpe":"5","done":true,"vol":1080},{"id":"bent-row","name":"Bent Over Rows","set":3,"weight":100,"reps":11,"rpe":"6","done":true,"vol":1100},{"id":"bent-row","name":"Bent Over Rows","set":4,"weight":105,"reps":8,"rpe":"9","done":true,"vol":840},{"id":"lat-pull","name":"Lat Pulldowns","set":1,"weight":160,"reps":15,"rpe":"4","done":true,"vol":2400},{"id":"lat-pull","name":"Lat Pulldowns","set":2,"weight":215,"reps":11,"rpe":"8","done":true,"vol":2365},{"id":"lat-pull","name":"Lat Pulldowns","set":3,"weight":235,"reps":8,"rpe":"8","done":false,"vol":1880},{"id":"seated-row","name":"Seated Rows","set":1,"weight":160,"reps":12,"rpe":"4","done":true,"vol":1920},{"id":"seated-row","name":"Seated Rows","set":2,"weight":180,"reps":12,"rpe":"5","done":true,"vol":2160},{"id":"seated-row","name":"Seated Rows","set":3,"weight":200,"reps":10,"rpe":"8","done":true,"vol":2000},{"id":"seated-row","name":"Seated Rows","set":4,"weight":210,"reps":8,"rpe":"8","done":true,"vol":1680},{"id":"close-row","name":"Standing Close Rows","set":1,"weight":70,"reps":15,"rpe":"3","done":true,"vol":1050},{"id":"close-row","name":"Standing Close Rows","set":2,"weight":80,"reps":12,"rpe":"2","done":true,"vol":960},{"id":"close-row","name":"Standing Close Rows","set":3,"weight":90,"reps":15,"rpe":"2","done":true,"vol":1350},{"id":"straight-pull","name":"Straight Arm Pulldowns","set":1,"weight":90,"reps":12,"rpe":"5","done":true,"vol":1080},{"id":"straight-pull","name":"Straight Arm Pulldowns","set":2,"weight":90,"reps":12,"rpe":"8","done":true,"vol":1080},{"id":"straight-pull","name":"Straight Arm Pulldowns","set":3,"weight":90,"reps":11,"rpe":"9","done":true,"vol":990},{"id":"hammer-b","name":"Hammer Curls","set":1,"weight":30,"reps":13,"rpe":"3","done":true,"vol":390},{"id":"hammer-b","name":"Hammer Curls","set":2,"weight":35,"reps":12,"rpe":"5","done":true,"vol":420},{"id":"hammer-b","name":"Hammer Curls","set":3,"weight":40,"reps":9,"rpe":"","done":true,"vol":360},{"id":"cable-curl-b","name":"Cable Curls","set":1,"weight":30,"reps":13,"rpe":"5","done":true,"vol":390},{"id":"cable-curl-b","name":"Cable Curls","set":2,"weight":35,"reps":12,"rpe":"6","done":true,"vol":420},{"id":"cable-curl-b","name":"Cable Curls","set":3,"weight":40,"reps":10,"rpe":"8","done":true,"vol":400},{"id":"cable-crunch","name":"Cable Crunches","set":1,"weight":80,"reps":15,"rpe":"2","done":true,"vol":1200},{"id":"cable-crunch","name":"Cable Crunches","set":2,"weight":100,"reps":15,"rpe":"3","done":true,"vol":1500},{"id":"cable-crunch","name":"Cable Crunches","set":3,"weight":120,"reps":15,"rpe":"4","done":true,"vol":1800},{"id":"leg-raise","name":"Lying Leg Raises","set":1,"weight":0,"reps":10,"rpe":"9","done":true,"vol":0},{"id":"leg-raise","name":"Lying Leg Raises","set":2,"weight":0,"reps":12,"rpe":"4","done":true,"vol":0},{"id":"leg-raise","name":"Lying Leg Raises","set":3,"weight":0,"reps":12,"rpe":"4","done":true,"vol":0}],"notes":"","duration":4052},{"date":"Monday, June 1, 2026","dateISO":"2026-06-01","day":"cardio-day","exercises":[],"notes":"","duration":0,"cardioMinutes":45},{"date":"Sunday, May 31, 2026","dateISO":"2026-05-31","day":"chest","notes":"","duration":0,"exercises":[{"id":"incline","name":"Incline Dumbbell Press","set":1,"weight":50,"reps":12,"rpe":"4","done":true,"vol":600},{"id":"incline","name":"Incline Dumbbell Press","set":2,"weight":55,"reps":12,"rpe":"4","done":true,"vol":660},{"id":"incline","name":"Incline Dumbbell Press","set":3,"weight":65,"reps":10,"rpe":"7","done":true,"vol":650},{"id":"incline","name":"Incline Dumbbell Press","set":4,"weight":65,"reps":8,"rpe":"8","done":true,"vol":520},{"id":"cable-press","name":"Seated Cable Press","set":1,"weight":120,"reps":12,"rpe":"9","done":true,"vol":1440},{"id":"cable-press","name":"Seated Cable Press","set":2,"weight":125,"reps":10,"rpe":"8","done":true,"vol":1250},{"id":"cable-press","name":"Seated Cable Press","set":3,"weight":130,"reps":8,"rpe":"8","done":true,"vol":1040},{"id":"low-fly","name":"Low-to-High Cable Fly","set":1,"weight":30,"reps":15,"rpe":"3","done":true,"vol":450},{"id":"low-fly","name":"Low-to-High Cable Fly","set":2,"weight":35,"reps":12,"rpe":"4","done":true,"vol":420},{"id":"low-fly","name":"Low-to-High Cable Fly","set":3,"weight":40,"reps":12,"rpe":"5","done":true,"vol":480},{"id":"high-fly","name":"High-to-Low Cable Fly","set":1,"weight":30,"reps":15,"rpe":"3","done":true,"vol":450},{"id":"high-fly","name":"High-to-Low Cable Fly","set":2,"weight":35,"reps":12,"rpe":"5","done":true,"vol":420},{"id":"high-fly","name":"High-to-Low Cable Fly","set":3,"weight":40,"reps":12,"rpe":"6","done":true,"vol":480},{"id":"pullover","name":"Dumbbell Pullovers","set":1,"weight":40,"reps":12,"rpe":"2","done":true,"vol":480},{"id":"pullover","name":"Dumbbell Pullovers","set":2,"weight":50,"reps":14,"rpe":"2","done":true,"vol":700},{"id":"pullover","name":"Dumbbell Pullovers","set":3,"weight":60,"reps":12,"rpe":"5","done":true,"vol":720},{"id":"pushdown-c","name":"Tricep Pushdowns","set":1,"weight":50,"reps":15,"rpe":"3","done":true,"vol":750},{"id":"pushdown-c","name":"Tricep Pushdowns","set":2,"weight":60,"reps":15,"rpe":"5","done":true,"vol":900},{"id":"pushdown-c","name":"Tricep Pushdowns","set":3,"weight":70,"reps":13,"rpe":"6","done":true,"vol":910},{"id":"overhead-c","name":"Tricep Overhead Press","set":1,"weight":60,"reps":15,"rpe":"6","done":true,"vol":900},{"id":"overhead-c","name":"Tricep Overhead Press","set":2,"weight":60,"reps":15,"rpe":"2","done":true,"vol":900},{"id":"overhead-c","name":"Tricep Overhead Press","set":3,"weight":70,"reps":15,"rpe":"5","done":true,"vol":1050}]}];
+    game={xp:105,level:5,streak:3,lastSaved:"2026-06-02T20:16:46.432Z",totalSets:50,totalWorkouts:3,totalPRs:15,totalLifted:45755,mseen:[]};
+    nutrData={"2026-06-01":{"checked":["i4","i5","i6","i7","i3","i9","i10","i11","i12"],"custom":[]},"2026-06-02":{"checked":["i3","i4","i5","i6","i7","i8"],"custom":[{"id":"cf-1780446936202","name":"Beef, steak, ribeye, lean and fat eaten (170g)","cal":491,"protein":39.9,"carbs":0,"fat":36.7},{"id":"cf-1780447001407","name":"100g cooked jasmine rice","cal":130,"protein":3,"carbs":28,"fat":0},{"id":"cf-1780453638073","name":"Protein Shake","cal":130,"protein":24,"carbs":3,"fat":2}]},"2026-05-31":{"checked":["i1","i2","i3","i4","i5","i8","i7","i6","i9","i10","i12","i11"],"custom":[]},"2026-06-03":{"checked":["i1","i2"],"custom":[]}};
+    suppData={"2026-06-01":{"checked":["creatine","fishoil","vitd","zinc","multi","pwpowder","electro","magnesium"]},"2026-06-02":{"checked":["creatine","fishoil","vitd","zinc","multi","electro","pwpowder","magnesium"]},"2026-05-31":{"checked":["creatine","fishoil","vitd","zinc","multi","electro","pwpowder","magnesium"]},"2026-06-03":{"checked":["creatine","fishoil","vitd","zinc","multi"]}};
+    bwLog={"2026-06-01":287,"2026-06-02":285.6,"2026-06-03":286};
+    stepsLog={"2026-06-02":15213,"2026-06-01":15552,"2026-05-31":17626,"2026-06-03":3506};
+    energyLog={"2026-06-01":7,"2026-06-02":6,"2026-05-31":8};
+    suppConfig=[{"id":"morning","label":"Morning -- with food","color":"var(--gold)","items":[{"id":"creatine","name":"Creatine monohydrate (5g)"},{"id":"fishoil","name":"Fish Oil / Omega-3"},{"id":"vitd","name":"Vitamin D3 + K2"},{"id":"zinc","name":"Zinc"},{"id":"multi","name":"Multivitamin"}]},{"id":"prewkt","label":"Pre-workout","color":"var(--accent)","items":[{"id":"pwpowder","name":"Pre-workout powder (optional)"}]},{"id":"wkt","label":"During / post workout","color":"var(--accent2)","items":[{"id":"electro","name":"Electrolytes"}]},{"id":"night","label":"Night -- before bed","color":"var(--blue2)","items":[{"id":"magnesium","name":"Magnesium glycinate (30-60 min before bed)"}]}];
+    MACRO_TARGETS={cal:1765,protein:240,carbs:121,fat:30};
+    exLibrary=["Bent Over Rows","Lat Pulldowns","Seated Rows","Standing Close Rows","Straight Arm Pulldowns","Hammer Curls","Cable Curls","Cable Crunches","Lying Leg Raises","Incline Dumbbell Press","Seated Cable Press","Low-to-High Cable Fly","High-to-Low Cable Fly","Dumbbell Pullovers","Tricep Pushdowns","Tricep Overhead Press"];
+  } catch(e) {}
+})();
 // ─────────────────────────────────────────────────────────────────────────
+
+
 
 // ── CONSTANTS ───────────────────────────────────────────────────────────
 const QUOTES=[
@@ -1420,7 +1406,7 @@ const DEFAULT_SUPPS=[
 const BADGE_CLS={chest:'b-chest',tri:'b-tri',legs:'b-legs',back:'b-back',bi:'b-bi',shoulder:'b-shoulder',core:'b-core'};
 const BADGE_LBL={chest:'Chest',tri:'Triceps',legs:'Legs',back:'Back',bi:'Biceps',shoulder:'Shoulder',core:'Core'};
 const DAY_LABEL={chest:'Chest + Triceps',back:'Back + Biceps',shoulders:'Shoulders + Triceps',legs:'Leg Day',arms:'Arm Day','cardio-day':'Cardio'};
-const ALL_TABS=['workout','fuel','body','records','history','achievements','week','bible','advisor'];
+const ALL_TABS=['workout','fuel','body','records','history','achievements','week','bible','advisor','settings'];
 const DAILY_TABS=['fuel','body','bible'];
 
 const VERSES=[
@@ -1534,8 +1520,8 @@ function importData(ev){
       if(d.suppConfig)suppConfig=d.suppConfig;if(d.daySummaryLog)daySummaryLog=d.daySummaryLog;
       if(d.foodLibrary)foodLibrary=d.foodLibrary;if(d.exLibrary)exLibrary=d.exLibrary;
       if(d.bibleLog)bibleLog=d.bibleLog;if(d.bibleChapters)bibleChapters=d.bibleChapters;
-      saveStorage();saveSC();updateStats();renderAchievements();alert('Imported successfully!');
-    }catch(e){alert('Invalid backup file.');}
+      saveStorage();saveSC();updateStats();renderAchievements();const ib=document.querySelector('.settings-btn.imp');if(ib){ib.textContent='✓ Imported!';ib.style.background='var(--green)';setTimeout(()=>{ib.textContent='📥 Import Backup';ib.style.background='';},3000);}scheduleAutoSync();
+    }catch(e){const ib=document.querySelector('.settings-btn.imp');if(ib){ib.textContent='⚠ Invalid file';setTimeout(()=>ib.textContent='📥 Import Backup',2500);}}
   };
   reader.readAsText(file);
 }
@@ -1586,7 +1572,7 @@ function saveDaySummary(dateKey){
   const cardio=cardioLog[dateKey]||[];
   daySummaryLog[dateKey]={
     date:dateKey,displayDate:fmtDisplay(dateKey),
-    steps,stepGoalHit:steps>=STEP_GOAL,
+    steps,stepGoalHit:steps>=STEP_GOAL_LIVE_LIVE,
     nutrition:{cal:Math.round(nt.cal),protein:Math.round(nt.protein*10)/10,carbs:Math.round(nt.carbs*10)/10,fat:Math.round(nt.fat*10)/10},
     supplements:{done:suppDone,total:allSIds.length,pct:allSIds.length>0?Math.round(suppDone/allSIds.length*100):0},
     energy:energyLog[dateKey]||null,bodyWeight:bwLog[dateKey]||null,
@@ -1617,7 +1603,6 @@ function navDate(delta){
   d.setDate(d.getDate()+delta);
   setActiveDate(localKey(d));
 }
-function goToToday(){setActiveDate(TODAY_KEY);}
 function updateDateNav(){
   const todayBtn = document.getElementById('today-btn');
   if(todayBtn) todayBtn.style.display = ACTIVE_DATE !== TODAY_KEY ? 'inline-block' : 'none';
@@ -1763,7 +1748,7 @@ function goToToday(){
 // ── COPY LAST SESSION ────────────────────────────────────────────────────
 function copyLastSession(){
   const last = history.find(h=>h.day===currentDay);
-  if(!last){alert('No previous '+currentDay+' session found.');return;}
+  if(!last){const b=document.getElementById('copy-last-btn');if(b){b.textContent='No prev session';setTimeout(()=>b.textContent='↺ Copy Last',2000);}return;}
   last.exercises.forEach(ex=>{
     if(!state[ex.id]) state[ex.id]=[];
     const setIdx = ex.set-1;
@@ -1792,10 +1777,45 @@ function scrollToNextEx(currentExId){
 
 // ── WORKOUT ─────────────────────────────────────────────────────────────
 function getAllEx(day){return day==='cardio-day'?[]:(DAYS[day]?.sections||[]).flatMap(s=>s.exercises);}
-function initState(day){state={};swaps={};if(day==='cardio-day')return;getAllEx(day).forEach(ex=>{state[ex.id]=Array.from({length:ex.sets},()=>({weight:'',reps:'',rpe:'',done:false}));});}
+// ── DRAFT WORKOUT PERSISTENCE ────────────────────────────────────────────
+function saveDraft(){
+  if(currentDay==='cardio-day')return;
+  try{
+    const notesEl=document.getElementById('sess-notes');
+    const draft={day:currentDay,state,swaps,sessSeconds,savedToday,notes:notesEl?notesEl.value:'',ts:Date.now()};
+    localStorage.setItem('il_draft',JSON.stringify(draft));
+  }catch(e){}
+}
+function clearDraft(){try{localStorage.removeItem('il_draft');}catch(e){}}
+function loadDraft(day){
+  try{
+    const raw=localStorage.getItem('il_draft');
+    if(!raw)return null;
+    const d=JSON.parse(raw);
+    if(d.day!==day)return null;
+    if(Date.now()-d.ts>86400000)return null;
+    return d;
+  }catch(e){return null;}
+}
+function initState(day){
+  if(day==='cardio-day'){state={};swaps={};return;}
+  const draft=loadDraft(day);
+  if(draft&&!draft.savedToday){
+    state=draft.state||{};
+    swaps=draft.swaps||{};
+    sessSeconds=draft.sessSeconds||0;
+    getAllEx(day).forEach(ex=>{if(!state[ex.id])state[ex.id]=Array.from({length:ex.sets},()=>({weight:'',reps:'',rpe:'',done:false}));});
+    // Restore session notes if saved
+    if(draft.notes){const nt=document.getElementById('sess-notes');if(nt)nt.value=draft.notes;}
+    return;
+  }
+  state={};swaps={};
+  getAllEx(day).forEach(ex=>{state[ex.id]=Array.from({length:ex.sets},()=>({weight:'',reps:'',rpe:'',done:false}));});
+}
 
 function switchDay(day,btn){
   currentDay=day;savedToday=false;todayPRs=0;
+  try{localStorage.setItem('il_last_day',day);}catch(e){}
   document.querySelectorAll('.day-btn').forEach(b=>b.classList.remove('active'));
   if(btn)btn.classList.add('active');
   else{const db=document.querySelector(`.day-btn[data-day="${day}"]`);if(db)db.classList.add('active');}
@@ -1816,6 +1836,7 @@ function switchDay(day,btn){
     initState(day);renderExercises();
   }
   renderPrevPanel(day);setQuote();updateStats();try{renderWeeklyChallenge();}catch(e){}try{renderPBTicker(day);}catch(e){}
+  const addBtn=document.getElementById('add-ex-btn');if(addBtn)addBtn.style.display=(day!=='cardio-day')?'block':'none';
 }
 
 function renderExercises(){
@@ -1857,7 +1878,7 @@ ${lastHtml}
 <datalist id="${listId}">${opts}</datalist>
 <div class="col-hdr"><span>#</span><span>Weight (lbs)</span><span>Reps</span><span>RPE</span><span>Rest</span><span>&#x2713;</span></div>
 <div id="sets-${ex.id}"></div>
-<div class="add-del-row"><button class="btn-sm" onclick="addSet('${ex.id}')">+ Set</button><button class="btn-sm btn-del" onclick="removeSet('${ex.id}')">- Remove</button></div>`;
+<div class="add-del-row"><button class="btn-sm" onclick="addSet('${ex.id}')">+ Set</button><button class="btn-sm btn-del" onclick="removeSet('${ex.id}')">- Set</button><button class="btn-sm btn-del" data-del-id="${ex.id}" onclick="deleteExerciseCard('${ex.id}')" style="margin-left:auto">&#x1F5D1; Remove Exercise</button></div>`;
   renderSets(ex);return div;
 }
 
@@ -1866,7 +1887,7 @@ function renderSets(ex){
   (state[ex.id]||[]).forEach((s,i)=>{
     const row=document.createElement('div');row.className='set-row'+(s.done?' done':'');row.id=`row-${ex.id}-${i}`;
     const rpeOpts=[1,2,3,4,5,6,7,8,9,10].map(k=>`<option value="${k}"${s.rpe==k?' selected':''}>${k}</option>`).join('');
-    row.innerHTML=`<span class="set-num">${i+1}</span><input type="number" placeholder="lbs" min="0" step="2.5" value="${s.weight||''}" oninput="upd('${ex.id}',${i},'weight',this.value)"><input type="number" placeholder="reps" min="0" step="1" value="${s.reps||''}" oninput="upd('${ex.id}',${i},'reps',this.value)"><select class="rpe-sel" onchange="upd('${ex.id}',${i},'rpe',this.value)"><option value="">RPE</option>${rpeOpts}</select><button class="btn-sm" style="padding:3px 6px;font-size:9px" onclick="startTimer(${DEFAULT_REST})">&#x23F1;</button><input type="checkbox"${s.done?' checked':''} onchange="toggleDone('${ex.id}',${i},this.checked)">`;
+    row.innerHTML=`<span class="set-num">${i+1}</span><input type="number" placeholder="lbs" min="0" step="2.5" value="${s.weight||''}" oninput="upd('${ex.id}',${i},'weight',this.value)"><input type="number" placeholder="reps" min="0" step="1" value="${s.reps||''}" oninput="upd('${ex.id}',${i},'reps',this.value)"><select class="rpe-sel" onchange="upd('${ex.id}',${i},'rpe',this.value)"><option value="">RPE</option>${rpeOpts}</select><button class="btn-sm" style="padding:3px 6px;font-size:9px" onclick="startTimer(DEFAULT_REST_LIVE)">&#x23F1;</button><input type="checkbox"${s.done?' checked':''} onchange="toggleDone('${ex.id}',${i},this.checked)">`;
     c.appendChild(row);
   });
 }
@@ -1890,15 +1911,15 @@ function cancelSwap(id){
   const orig=swaps[id]||getAllEx(currentDay).find(e=>e.id===id)?.name||id;
   const el=document.getElementById('exn-'+id);if(el){el.className='ex-name';el.textContent=orig;}
 }
-function upd(id,i,field,val){if(!state[id])return;state[id][i][field]=val;checkPR(id,i);updateStats();}
+function upd(id,i,field,val){if(!state[id])return;state[id][i][field]=val;checkPR(id,i);updateStats();saveDraft();}
 function toggleDone(id,i,checked){
   if(!state[id])return;state[id][i].done=checked;
   const row=document.getElementById(`row-${id}-${i}`);if(row)row.className='set-row'+(checked?' done':'');
-  if(checked){startTimer(DEFAULT_REST);startSessTimer();}
-  checkPR(id,i);updateStats();
+  if(checked){startTimer(DEFAULT_REST_LIVE);startSessTimer();try{if(navigator.vibrate)navigator.vibrate(40);}catch(e){}}
+  checkPR(id,i);updateStats();saveDraft();
 }
-function addSet(id){if(!state[id])return;state[id].push({weight:'',reps:'',rpe:'',done:false});const ex=getAllEx(currentDay).find(e=>e.id===id);if(ex)renderSets(ex);updateStats();}
-function removeSet(id){if(!state[id]||state[id].length<=1)return;state[id].pop();const ex=getAllEx(currentDay).find(e=>e.id===id);if(ex)renderSets(ex);updateStats();}
+function addSet(id){if(!state[id])return;state[id].push({weight:'',reps:'',rpe:'',done:false});const ex=getAllEx(currentDay).find(e=>e.id===id);if(ex)renderSets(ex);updateStats();saveDraft();}
+function removeSet(id){if(!state[id]||state[id].length<=1)return;state[id].pop();const ex=getAllEx(currentDay).find(e=>e.id===id);if(ex)renderSets(ex);updateStats();saveDraft();}
 
 function getHistPR(name){let b=0;history.forEach(e=>(e.exercises||[]).filter(ex=>ex.name===name).forEach(ex=>{const v=(parseFloat(ex.weight)||0)*(parseFloat(ex.reps)||0);if(v>b)b=v;}));return b;}
 function checkPR(id,i){
@@ -1987,7 +2008,7 @@ function addCardioToWorkout(){
   const dur=parseInt(document.getElementById('cw-dur')?.value||'0');
   const intensity=document.getElementById('cw-int')?.value||'';
   const notes=document.getElementById('cw-notes')?.value.trim()||'';
-  if(!type||!dur){alert('Select an activity and enter duration.');return;}
+  if(!type||!dur){const b=document.querySelector('.cf-log-btn');if(b){b.textContent='Select type & duration';setTimeout(()=>b.textContent='Add',2000);}return;}
   if(!cardioLog[TODAY_KEY])cardioLog[TODAY_KEY]=[];
   cardioLog[TODAY_KEY].push({id:'c-'+Date.now(),type,duration:dur,intensity,notes,time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})});
   saveStorage();
@@ -2023,13 +2044,13 @@ function updateStats(){
 }
 function updateStepDisplay(){
   const steps=stepsLog[ACTIVE_DATE]||0;
-  const pct=Math.min(100,Math.round((steps/STEP_GOAL)*100));
+  const pct=Math.min(100,Math.round((steps/STEP_GOAL_LIVE)*100));
   const $=id=>document.getElementById(id);
   if($('s-steps'))$('s-steps').textContent=steps.toLocaleString();
   if($('s-steps-bar'))$('s-steps-bar').style.width=pct+'%';
   if($('steps-big'))$('steps-big').textContent=steps.toLocaleString();
   if($('steps-big-fill'))$('steps-big-fill').style.width=pct+'%';
-  if($('steps-pct-lbl'))$('steps-pct-lbl').textContent=pct+'% of goal ('+steps.toLocaleString()+' / '+STEP_GOAL.toLocaleString()+')';
+  if($('steps-pct-lbl'))$('steps-pct-lbl').textContent=pct+'% of goal ('+steps.toLocaleString()+' / '+STEP_GOAL_LIVE.toLocaleString()+')';
 }
 function checkMilestones(prev,curr){
   MILESTONES.forEach(ms=>{
@@ -2046,10 +2067,10 @@ function checkMilestones(prev,curr){
   });
 }
 function saveWorkout(){
-  if(savedToday){alert('Already saved this session!');return;}
+  if(savedToday){const sb=document.getElementById('save-btn');if(sb){sb.textContent='Already saved!';setTimeout(()=>sb.textContent='SAVED!',1500);}return;}
   if(currentDay==='cardio-day'){
     const daySessions=cardioLog[TODAY_KEY]||[];
-    if(!daySessions.length){alert('Add at least one cardio session first!');return;}
+    if(!daySessions.length){const sb=document.getElementById('save-btn');if(sb){const ot=sb.textContent;sb.textContent='Add cardio first!';sb.style.background='var(--steel)';setTimeout(()=>{sb.textContent=ot;sb.style.background='var(--teal)';},2000);}return;}
     const totalMin=daySessions.reduce((a,c)=>a+c.duration,0);
     const notes2=document.getElementById('sess-notes')?.value||'';
     history.unshift({date:fmtDisplay(TODAY_KEY),dateISO:TODAY_KEY,day:'cardio-day',exercises:[],notes:notes2,duration:sessSeconds,cardioMinutes:totalMin});
@@ -2060,7 +2081,7 @@ function saveWorkout(){
     const lastS=game.lastSaved?new Date(game.lastSaved):null;
     if(lastS){const diff=(new Date()-lastS)/(86400000);game.streak=diff<3?game.streak+1:1;}else game.streak=1;
     game.lastSaved=new Date().toISOString();
-    _origSaveStorage();savedToday=true;stopSessTimer();haptic('success');
+    _origSaveStorage();savedToday=true;stopSessTimer();haptic('success');clearDraft();
     finalizeSave(xpE,prevLvl,totalMin+' min',fmtDur(sessSeconds));
     scheduleAutoSync();
     return;
@@ -2072,7 +2093,7 @@ function saveWorkout(){
       if(s.weight||s.reps)exercises.push({id:ex.id,name:dname,set:i+1,weight:parseFloat(s.weight)||0,reps:parseFloat(s.reps)||0,rpe:s.rpe,done:s.done,vol:(parseFloat(s.weight)||0)*(parseFloat(s.reps)||0)});
     });
   });
-  if(!exercises.length){alert('Log at least one set first!');return;}
+  if(!exercises.length){const sb=document.getElementById('save-btn');if(sb){const orig=sb.textContent;sb.textContent='Log a set first!';sb.style.background='var(--steel)';setTimeout(()=>{sb.textContent=orig;sb.style.background='';},2000);}return;}
   const notes2=document.getElementById('sess-notes')?.value||'';
   history.unshift({date:fmtDisplay(TODAY_KEY),dateISO:TODAY_KEY,day:currentDay,exercises,notes:notes2,duration:sessSeconds});
   const doneSets=exercises.filter(e=>e.done).length;
@@ -2084,7 +2105,7 @@ function saveWorkout(){
   const lastS=game.lastSaved?new Date(game.lastSaved):null;
   if(lastS){const diff=(new Date()-lastS)/(86400000);game.streak=diff<3?game.streak+1:1;}else game.streak=1;
   game.lastSaved=new Date().toISOString();
-  _origSaveStorage();savedToday=true;stopSessTimer();
+  _origSaveStorage();savedToday=true;stopSessTimer();clearDraft();
   checkMilestones(prevLifted,game.totalLifted);
   finalizeSave(xpE,prevLvl,totalVol.toLocaleString()+' lbs',fmtDur(sessSeconds));
   todayPRs=0;
@@ -2140,7 +2161,7 @@ function logCardio(){
   const dur=parseInt(document.getElementById('cardio-duration')?.value||'0');
   const intensity=document.getElementById('cardio-intensity')?.value||'';
   const notes=document.getElementById('cardio-notes')?.value.trim()||'';
-  if(!type||!dur){alert('Select an activity and enter duration.');return;}
+  if(!type||!dur){const b=document.querySelector('.cf-log-btn');if(b){b.textContent='Select type & duration';setTimeout(()=>b.textContent='Add',2000);}return;}
   if(!cardioLog[cardioDateKey])cardioLog[cardioDateKey]=[];
   cardioLog[cardioDateKey].push({id:'c-'+Date.now(),type,duration:dur,intensity,notes,time:new Date().toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'})});
   ['cardio-type','cardio-duration','cardio-intensity','cardio-notes'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
@@ -2173,7 +2194,7 @@ function toggleTargetsEditor(){const ed=document.getElementById('targets-ed');if
 function saveTargets(){
   const cal=parseInt(document.getElementById('tg-cal')?.value);const pro=parseInt(document.getElementById('tg-pro')?.value);
   const carb=parseInt(document.getElementById('tg-carb')?.value);const fat=parseInt(document.getElementById('tg-fat')?.value);
-  if(!cal||!pro||isNaN(carb)||!fat){alert('Fill in all fields.');return;}
+  if(!cal||!pro||isNaN(carb)||!fat){const b=document.querySelector('.tg-save');if(b){b.textContent='Fill all fields!';b.style.background='var(--steel)';setTimeout(()=>{b.textContent='Save Targets';b.style.background='';},2000);}return;}
   MACRO_TARGETS={cal,protein:pro,carbs:carb,fat};
   saveStorage();const ed=document.getElementById('targets-ed');if(ed)ed.style.display='none';renderNutrition();
 }
@@ -2183,7 +2204,7 @@ function calcConsumed(){
   (d.custom||[]).forEach(f=>{c.cal+=f.cal||0;c.protein+=f.protein||0;c.carbs+=f.carbs||0;c.fat+=f.fat||0;});
   return c;
 }
-function renderNutrition(){
+function renderNutrition(){try{updateTDEEBadge();}catch(e){}
   const con=calcConsumed();const t=MACRO_TARGETS;
   const pct=(v,mx)=>Math.min(110,Math.round((v/mx)*100));
   const over=(v,mx)=>v>mx;
@@ -2271,7 +2292,7 @@ function renderSavedFoods(){
 // ── FOOD SEARCH ───────────────────────────────────────────────────────────
 function escA(s){return String(s).replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 async function searchFood(){
-  const q=(document.getElementById('fs-inp')?.value||'').trim();if(!q){alert('Enter a food to search.');return;}
+  const q=(document.getElementById('fs-inp')?.value||'').trim();if(!q){const inp=document.getElementById('fs-inp');if(inp){inp.placeholder='Type something first...';setTimeout(()=>inp.placeholder='Search food...',2000);}return;}
   const res=document.getElementById('fs-results');const btn=document.getElementById('fs-btn');const sv=document.getElementById('fs-serving-section');
   if(btn){btn.disabled=true;btn.textContent='Searching...';}
   if(res)res.innerHTML='<div class="fs-loading">Searching USDA database...</div>';
@@ -2341,7 +2362,7 @@ function addFoodToLog(name,c100,p100,cb100,f100){
 
 // ── SUPPLEMENTS ──────────────────────────────────────────────────────────
 function toggleSuppEdit(){suppEditMode=!suppEditMode;const btn=document.getElementById('supp-edit-btn');if(btn){btn.innerHTML=suppEditMode?'&#x2714; Done':'&#x270E; Edit';btn.className=suppEditMode?'edit-btn on':'edit-btn';}renderSupplements();}
-function addSupplement(groupId){const inp=document.getElementById('supp-new-inp-'+groupId);const name=(inp?inp.value.trim():'');if(!name){alert('Enter a supplement name.');return;}const group=(suppConfig||DEFAULT_SUPPS).find(g=>g.id===groupId);if(!group)return;group.items.push({id:'cus-'+Date.now(),name});saveSC();renderSupplements();}
+function addSupplement(groupId){const inp=document.getElementById('supp-new-inp-'+groupId);const name=(inp?inp.value.trim():'');if(!name){if(inp){inp.placeholder='Name required...';inp.focus();setTimeout(()=>inp.placeholder='Add supplement...',2000);}return;}const group=(suppConfig||DEFAULT_SUPPS).find(g=>g.id===groupId);if(!group)return;group.items.push({id:'cus-'+Date.now(),name});saveSC();renderSupplements();}
 function removeSupplement(groupId,suppId){const cfg=suppConfig||DEFAULT_SUPPS;const group=cfg.find(g=>g.id===groupId);if(!group)return;group.items=group.items.filter(i=>i.id!==suppId);const d=getDaySupp(ACTIVE_DATE);d.checked=d.checked.filter(id=>id!==suppId);saveSC();saveStorage();renderSupplements();}
 function toggleSupp(id,checked){
   const d=getDaySupp(ACTIVE_DATE);
@@ -2374,11 +2395,11 @@ function renderSupplements(){
 // ── BODY TAB ─────────────────────────────────────────────────────────────
 function saveBodyWeight(){
   const inp=document.getElementById('bw-inp');const w=parseFloat(inp?.value);
-  if(!w||w<50||w>600){alert('Enter a valid weight (50-600 lbs).');return;}
+  if(!w||w<50||w>600){const inp=document.getElementById('bw-inp');if(inp){inp.style.borderColor='var(--accent)';setTimeout(()=>inp.style.borderColor='',2000);}return;}
   bwLog[ACTIVE_DATE]=w;if(inp)inp.value='';saveStorage();renderBodyTab();
 }
 function setSteps(amount){
-  const n=parseInt(amount);if(!n||n<0){alert('Enter a valid step count.');return;}
+  const n=parseInt(amount);if(!n||n<0){const inp=document.getElementById('steps-add-inp');if(inp){inp.style.borderColor='var(--accent)';setTimeout(()=>inp.style.borderColor='',2000);}return;}
   stepsLog[ACTIVE_DATE]=n;
   const inp=document.getElementById('steps-add-inp');if(inp)inp.value='';
   // Save to localStorage directly — never block UI
@@ -2387,7 +2408,15 @@ function setSteps(amount){
   scheduleAutoSync();
 }
 function quickSetSteps(n){stepsLog[ACTIVE_DATE]=n;try{localStorage.setItem('il_steps',JSON.stringify(stepsLog));}catch(e){}updateStepDisplay();scheduleAutoSync();}
-function resetSteps(){if(!confirm('Reset steps for this day to 0?'))return;stepsLog[ACTIVE_DATE]=0;try{localStorage.setItem('il_steps',JSON.stringify(stepsLog));}catch(e){}updateStepDisplay();scheduleAutoSync();}
+function resetSteps(){
+  const btn=document.querySelector('.steps-reset');
+  if(btn&&btn.dataset.confirm!=='1'){
+    btn.textContent='Tap again to reset';btn.style.background='rgba(232,56,13,.2)';btn.dataset.confirm='1';
+    setTimeout(()=>{btn.textContent='Reset';btn.style.background='';btn.dataset.confirm='';},2500);return;
+  }
+  if(btn){btn.textContent='Reset';btn.style.background='';btn.dataset.confirm='';}
+  stepsLog[ACTIVE_DATE]=0;try{localStorage.setItem('il_steps',JSON.stringify(stepsLog));}catch(e){}updateStepDisplay();scheduleAutoSync();
+}
 function setEnergy(rating){energyLog[ACTIVE_DATE]=rating;try{localStorage.setItem('il_energy',JSON.stringify(energyLog));}catch(e){}renderBodyTab();scheduleAutoSync();}
 function renderBodyTab(){
   updateStepDisplay();
@@ -2403,10 +2432,10 @@ function renderBodyTab(){
       const k=localKey(d);const steps=stepsLog[k]||0;weekTotal+=steps;
       return {dn,k,steps,isToday:k===TODAY_KEY};
     });
-    const maxSteps=Math.max(...cols.map(c=>c.steps),STEP_GOAL,1);
+    const maxSteps=Math.max(...cols.map(c=>c.steps),STEP_GOAL_LIVE,1);
     wsg.innerHTML=`<div class="wk-steps-grid">${cols.map(c=>{
       const pct=Math.round((c.steps/maxSteps)*100);
-      const goalHit=c.steps>=STEP_GOAL;
+      const goalHit=c.steps>=STEP_GOAL_LIVE_LIVE;
       const isT=c.isToday;
       const barCls='wk-step-bar'+(goalHit?' goal-hit':'')+(isT?' today-col':'');
       const numCls='wk-step-num'+(goalHit?' goal-hit':'')+(isT?' today-col':'');
@@ -2439,7 +2468,7 @@ function renderBodyTab(){
   const stE=Object.entries(stepsLog).filter(e=>e[1]>0).sort((a,b)=>a[0].localeCompare(b[0]));
   if(stepsChart)stepsChart.destroy();
   const stc=document.getElementById('steps-chart');
-  if(stc&&stE.length){stepsChart=new Chart(stc,{type:'bar',data:{labels:stE.map(e=>e[0].slice(5)),datasets:[{data:stE.map(e=>e[1]),backgroundColor:stE.map(e=>e[1]>=STEP_GOAL?'rgba(42,154,212,0.7)':'rgba(42,154,212,0.3)'),borderColor:'var(--blue2)',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:10}},grid:{color:gc},beginAtZero:true}}}});}
+  if(stc&&stE.length){stepsChart=new Chart(stc,{type:'bar',data:{labels:stE.map(e=>e[0].slice(5)),datasets:[{data:stE.map(e=>e[1]),backgroundColor:stE.map(e=>e[1]>=STEP_GOAL_LIVE?'rgba(42,154,212,0.7)':'rgba(42,154,212,0.3)'),borderColor:'var(--blue2)',borderWidth:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}},y:{ticks:{color:tc,font:{size:10}},grid:{color:gc},beginAtZero:true}}}});}
   const eRating=energyLog[ACTIVE_DATE];
   const eBtns=document.getElementById('energy-btns');
   if(eBtns)eBtns.innerHTML=[1,2,3,4,5,6,7,8,9,10].map(n=>`<button class="e-btn${eRating===n?' sel':''}" onclick="setEnergy(${n})">${n}</button>`).join('');
@@ -2483,13 +2512,7 @@ function renderChart(){
 }
 
 // ── HISTORY ───────────────────────────────────────────────────────────────
-function switchHistView(view){
-  histView=view;
-  const sv=document.getElementById('hist-session-view'),dv=document.getElementById('hist-day-view');
-  const sb=document.getElementById('ht-sessions'),db=document.getElementById('ht-daylog');
-  if(view==='sessions'){if(sv)sv.style.display='';if(dv)dv.style.display='none';if(sb)sb.className='ht-btn active';if(db)db.className='ht-btn';renderHistory();}
-  else{if(sv)sv.style.display='none';if(dv)dv.style.display='';if(sb)sb.className='ht-btn';if(db)db.className='ht-btn active';renderDayLog();}
-}
+/* switchHistView: canonical version below */
 function toggleHistPanel(id){const p=document.getElementById(id);if(!p)return;const open=p.style.display!=='none';p.style.display=open?'none':'';const prev=p.previousElementSibling;if(prev){const arr=prev.querySelector('.hist-arrow');if(arr)arr.textContent=open?'\u25B6':'\u25BC';}}
 function renderHistory(){
   const el=document.getElementById('history-list');if(!el)return;
@@ -2573,7 +2596,7 @@ function renderDayLog(){
     MEAL_PLAN.forEach(m=>m.items.forEach(i=>{if((nd.checked||[]).includes(i.id)){nt.cal+=i.cal||0;nt.protein+=i.protein||0;nt.carbs+=i.carbs||0;nt.fat+=i.fat||0;}}));
     (nd.custom||[]).forEach(f=>{nt.cal+=f.cal||0;nt.protein+=f.protein||0;nt.carbs+=f.carbs||0;nt.fat+=f.fat||0;});
 
-    const stepGoal=steps>=STEP_GOAL;
+    const stepGoal=steps>=STEP_GOAL_LIVE_LIVE;
     const tv=workout?Math.round((workout.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0)):0;
 
     // Status tags
@@ -2701,8 +2724,8 @@ function saveDlSteps(key){
   const inp=document.getElementById('dl-steps-'+key);if(!inp)return;
   const val=parseInt(inp.value)||0;
   stepsLog[key]=val;
-  try{localStorage.setItem('wl_steps'||'il_steps', JSON.stringify(stepsLog));localStorage.setItem('il_steps',JSON.stringify(stepsLog));}catch(e){}
-  _origSaveStorage();scheduleAutoSync();
+  try{localStorage.setItem('il_steps',JSON.stringify(stepsLog));}catch(e){}
+  saveStorage();
   renderDayLog();
 }
 
@@ -2711,7 +2734,7 @@ function saveDlBody(key){
   const enInp=document.getElementById('dl-energy-'+key);
   if(bwInp?.value)bwLog[key]=parseFloat(bwInp.value)||0;
   if(enInp?.value)energyLog[key]=parseInt(enInp.value)||0;
-  _origSaveStorage();scheduleAutoSync();
+  saveStorage();
   renderDayLog();
 }
 
@@ -2720,13 +2743,13 @@ function saveDlNutr(key){
   const checked=items.filter(i=>{const el=document.getElementById('dl-nutr-'+key+'-'+i.id);return el&&el.checked;}).map(i=>i.id);
   if(!nutrData[key])nutrData[key]={checked:[],custom:[]};
   nutrData[key].checked=checked;
-  _origSaveStorage();scheduleAutoSync();
+  saveStorage();
 }
 
 function deleteDlCustomFood(key,idx){
   if(!nutrData[key]?.custom)return;
   nutrData[key].custom.splice(idx,1);
-  _origSaveStorage();scheduleAutoSync();
+  saveStorage();
   renderDayLog();
 }
 
@@ -2736,7 +2759,7 @@ function saveDlSupp(key){
   const checked=allItems.filter(i=>{const el=document.getElementById('dl-supp-'+key+'-'+i.id);return el&&el.checked;}).map(i=>i.id);
   if(!suppData[key])suppData[key]={checked:[]};
   suppData[key].checked=checked;
-  _origSaveStorage();scheduleAutoSync();
+  saveStorage();
 }
 
 function saveDlBible(key){
@@ -2819,7 +2842,20 @@ const ACHIEVEMENTS=[
   {id:'backup',     cat:'game',  name:'Data Protector',      desc:'Export a backup',                  icon:'💾', check:()=>!!localStorage.getItem('il_exported')},
 ];
 
+// Badge notification system
+// _prevUnlocked tracks which badges the user has already seen
+// _appReady gates notifications — stays false during startup render
 let _prevUnlocked = new Set();
+let _appReady = false;
+
+function initBadgeTracking(){
+  // Called once after startup render completes
+  // Silently mark all currently-earned badges as already seen
+  const earned = getUnlocked();
+  earned.forEach(a => _prevUnlocked.add(a.id));
+  try{localStorage.setItem('il_seen_badges', JSON.stringify([..._prevUnlocked]));}catch(e){}
+  _appReady = true;
+}
 
 function getUnlocked(){ return ACHIEVEMENTS.filter(a=>{ try{return a.check();}catch(e){return false;} }); }
 
@@ -2853,13 +2889,13 @@ function renderBadgeSidebars(){
   const mob=document.getElementById('badge-mobile');
   if(!left||!right||!mob)return;
 
-  // Check for newly unlocked badges
-  const newlyUnlocked=unlocked.filter(a=>!_prevUnlocked.has(a.id));
-  newlyUnlocked.forEach(a=>{
-    _prevUnlocked.add(a.id);
-    showBadgeUnlockNotif(a);
-  });
+  // Only show new-badge notifications after startup is complete
+  if(_appReady){
+    const newlyUnlocked=unlocked.filter(a=>!_prevUnlocked.has(a.id));
+    newlyUnlocked.forEach(a => showBadgeUnlockNotif(a));
+  }
   unlocked.forEach(a=>_prevUnlocked.add(a.id));
+  try{localStorage.setItem('il_seen_badges', JSON.stringify([..._prevUnlocked]));}catch(e){}
 
   // Split left/right by category
   const leftCats=['lift','streak','game'];
@@ -3179,7 +3215,7 @@ function getNutritionAdvice(ym){
     advice=`⚠️ You're losing weight too fast (${weeklyRate.toFixed(1)} lbs/week). At this rate you risk losing muscle mass. <strong>Increase calories by 200-300/day</strong> and make sure you're hitting ${MACRO_TARGETS.protein}g protein. Target 0.5-0.75 lbs/week for recomp.`;
   } else if(weeklyRate <= -0.25){
     trend='losing-good'; status='losing';
-    advice=`✅ Perfect rate! You're losing ${Math.abs(weeklyRate).toFixed(1)} lbs/week — ideal for preserving muscle during recomp. Keep your protein at ${MACRO_TARGETS.protein}g and calories at ${MACRO_TARGETS.cal}. You're ${Math.round(Math.abs(last-225))} lbs from your goal.`;
+    advice=`✅ Perfect rate! You're losing ${Math.abs(weeklyRate).toFixed(1)} lbs/week — ideal for preserving muscle during recomp. Keep your protein at ${MACRO_TARGETS.protein}g and calories at ${MACRO_TARGETS.cal}. You're ${Math.round(Math.abs(last-(userProfile.goalWeight||225)))} lbs from your goal.`;
   } else if(weeklyRate > 0.25){
     trend='gaining'; status='gaining';
     advice=`📈 You're gaining weight (${weeklyRate.toFixed(1)} lbs/week). For recomp, <strong>reduce calories by 200-300/day</strong> — try ${MACRO_TARGETS.cal-250} calories. Keep protein high to preserve muscle. This may be water weight, so track for another week before adjusting.`;
@@ -3201,12 +3237,12 @@ function getNutritionAdvice(ym){
         <div class="nutr-adv-status ${status}">${statusLabels[trend]||status}</div>
       </div>
       <div class="nutr-adv-row"><div class="nutr-adv-lbl">Current Weight</div><div class="nutr-adv-val">${last} lbs</div></div>
-      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Goal Weight</div><div class="nutr-adv-val">225-230 lbs</div></div>
-      <div class="nutr-adv-row"><div class="nutr-adv-lbl">To Goal</div><div class="nutr-adv-val">${Math.max(0,last-227.5).toFixed(1)} lbs</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Goal Weight</div><div class="nutr-adv-val">${userProfile.goalWeight||225} lbs</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">To Goal</div><div class="nutr-adv-val">${Math.max(0,last-(userProfile.goalWeight||225)).toFixed(1)} lbs</div></div>
       <div class="nutr-adv-row"><div class="nutr-adv-lbl">7-Day Rate</div><div class="nutr-adv-val" style="color:${weeklyRate<0?'var(--green2)':'#F87171'}">${weeklyRate>0?'+':''}${weeklyRate.toFixed(2)} lbs/wk</div></div>
       <div class="nutr-adv-row"><div class="nutr-adv-lbl">Est. Calorie Burn Today</div><div class="nutr-adv-val">${totalBurn.toLocaleString()} cal</div></div>
       <div class="nutr-adv-row"><div class="nutr-adv-lbl">Calorie Target</div><div class="nutr-adv-val">${MACRO_TARGETS.cal} cal</div></div>
-      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Est. Daily Deficit</div><div class="nutr-adv-val" style="color:var(--green2)">~${Math.max(0,totalBurn-MACRO_TARGETS.cal).toLocaleString()} cal</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Est. Daily Deficit</div><div class="nutr-adv-val" style="color:var(--green2)">~${Math.max(0,totalBurn-MACRO_TARGETS.cal).toLocaleString()} cal <span style="font-size:10px;color:var(--mid)">(vs target)</span></div></div>
       <div class="nutr-adv-row"><div class="nutr-adv-lbl">At Current Rate, Goal By</div><div class="nutr-adv-val">${weeklyRate<-0.1?estimateGoalDate(last,weeklyRate):'Adjust to accelerate'}</div></div>
       <div class="nutr-advice-box"><div class="nutr-advice-txt">${advice}</div></div>
     </div>`;
@@ -3214,26 +3250,42 @@ function getNutritionAdvice(ym){
 
 function estimateGoalDate(currentWeight, weeklyRate){
   if(weeklyRate >= 0) return '—';
-  const weeksNeeded = Math.abs((currentWeight - 227.5) / weeklyRate);
+  const weeksNeeded = Math.abs((currentWeight - (userProfile.goalWeight||225)) / weeklyRate);
   const d = new Date();
   d.setDate(d.getDate() + Math.round(weeksNeeded * 7));
   return d.toLocaleDateString('en-US',{month:'short',year:'numeric'});
 }
 
 // ── ADVISOR TAB ──────────────────────────────────────────────────────────
-// Mifflin-St Jeor BMR: Male, 36yo, 6'2" (188cm)
+// Mifflin-St Jeor BMR — uses userProfile (set in Settings tab)
 // BMR = 10*weight_kg + 6.25*height_cm - 5*age + 5
+function calcActualCals(dateKey) {
+  const nd = nutrData[dateKey] || { checked: [], custom: [] };
+  let cal = 0, protein = 0, carbs = 0, fat = 0;
+  MEAL_PLAN.forEach(m => m.items.forEach(i => {
+    if ((nd.checked || []).includes(i.id)) {
+      cal += i.cal || 0; protein += i.protein || 0; carbs += i.carbs || 0; fat += i.fat || 0;
+    }
+  }));
+  (nd.custom || []).forEach(f => {
+    cal += f.cal || 0; protein += f.protein || 0; carbs += f.carbs || 0; fat += f.fat || 0;
+  });
+  return { cal: Math.round(cal), protein: Math.round(protein*10)/10, carbs: Math.round(carbs*10)/10, fat: Math.round(fat*10)/10 };
+}
+
 function calcBMR(weightLbs) {
   const weightKg = weightLbs * 0.453592;
-  const heightCm = 187.96; // 6'2"
-  const age = 36;
-  return Math.round(10 * weightKg + 6.25 * heightCm - 5 * age + 5);
+  const heightCm = (userProfile.heightIn || 74) * 2.54;
+  const age = userProfile.age || 36;
+  const isMale = (userProfile.gender || 'male') === 'male';
+  // Mifflin-St Jeor
+  return Math.round(10 * weightKg + 6.25 * heightCm - 5 * age + (isMale ? 5 : -161));
 }
 
 function calcDailyBurn(dateKey) {
   // Get body weight — use most recent available
   const bwEntries = Object.entries(bwLog).filter(([k,v])=>v>0).sort((a,b)=>b[0].localeCompare(a[0]));
-  const currentBW = bwEntries.length ? bwEntries[0][1] : 286;
+  const currentBW = bwEntries.length ? bwEntries[0][1] : (userProfile.goalWeight ? userProfile.goalWeight + 40 : 286);
   const bmr = calcBMR(currentBW);
 
   // Step burn: ~0.04 cal per step (accounts for body weight)
@@ -3259,6 +3311,14 @@ function calcDailyBurn(dateKey) {
   return { bmr, stepBurn, workoutBurn, cardioBurn, total: bmr + stepBurn + workoutBurn + cardioBurn, currentBW };
 }
 
+function updateTDEEBadge(){
+  try{
+    const burn=calcDailyBurn(TODAY_KEY);
+    const el=document.getElementById('tdee-badge-lbl');
+    if(el)el.textContent='TDEE ~'+burn.total.toLocaleString()+' cal';
+  }catch(e){}
+}
+
 function renderAdvisorTab() {
   const el = document.getElementById('advisor-main-content'); if(!el)return;
   const burn = calcDailyBurn(TODAY_KEY);
@@ -3279,8 +3339,11 @@ function renderAdvisorTab() {
   const recent7 = allBW.slice(-7);
   const weeklyRate = recent7.length >= 2 ? (recent7[recent7.length-1][1] - recent7[0][1]) / Math.max(1,(recent7.length-1)/7) : 0;
   const last = allBW[allBW.length-1][1];
-  const deficit = burn.total - MACRO_TARGETS.cal;
-  const weeksToGoal = weeklyRate < -0.1 ? Math.abs((last - 227.5) / weeklyRate) : null;
+  const actualCals = calcActualCals(TODAY_KEY);
+  const hasActualCals = actualCals.cal > 0;
+  const deficitVsActual = hasActualCals ? burn.total - actualCals.cal : null;
+  const deficitVsTarget = burn.total - MACRO_TARGETS.cal;
+  const weeksToGoal = weeklyRate < -0.1 ? Math.abs((last - (userProfile.goalWeight||225)) / weeklyRate) : null;
   const goalDate = weeksToGoal ? estimateGoalDate(last, weeklyRate) : null;
 
   let trend, status, advice, adjCal = null;
@@ -3290,7 +3353,7 @@ function renderAdvisorTab() {
     advice = `You are losing weight too fast at ${Math.abs(weeklyRate).toFixed(2)} lbs/week. At this rate you risk losing muscle. Increase to ${adjCal} calories/day and keep protein at ${MACRO_TARGETS.protein}g. Target 0.5-0.75 lbs/week for clean recomp.`;
   } else if (weeklyRate <= -0.25) {
     trend = 'losing-good'; status = 'losing';
-    advice = `Perfect rate at ${Math.abs(weeklyRate).toFixed(2)} lbs/week — ideal for preserving muscle. Keep calories at ${MACRO_TARGETS.cal} and protein at ${MACRO_TARGETS.protein}g. You are ${Math.round(last - 227.5)} lbs from your goal weight.`;
+    advice = `Perfect rate at ${Math.abs(weeklyRate).toFixed(2)} lbs/week — ideal for preserving muscle. Keep calories at ${MACRO_TARGETS.cal} and protein at ${MACRO_TARGETS.protein}g. You are ${Math.round(last - (userProfile.goalWeight||225))} lbs from your goal.`;
   } else if (weeklyRate > 0.5) {
     trend = 'gaining'; status = 'gaining';
     adjCal = MACRO_TARGETS.cal - 300;
@@ -3307,7 +3370,7 @@ function renderAdvisorTab() {
     <div class="nutr-advisor">
       <div class="nutr-advisor-hdr">
         <div class="nutr-adv-title">Calorie Burn Breakdown</div>
-        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid)">Based on Mifflin-St Jeor · Male · 36yo · 6'2"</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid)">Based on Mifflin-St Jeor · ${userProfile.gender==='female'?'Female':'Male'} · ${userProfile.age||36}yo · ${Math.floor((userProfile.heightIn||74)/12)}'${(userProfile.heightIn||74)%12}"</div>
       </div>
       <div class="nutr-adv-row"><div class="nutr-adv-lbl">Current Weight</div><div class="nutr-adv-val">${burn.currentBW} lbs</div></div>
       <div class="nutr-adv-row"><div class="nutr-adv-lbl">BMR (Base Metabolism)</div><div class="nutr-adv-val">${burn.bmr.toLocaleString()} cal</div></div>
@@ -3322,10 +3385,25 @@ function renderAdvisorTab() {
         <div class="nutr-adv-lbl">Calorie Target</div>
         <div class="nutr-adv-val">${MACRO_TARGETS.cal.toLocaleString()} cal</div>
       </div>
+      ${hasActualCals ? `
       <div class="nutr-adv-row">
-        <div class="nutr-adv-lbl">Estimated Deficit Today</div>
-        <div class="nutr-adv-val" style="color:${deficit>0?'var(--green2)':'#F87171'}">${deficit>0?'+':''}${deficit.toLocaleString()} cal</div>
+        <div class="nutr-adv-lbl">Calories Logged Today</div>
+        <div class="nutr-adv-val">${actualCals.cal.toLocaleString()} cal <span style="font-size:10px;color:var(--mid)">(P:${actualCals.protein}g C:${actualCals.carbs}g F:${actualCals.fat}g)</span></div>
       </div>
+      <div class="nutr-adv-row">
+        <div class="nutr-adv-lbl">Actual Deficit Today</div>
+        <div class="nutr-adv-val" style="color:${deficitVsActual>0?'var(--green2)':'#F87171'};font-weight:700">${deficitVsActual>0?'+':''}${deficitVsActual.toLocaleString()} cal <span style="font-size:10px;color:var(--mid)">(burn ${burn.total.toLocaleString()} − ate ${actualCals.cal.toLocaleString()})</span></div>
+      </div>
+      <div class="nutr-adv-row">
+        <div class="nutr-adv-lbl">Remaining to Target</div>
+        <div class="nutr-adv-val" style="color:${MACRO_TARGETS.cal-actualCals.cal>0?'var(--blue2)':'var(--mid)'}">
+          ${MACRO_TARGETS.cal - actualCals.cal > 0 ? (MACRO_TARGETS.cal - actualCals.cal).toLocaleString() + ' cal left' : 'Target hit ✓'}
+        </div>
+      </div>` : `
+      <div class="nutr-adv-row">
+        <div class="nutr-adv-lbl">Target Deficit</div>
+        <div class="nutr-adv-val" style="color:${deficitVsTarget>0?'var(--green2)':'#F87171'}">${deficitVsTarget>0?'+':''}${deficitVsTarget.toLocaleString()} cal <span style="font-size:10px;color:var(--mid)">(log food for actual)</span></div>
+      </div>`}
     </div>
 
     <div class="nutr-advisor" style="margin-top:.75rem">
@@ -3334,8 +3412,8 @@ function renderAdvisorTab() {
         <div class="nutr-adv-status ${status}">${statusLabels[trend]||status}</div>
       </div>
       <div class="nutr-adv-row"><div class="nutr-adv-lbl">Current Weight</div><div class="nutr-adv-val">${last} lbs</div></div>
-      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Goal Weight</div><div class="nutr-adv-val">225–230 lbs</div></div>
-      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Pounds to Goal</div><div class="nutr-adv-val">${Math.max(0,last-227.5).toFixed(1)} lbs</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Goal Weight</div><div class="nutr-adv-val">${userProfile.goalWeight||225} lbs</div></div>
+      <div class="nutr-adv-row"><div class="nutr-adv-lbl">Pounds to Goal</div><div class="nutr-adv-val">${Math.max(0,last-(userProfile.goalWeight||225)).toFixed(1)} lbs</div></div>
       <div class="nutr-adv-row"><div class="nutr-adv-lbl">7-Day Rate</div><div class="nutr-adv-val" style="color:${weeklyRate<0?'var(--green2)':'#F87171'}">${weeklyRate>0?'+':''}${weeklyRate.toFixed(2)} lbs/wk</div></div>
       ${goalDate?`<div class="nutr-adv-row"><div class="nutr-adv-lbl">Estimated Goal Date</div><div class="nutr-adv-val" style="color:var(--gold)">${goalDate}</div></div>`:''}
       ${adjCal?`<div class="nutr-adv-row"><div class="nutr-adv-lbl">Suggested Calories</div><div class="nutr-adv-val" style="color:var(--blue2)">${adjCal.toLocaleString()} cal/day</div></div>`:''}
@@ -3357,11 +3435,15 @@ function renderNutritionAdvisor(){
 }
 
 // ── HISTORY EDIT / DELETE ─────────────────────────────────────────────────
-function deleteSession(idx){
-  if(!confirm('Delete this workout session? This cannot be undone.'))return;
+function deleteSession(idx,btnEl){
+  if(!btnEl||btnEl.dataset.confirm!=='1'){
+    if(btnEl){btnEl.textContent='Tap to confirm delete';btnEl.style.color='var(--accent)';btnEl.dataset.confirm='1';
+      setTimeout(()=>{if(btnEl.dataset.confirm==='1'){btnEl.textContent='🗑 Delete';btnEl.style.color='';btnEl.dataset.confirm='';}},3000);}
+    return;
+  }
   history.splice(idx,1);
   recalcGameStats();
-  scheduleAutoSync();
+  saveStorage();scheduleAutoSync();
   renderHistory();renderDayLog();
 }
 
@@ -3644,6 +3726,9 @@ function showTab(tab){
   const showNav=DAILY_TABS.includes(tab);
   const dNav=document.getElementById('date-nav');if(dNav)dNav.style.display=showNav?'flex':'none';
   if(showNav){updateDateNav();updatePastBanners();}
+  // Show "Add Exercise" button only on workout tab and only for non-cardio days
+  const addBtn=document.getElementById('add-ex-btn');
+  if(addBtn)addBtn.style.display=(tab==='workout'&&currentDay!=='cardio-day')?'block':'none';
   if(tab==='fuel'){renderNutrition();renderSupplements();}
   else if(tab==='body')renderBodyTab();
   else if(tab==='records'){renderRecordsTab();}
@@ -3652,6 +3737,7 @@ function showTab(tab){
   else if(tab==='week')renderWeekly();
   else if(tab==='bible')renderBibleTab();
   else if(tab==='advisor'){renderAdvisorTab();renderMonthlyTab();}
+  else if(tab==='settings'){populateSettingsTab();}
 }
 
 // ── SWIPE GESTURES ────────────────────────────────────────────────────────
@@ -3758,7 +3844,7 @@ function openChapter(book,ch){
 async function fetchAndReadChapter(){
   const bookSel=document.getElementById('bible-book-sel');const chSel=document.getElementById('bible-ch-inp');
   const book=bibleCurrentBook||(bookSel?.value)||'';const ch=parseInt(bibleCurrentChapter||chSel?.value||'1')||1;
-  if(!book){alert('Please select a book first.');return;}
+  if(!book){const el=document.querySelector('.bible-book-sel');if(el){el.style.borderColor='var(--gold)';setTimeout(()=>el.style.borderColor='',2000);}return;}
   bibleCurrentBook=book;bibleCurrentChapter=ch;
   const reader=document.getElementById('bible-reader');if(!reader)return;
   reader.style.display='block';
@@ -3814,7 +3900,7 @@ function markBibleReadFromReader(){
 }
 function markBibleRead(){
   const book=document.getElementById('bible-book-sel')?.value;const ch=document.getElementById('bible-ch-inp')?.value||'';const notes=document.getElementById('bible-notes-inp')?.value.trim()||'';
-  if(!book){alert('Please select a book.');return;}
+  if(!book){const el=document.querySelector('.bible-book-sel');if(el){el.style.borderColor='var(--gold)';setTimeout(()=>el.style.borderColor='',2000);}return;}
   bibleLog[ACTIVE_DATE]={read:true,book,chapter:ch,notes};
   if(ch)markChRead(book,parseInt(ch));
   try{localStorage.setItem('il_bible',JSON.stringify(bibleLog));}catch(e){}
@@ -3901,14 +3987,9 @@ function setSyncStatus(state, msg, sub) {
     else hLbl.textContent = 'Not signed in';
   }
   if (pill) pill.style.borderColor = state==='ok' ? 'rgba(34,176,90,.35)' : state==='error' ? 'rgba(232,56,13,.35)' : state==='syncing' ? 'rgba(212,168,67,.35)' : 'var(--border2)';
-  // Show/hide signin vs action buttons
-  const signinRow = document.getElementById('sync-signin-row');
-  const actionRow = document.getElementById('sync-action-row');
-  if (signinRow && actionRow) {
-    const signedIn = !!driveAccessToken;
-    signinRow.style.display = signedIn ? 'none' : 'block';
-    actionRow.style.display = signedIn ? 'block' : 'none';
-  }
+  // Mirror to Settings tab sync indicators
+  const dot2=document.getElementById('sync-dot2');const txt2=document.getElementById('sync-status-txt2');
+  if(dot2)dot2.style.background=color;if(txt2)txt2.textContent=msg;
 }
 
 function driveSignIn() {
@@ -3918,7 +3999,7 @@ function driveSignIn() {
     redirect_uri: REDIRECT_URI,
     response_type: 'token',
     scope: GAPI_SCOPE,
-    prompt: 'consent'
+    prompt: 'select_account'
   });
   const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
   // Save current state so we can restore after redirect
@@ -4027,26 +4108,26 @@ async function loadFromDrive() {
     if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — sign in again'); syncInProgress = false; return; }
 
     const d = await res.json();
-    // MOST-RECENT WINS MERGE
-    // Compare Drive _syncedAt vs last time this device saved to Drive
-    const driveTime = d._syncedAt ? new Date(d._syncedAt).getTime() : 0;
-    const localSyncTime = localStorage.getItem('il_last_sync_iso') ? new Date(localStorage.getItem('il_last_sync_iso')).getTime() : 0;
-    const driveIsNewer = driveTime > localSyncTime;
-    // History: always union — add any Drive sessions not already local
+    // SAFE ADDITIVE MERGE — local data is NEVER overwritten by Drive.
+    // Drive only ADDS data for dates/sessions not already on this device.
+    // This prevents any deploy or sync from wiping freshly logged data.
+
+    // History: always union — Drive can only ADD sessions, never remove or replace
     if (d.history) {
       d.history.forEach(s => {
         if (!history.find(x => x.dateISO === s.dateISO && x.day === s.day)) history.push(s);
       });
       history.sort((a,b) => b.dateISO.localeCompare(a.dateISO));
     }
-    // Game: take whichever has more total workouts
-    if (d.game && (d.game.totalWorkouts||0) >= (game.totalWorkouts||0)) game = { ...game, ...d.game };
-    // Date-keyed logs: Drive wins for any date if Drive is newer, else only fill missing dates
+    // Game: take whichever has MORE progress (higher workouts/XP)
+    if (d.game && (d.game.totalWorkouts||0) > (game.totalWorkouts||0)) game = { ...game, ...d.game };
+
+    // Date-keyed logs: LOCAL ALWAYS WINS if the date exists here.
+    // Drive only fills in dates this device has never seen.
     const mergeLog = (local, remote) => {
       if (!remote) return;
       Object.entries(remote).forEach(([k,v]) => {
-        if (!local[k]) local[k] = v;
-        else if (driveIsNewer) local[k] = v;
+        if (local[k] === undefined || local[k] === null) local[k] = v; // only fill gaps
       });
     };
     mergeLog(nutrData, d.nutrData);
@@ -4058,20 +4139,22 @@ async function loadFromDrive() {
     mergeLog(daySummaryLog, d.daySummaryLog);
     mergeLog(bibleLog, d.bibleLog);
     mergeLog(bibleChapters, d.bibleChapters);
-    // Steps: always take higher value (running daily total)
+    // Steps: always take higher (running daily total — can't un-walk steps)
     if (d.stepsLog) Object.entries(d.stepsLog).forEach(([k,v])=>{ if(!stepsLog[k] || v > stepsLog[k]) stepsLog[k]=v; });
-    // Settings: Drive wins if newer, else keep local
-    if (d.macroTargets && driveIsNewer) MACRO_TARGETS = { ...MACRO_TARGETS, ...d.macroTargets };
-    if (d.suppConfig && (driveIsNewer || !suppConfig)) suppConfig = d.suppConfig;
-    if (d.foodLibrary && (driveIsNewer || !foodLibrary.length)) foodLibrary = d.foodLibrary;
+    // Settings: only apply from Drive if nothing set locally
+    if (d.macroTargets && !localStorage.getItem('il_macros')) MACRO_TARGETS = { ...MACRO_TARGETS, ...d.macroTargets };
+    if (d.suppConfig && !suppConfig) suppConfig = d.suppConfig;
+    if (d.foodLibrary && !foodLibrary.length) foodLibrary = d.foodLibrary;
     if (d.exLibrary && d.exLibrary.length > exLibrary.length) exLibrary = d.exLibrary;
     saveStorage(); saveSC();
     updateStats(); renderAchievements(); switchDay(currentDay);
     const syncedAt = d._syncedAt ? new Date(d._syncedAt).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }) : '';
     setSyncStatus('ok', '✓ Synced with Google Drive', syncedAt);
+    if(!_appReady) initBadgeTracking(); // safe to show new-badge notifs now
   } catch(e) {
     console.error('loadFromDrive:', e);
     setSyncStatus('error', '✗ Could not load — check connection');
+    if(!_appReady) initBadgeTracking(); // Drive failed — still init so badges work
   }
   syncInProgress = false;
 }
@@ -4134,166 +4217,9 @@ function updateStreakFlame(){
   }
 }
 
-// ── PR FLASH ──────────────────────────────────────────────────────────────
-function flashPR(exName, weight, reps){
-  haptic('heavy');
-  const el = document.createElement('div');
-  el.className = 'pr-flash';
-  el.innerHTML = `<span class="pr-flash-icon">🏆</span>
-    <span class="pr-flash-text">NEW PR!</span>
-    <span class="pr-flash-sub">${exName} — ${weight}lbs × ${reps}</span>`;
-  document.body.appendChild(el);
-  setTimeout(()=>el.remove(), 1900);
-}
+/* flashPR: V4 canonical version used */
 
-// ── LEVEL UP SCREEN ───────────────────────────────────────────────────────
-function showLevelUp(newLevel){
-  haptic('success');
-  // Play fanfare
-  try{
-    const ctx = new(window.AudioContext||window.webkitAudioContext)();
-    [[0,523],[0.12,659],[0.24,784],[0.36,1047],[0.5,1319],[0.65,1047],[0.8,1319]].forEach(([d,f])=>{
-      const o=ctx.createOscillator(),g=ctx.createGain();
-      o.connect(g);g.connect(ctx.destination);o.type='sine';
-      const t=ctx.currentTime+d;
-      o.frequency.setValueAtTime(f,t);g.gain.setValueAtTime(0,t);
-      g.gain.linearRampToValueAtTime(0.4,t+0.02);g.gain.exponentialRampToValueAtTime(0.001,t+0.5);
-      o.start(t);o.stop(t+0.55);
-    });
-  }catch(e){}
-  const overlay = document.createElement('div');
-  overlay.className = 'levelup-overlay';
-  // Stars at random positions
-  const stars = ['⭐','✨','💫','🌟','⚡'].map((s,i)=>{
-    const angle = (i/5)*360;
-    const x = 80 + Math.cos(angle*Math.PI/180)*60;
-    const y = 80 + Math.sin(angle*Math.PI/180)*60;
-    return `<span class="levelup-star" style="left:${x}px;top:${y}px;animation-delay:${i*0.1}s">${s}</span>`;
-  }).join('');
-  overlay.innerHTML = `
-    <div class="levelup-ring" style="position:relative">
-      ${stars}
-      <div class="levelup-num">${newLevel}</div>
-    </div>
-    <div class="levelup-title">LEVEL UP!</div>
-    <div class="levelup-sub">You have reached Level ${newLevel}. The iron forges champions. Keep grinding.</div>`;
-  document.body.appendChild(overlay);
-  setTimeout(()=>overlay.remove(), 3600);
-}
-
-// ── PERSONAL BEST TICKER ─────────────────────────────────────────────────
-function renderPBTicker(day){
-  const el = document.getElementById('pb-ticker');
-  if(!el) return;
-  const allEx = getAllEx(day);
-  if(!allEx.length){el.style.display='none';return;}
-  const bests = {};
-  history.filter(h=>h.day===day).forEach(sess=>{
-    (sess.exercises||[]).forEach(e=>{
-      const orm = calc1RM(e.weight||0, e.reps||0);
-      if(!bests[e.name]||orm>bests[e.name].orm) bests[e.name]={weight:e.weight,reps:e.reps,orm};
-    });
-  });
-  const items = Object.entries(bests).slice(0,4).map(([name,b])=>
-    `<span class="pb-ticker-item">${name.split(' ').slice(-1)[0]}: <strong>${b.weight}lbs</strong></span>`
-  ).join('<span style="color:var(--border2);margin:0 4px">|</span>');
-  if(items){
-    el.style.display='flex';
-    el.querySelector('.pb-ticker-items').innerHTML=items;
-  } else {
-    el.style.display='none';
-  }
-}
-
-// ── WEEKLY CHALLENGE ──────────────────────────────────────────────────────
-function generateWeeklyChallenge(){
-  const challenges = [];
-  // Step challenge
-  const avgSteps = Object.values(stepsLog).length ?
-    Math.round(Object.values(stepsLog).reduce((a,v)=>a+(v||0),0)/Object.values(stepsLog).length) : 0;
-  const stepTarget = Math.max(STEP_GOAL, avgSteps + 1000);
-  const stepsThisWeek = Object.entries(stepsLog).filter(([k])=>k>=getWeekStart()).filter(([k,v])=>v>=stepTarget).length;
-  challenges.push({
-    title:'STEP MASTER',
-    desc:`Hit ${stepTarget.toLocaleString()} steps on 5 days this week`,
-    current: stepsThisWeek, target: 5,
-    type:'steps'
-  });
-  // Workout challenge
-  const workoutsThisWeek = history.filter(h=>h.dateISO>=getWeekStart()).length;
-  challenges.push({
-    title:'IRON WEEK',
-    desc:'Complete 4 workouts this week',
-    current: workoutsThisWeek, target: 4,
-    type:'workouts'
-  });
-  // Volume challenge
-  const weekVol = history.filter(h=>h.dateISO>=getWeekStart()).reduce((a,s)=>a+Math.round((s.exercises||[]).filter(e=>e.done).reduce((b,e)=>b+e.vol,0)),0);
-  challenges.push({
-    title:'VOLUME KING',
-    desc:'Lift 50,000 lbs total this week',
-    current: Math.round(weekVol/1000), target: 50,
-    type:'volume',
-    unit:'K lbs'
-  });
-  // Bible challenge
-  const bibleThisWeek = Object.entries(bibleLog).filter(([k])=>k>=getWeekStart()).filter(([k,v])=>v.read).length;
-  challenges.push({
-    title:'WORD & IRON',
-    desc:'Read the Bible every day this week (7 days)',
-    current: bibleThisWeek, target: 7,
-    type:'bible'
-  });
-  // Pick the most relevant one (lowest % completion)
-  const sorted = challenges.sort((a,b)=>(a.current/a.target)-(b.current/b.target));
-  return sorted[0];
-}
-
-function getWeekStart(){
-  const d = new Date();
-  const day = d.getDay();
-  const diff = d.getDate() - ((day+6)%7);
-  const mon = new Date(d.setDate(diff));
-  return mon.getFullYear()+'-'+String(mon.getMonth()+1).padStart(2,'0')+'-'+String(mon.getDate()).padStart(2,'0');
-}
-
-function renderWeeklyChallenge(){
-  const el = document.getElementById('weekly-challenge-card');
-  if(!el) return;
-  const ch = generateWeeklyChallenge();
-  if(!ch){el.style.display='none';return;}
-  const pct = Math.min(100, Math.round((ch.current/ch.target)*100));
-  const done = ch.current >= ch.target;
-  el.innerHTML = `<div class="weekly-challenge">
-    <div class="wc-label">⚡ Weekly Challenge${done?' — COMPLETED! 🏆':''}</div>
-    <div class="wc-title">${ch.title}</div>
-    <div class="wc-desc">${ch.desc}</div>
-    <div class="wc-progress"><div class="wc-fill" style="width:${pct}%"></div></div>
-    <div class="wc-pct">${ch.current} / ${ch.target}${ch.unit?' '+ch.unit:''} &nbsp;·&nbsp; ${pct}%</div>
-  </div>`;
-}
-
-// ── NEAR-UNLOCK BADGE GLOW ────────────────────────────────────────────────
-function markNearUnlockBadges(){
-  // Check each achievement — if 70%+ complete, add glow
-  const nearThresholds = {
-    sets100: ()=>game.totalSets>=70,
-    sets500: ()=>game.totalSets>=350,
-    lifted100k: ()=>(game.totalLifted||0)>=70000,
-    steps12k: ()=>Object.values(stepsLog).some(s=>s>=9000&&s<12000),
-    streak7: ()=>game.streak>=5,
-    streak14: ()=>game.streak>=10,
-    bible30: ()=>Object.values(bibleLog).filter(v=>v.read).length>=21,
-  };
-  // Update sidebar badges
-  document.querySelectorAll('.sdg-badge, .bmob-badge').forEach(b=>{
-    const id = b.dataset?.achievementId;
-    if(id && nearThresholds[id] && nearThresholds[id]()) b.classList.add('near-unlock');
-    else b.classList.remove('near-unlock');
-  });
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────
+// ── APP STARTUP ──────────────────────────────────────────────────────────
 // Check if returning from Google OAuth redirect
 (function handleOAuthReturn(){
   const hash = window.location.hash;
@@ -4306,7 +4232,6 @@ function markNearUnlockBadges(){
       localStorage.setItem('il_drive_token', token);
       localStorage.setItem('il_drive_token_expiry', String(expiresAt));
       driveAccessToken = token;
-      // Clean up URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }
@@ -4314,7 +4239,7 @@ function markNearUnlockBadges(){
 
 function isTokenExpired() {
   const expiry = localStorage.getItem('il_drive_token_expiry');
-  if (!expiry) return true; // no expiry stored — treat as expired to be safe
+  if (!expiry) return true;
   return Date.now() > parseInt(expiry, 10);
 }
 
@@ -4325,7 +4250,6 @@ function clearExpiredToken() {
   setSyncStatus('idle', 'Session expired — tap Sign In to re-connect');
 }
 
-// Called every 5 min by the poll interval to silently re-check token validity
 function checkTokenExpiry() {
   if (!localStorage.getItem('il_drive_token')) return;
   if (isTokenExpired()) { clearExpiredToken(); }
@@ -4333,32 +4257,53 @@ function checkTokenExpiry() {
 
 try {
   loadStorage();
-
+  loadUserSettings();
 
   ACTIVE_DATE=localKey();lastCheckedDate=localKey();cardioDateKey=localKey();
-  switchDay('chest');
+  // Restore last used workout day (or check if there's a draft)
+  const _lastDay = localStorage.getItem('il_last_day') || 'chest';
+  switchDay(_lastDay);
   updateStats();renderAchievements();setQuote();
+  // Badge tracking initialized after Drive load (or after 5s fallback) — see initBadgeTracking()
   // Restore Google sign-in token if previously signed in and not expired
   const savedToken = localStorage.getItem('il_drive_token');
   if (savedToken && !isTokenExpired()) {
     driveAccessToken = savedToken;
     const lastSync = localStorage.getItem('il_last_sync');
     setSyncStatus('ok', '✓ Signed in to Google Drive', lastSync || '');
-    // Auto-load from Drive on startup so latest data from any device is pulled in
-    setTimeout(() => { try { loadFromDrive(); } catch(e) {} }, 1500);
-    // Poll Drive every 5 minutes; also checks token expiry
+    // Auto-load from Drive on startup — skip if workout draft in progress
+    setTimeout(() => {
+      try {
+        const raw = localStorage.getItem('il_draft');
+        const hasDraft = raw ? (() => { try { const d=JSON.parse(raw); return d&&!d.savedToday&&Date.now()-d.ts<86400000; } catch(e){ return false; } })() : false;
+        if (!hasDraft) loadFromDrive();
+      } catch(e) {}
+    }, 1500);
+    // Poll Drive every 5 minutes — skip if workout in progress
     setInterval(() => {
       checkTokenExpiry();
-      if (driveAccessToken) { try { loadFromDrive(); } catch(e) {} }
+      if (driveAccessToken) {
+        try {
+          const raw=localStorage.getItem('il_draft');
+          const hasDraft=raw?(() => { try{const d=JSON.parse(raw);return d&&!d.savedToday&&Date.now()-d.ts<86400000;}catch(e){return false;} })():false;
+          if(!hasDraft) loadFromDrive();
+        } catch(e) {}
+      }
     }, 5 * 60 * 1000);
   } else {
-    if (savedToken) clearExpiredToken(); // had a token but it expired
+    if (savedToken) clearExpiredToken();
     else setSyncStatus('idle', 'Tap Sign In with Google to enable sync');
+    setTimeout(initBadgeTracking, 500); // no Drive — init badge tracking after render
   }
 } catch(e) { console.error('Init error:',e); }
 startClock();
 
+// Save draft whenever app loses focus (phone lock, app switch, tab change)
+document.addEventListener('visibilitychange', () => { if(document.hidden){ saveDraft(); } });
+window.addEventListener('pagehide', () => { saveDraft(); });
+window.addEventListener('beforeunload', () => { saveDraft(); });
 
+// V4 feature functions consolidated below
 
 // ── V4 FEATURE FUNCTIONS ─────────────────────────────────────────────────
 // All wrapped in try/catch so they never break the app
@@ -4377,19 +4322,27 @@ function toggleLightMode(){
   try{
     const on=document.body.classList.toggle('light-mode');
     localStorage.setItem('il_light_mode',on?'1':'');
-    const b=document.getElementById('mode-toggle-btn');
-    if(b)b.innerHTML=on?'&#x1F319; Dark Mode':'&#x2600; Light Mode';
+    ['mode-toggle-btn','mode-toggle-btn2'].forEach(id=>{const b=document.getElementById(id);if(b)b.innerHTML=on?'&#x1F319; Dark Mode':'&#x2600; Light Mode';});
   }catch(e){}
 }
 function restoreTheme(){
   try{
     const a=localStorage.getItem('il_accent'),a2=localStorage.getItem('il_accent2');
-    if(a)document.documentElement.style.setProperty('--accent',a);
+    if(a){
+      document.documentElement.style.setProperty('--accent',a);
+      setTimeout(()=>{
+        document.querySelectorAll('.theme-swatch').forEach(s=>{
+          const bg=s.style.background||s.style.backgroundColor;
+          s.classList.toggle('active', bg===a);
+        });
+      }, 200);
+    }
     if(a2)document.documentElement.style.setProperty('--accent2',a2);
     if(localStorage.getItem('il_light_mode')==='1'){
       document.body.classList.add('light-mode');
-      const b=document.getElementById('mode-toggle-btn');
-      if(b)b.innerHTML='&#x1F319; Dark Mode';
+      ['mode-toggle-btn','mode-toggle-btn2'].forEach(id=>{
+        const b=document.getElementById(id);if(b)b.innerHTML='&#x1F319; Dark Mode';
+      });
     }
   }catch(e){}
 }
@@ -4467,7 +4420,7 @@ function renderWeeklyChallenge(){
     if(!el)return;
     var ws=getWeekStart();
     var ww=history.filter(function(h){return h.dateISO>=ws;}).length;
-    var wsd=Object.entries(stepsLog).filter(function(e){return e[0]>=ws&&e[1]>=STEP_GOAL;}).length;
+    var wsd=Object.entries(stepsLog).filter(function(e){return e[0]>=ws&&e[1]>=STEP_GOAL_LIVE;}).length;
     var wb=Object.entries(bibleLog).filter(function(e){return e[0]>=ws&&e[1].read;}).length;
     var wv=Math.round(history.filter(function(h){return h.dateISO>=ws;}).reduce(function(a,s){return a+Math.round((s.exercises||[]).filter(function(e){return e.done;}).reduce(function(b,e){return b+e.vol;},0));},0)/1000);
     var chs=[
@@ -4559,7 +4512,7 @@ function runAIAdvisor(){
   var bests={};
   history.slice(0,15).forEach(function(sess){(sess.exercises||[]).forEach(function(e){var orm=calc1RM(e.weight||0,e.reps||0);if(!bests[e.name]||orm>bests[e.name])bests[e.name]=orm;});});
   var topLifts=Object.entries(bests).sort(function(a,b){return b[1]-a[1];}).slice(0,5).map(function(e){return e[0]+': ~'+e[1]+'lbs 1RM';}).join(', ');
-  var prompt='You are an elite strength coach. Analyze this data and give a SPECIFIC, PERSONALIZED weekly recommendation.\n\nATHLETE: Male, 36, 6ft2, ~'+(bwArr[0]||286)+'lbs, goal 225lbs recomp\nWORKOUTS (last 20): '+JSON.stringify(wkCounts)+'\nAVG STEPS: '+avgSteps.toLocaleString()+'/day\nWEIGHT TREND: '+bwArr.join(', ')+' lbs\nTOP LIFTS: '+(topLifts||'building history')+'\nTOTAL LIFTED: '+(game.totalLifted||0).toLocaleString()+' lbs\nSTREAK: '+(game.streak||0)+' sessions\n\nGive advice in 5 short sections: (1) Priority muscle group this week and why, (2) One specific progressive overload target with exact weight, (3) Recovery assessment, (4) One nutrition adjustment, (5) A fired-up motivational closer with their actual numbers. Max 180 words. Be direct and punchy.';
+  var goalLbs=userProfile.goalWeight||225;var ageY=userProfile.age||36;var htStr=Math.floor((userProfile.heightIn||74)/12)+'ft'+((userProfile.heightIn||74)%12)+'in';var goalTypStr=userProfile.goalType||'recomp';var prompt='You are an elite strength coach. Analyze this data and give a SPECIFIC, PERSONALIZED weekly recommendation.\n\nATHLETE: '+(userProfile.gender==='female'?'Female':'Male')+', '+ageY+', '+htStr+', ~'+(bwArr[0]||286)+'lbs, goal '+goalLbs+'lbs '+goalTypStr+'\nWORKOUTS (last 20): '+JSON.stringify(wkCounts)+'\nAVG STEPS: '+avgSteps.toLocaleString()+'/day\nWEIGHT TREND: '+bwArr.join(', ')+' lbs\nTOP LIFTS: '+(topLifts||'building history')+'\nTOTAL LIFTED: '+(game.totalLifted||0).toLocaleString()+' lbs\nSTREAK: '+(game.streak||0)+' sessions\n\nGive advice in 5 short sections: (1) Priority muscle group this week and why, (2) One specific progressive overload target with exact weight, (3) Recovery assessment, (4) One nutrition adjustment, (5) A fired-up motivational closer with their actual numbers. Max 180 words. Be direct and punchy.';
   fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
   .then(function(r){return r.json();})
   .then(function(data){
@@ -4653,6 +4606,319 @@ function markNearUnlockBadges(){
   }
 })();
 
+
+// ── ADD / REMOVE EXERCISE DURING WORKOUT ─────────────────────────────────
+function openAddExercise(){
+  const inp=document.getElementById('add-ex-inp');
+  const dl=document.getElementById('add-ex-list');
+  if(inp)inp.value='';
+  if(dl){const opts=exLibrary.map(n=>`<option value="${n.replace(/"/g,'&quot;')}">`).join('');dl.innerHTML=opts;}
+  const modal=document.getElementById('add-ex-modal');
+  if(modal){modal.style.display='flex';setTimeout(()=>inp&&inp.focus(),100);}
+}
+function closeAddExercise(){
+  const modal=document.getElementById('add-ex-modal');
+  if(modal)modal.style.display='none';
+}
+function confirmAddExercise(){
+  const inp=document.getElementById('add-ex-inp');
+  const setsInp=document.getElementById('add-ex-sets');
+  const name=(inp?inp.value.trim():'');
+  const sets=Math.max(1,Math.min(10,parseInt(setsInp?.value||'3')));
+  if(!name){inp&&inp.focus();return;}
+  // Build a unique id
+  const id='custom-'+Date.now();
+  const ex={id,name,hint:'Custom exercise',badge:'core',ss:null,sets};
+  // Add to current day's first section so getAllEx picks it up
+  if(DAYS[currentDay]){
+    if(!DAYS[currentDay]._customSection){
+      DAYS[currentDay]._customSection=true;
+      DAYS[currentDay].sections.push({label:'Added This Session',exercises:[]});
+    }
+    const customSec=DAYS[currentDay].sections.find(s=>s.label==='Added This Session');
+    if(customSec)customSec.exercises.push(ex);
+  }
+  state[id]=Array.from({length:sets},()=>({weight:'',reps:'',rpe:'',done:false}));
+  if(!exLibrary.includes(name)){exLibrary.push(name);try{localStorage.setItem('il_ex_lib',JSON.stringify(exLibrary));}catch(e){}}
+  // Re-render and scroll to the new card
+  renderExercises();
+  saveDraft();
+  closeAddExercise();
+  setTimeout(()=>{const card=document.getElementById('card-'+id);if(card)card.scrollIntoView({behavior:'smooth',block:'nearest'});},100);
+}
+function deleteExerciseCard(id){
+  const btn=document.querySelector(`[data-del-id="${id}"]`);
+  if(btn&&btn.dataset.confirm!=='1'){
+    btn.textContent='Tap again to remove';btn.dataset.confirm='1';
+    setTimeout(()=>{if(btn.dataset.confirm==='1'){btn.textContent='🗑 Remove Exercise';btn.dataset.confirm='';}},2500);return;
+  }
+  if(DAYS[currentDay]){
+    DAYS[currentDay].sections.forEach(sec=>{sec.exercises=sec.exercises.filter(e=>e.id!==id);});
+  }
+  delete state[id];renderExercises();saveDraft();
+}
+// Close modal on backdrop click
+document.getElementById('add-ex-modal')?.addEventListener('click',function(e){if(e.target===this)closeAddExercise();});
+
+// ── SETTINGS: PROFILE + PREFS ────────────────────────────────────────────
+let userProfile = { name:'', age:36, heightIn:74, goalWeight:225, gender:'male', goalType:'recomp' };
+let userPrefs   = { restTimer:70, stepGoal:12000, musicUrl:'https://www.pandora.com', musicLabel:'Pandora' };
+
+function loadUserSettings(){
+  try{
+    const p=localStorage.getItem('il_profile'); if(p) userProfile={...userProfile,...JSON.parse(p)};
+    const r=localStorage.getItem('il_prefs');   if(r) userPrefs={...userPrefs,...JSON.parse(r)};
+    // Apply live values
+    DEFAULT_REST_LIVE = userPrefs.restTimer;
+    STEP_GOAL_LIVE    = userPrefs.stepGoal;
+    applyMusicLink();
+  }catch(e){}
+}
+
+// Use these live vars everywhere instead of constants
+var DEFAULT_REST_LIVE = 70;
+var STEP_GOAL_LIVE    = 12000;
+
+function saveProfile(){
+  userProfile.name      = document.getElementById('prf-name')?.value.trim()||userProfile.name;
+  userProfile.age       = parseInt(document.getElementById('prf-age')?.value)||userProfile.age;
+  userProfile.heightIn  = parseFloat(document.getElementById('prf-height')?.value)||userProfile.heightIn;
+  userProfile.goalWeight= parseFloat(document.getElementById('prf-goal')?.value)||userProfile.goalWeight;
+  userProfile.gender    = document.getElementById('prf-gender')?.value||userProfile.gender;
+  userProfile.goalType  = document.getElementById('prf-goaltype')?.value||userProfile.goalType;
+  try{localStorage.setItem('il_profile',JSON.stringify(userProfile));}catch(e){}
+  const el=document.getElementById('prf-saved');if(el){el.style.display='block';setTimeout(()=>el.style.display='none',2500);}
+  scheduleAutoSync();
+}
+
+function savePrefs(){
+  userPrefs.restTimer = parseInt(document.getElementById('pref-rest')?.value)||userPrefs.restTimer;
+  userPrefs.stepGoal  = parseInt(document.getElementById('pref-steps')?.value)||userPrefs.stepGoal;
+  DEFAULT_REST_LIVE   = userPrefs.restTimer;
+  STEP_GOAL_LIVE      = userPrefs.stepGoal;
+  try{localStorage.setItem('il_prefs',JSON.stringify(userPrefs));}catch(e){}
+  const el=document.getElementById('prefs-saved');if(el){el.style.display='block';setTimeout(()=>el.style.display='none',2500);}
+  // Update step display labels
+  ['steps-goal-lbl'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent='Goal: '+STEP_GOAL_LIVE.toLocaleString()+' steps — enter your total for the day';});
+  updateStepDisplay();
+}
+
+function saveMusicPref(){
+  userPrefs.musicUrl   = document.getElementById('pref-music-url')?.value.trim()||userPrefs.musicUrl;
+  userPrefs.musicLabel = document.getElementById('pref-music-label')?.value.trim()||userPrefs.musicLabel;
+  try{localStorage.setItem('il_prefs',JSON.stringify(userPrefs));}catch(e){}
+  applyMusicLink();
+  const el=document.getElementById('music-saved');if(el){el.style.display='block';setTimeout(()=>el.style.display='none',2500);}
+}
+
+function applyMusicLink(){
+  const link=document.querySelector('a[data-music-link]');
+  if(link){
+    link.href=userPrefs.musicUrl||'https://www.pandora.com';
+    const lbl=link.querySelector('.music-lbl');
+    if(lbl)lbl.textContent=userPrefs.musicLabel||'Music';
+  }
+}
+
+function populateSettingsTab(){
+  try{
+    const f=(id,val)=>{const e=document.getElementById(id);if(e)e.value=val;};
+    f('prf-name',     userProfile.name);
+    f('prf-age',      userProfile.age);
+    f('prf-height',   userProfile.heightIn);
+    f('prf-goal',     userProfile.goalWeight);
+    f('pref-rest',    userPrefs.restTimer);
+    f('pref-steps',   userPrefs.stepGoal);
+    f('pref-music-url',   userPrefs.musicUrl);
+    f('pref-music-label', userPrefs.musicLabel);
+    const gs=document.getElementById('prf-gender');    if(gs)gs.value=userProfile.gender;
+    const gt=document.getElementById('prf-goaltype');  if(gt)gt.value=userProfile.goalType;
+    // Sync dots mirror
+    const dot2=document.getElementById('sync-dot2');
+    const txt2=document.getElementById('sync-status-txt2');
+    const dot=document.getElementById('sync-dot');
+    const txt=document.getElementById('sync-status-txt');
+    if(dot2&&dot){dot2.style.background=dot.style.background;}
+    if(txt2&&txt){txt2.textContent=txt.textContent;}
+  }catch(e){}
+}
+
+// ── SILENT OAUTH REFRESH ─────────────────────────────────────────────────
+// Automatically renews the Google token without interrupting the user.
+// Uses a hidden iframe with prompt=none — works when the user is still
+// signed into Google in their browser (which is almost always).
+function silentTokenRefresh() {
+  if (!localStorage.getItem('il_drive_token')) return; // not signed in
+  const REDIRECT_URI = 'https://rholliday0523.github.io/ironlog/ironlog.html';
+  const params = new URLSearchParams({
+    client_id: GAPI_CLIENT_ID,
+    redirect_uri: REDIRECT_URI,
+    response_type: 'token',
+    scope: GAPI_SCOPE,
+    prompt: 'none' // silent — no user interaction required
+  });
+  const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
+  const iframe = document.createElement('iframe');
+  iframe.style.cssText = 'display:none;position:absolute;width:1px;height:1px';
+  iframe.src = authUrl;
+  document.body.appendChild(iframe);
+  // Listen for the iframe to redirect back with a new token
+  const checkInterval = setInterval(() => {
+    try {
+      const hash = iframe.contentWindow?.location?.hash;
+      if (hash && hash.includes('access_token')) {
+        const p = new URLSearchParams(hash.replace('#', ''));
+        const token = p.get('access_token');
+        const expiresIn = parseInt(p.get('expires_in') || '3600', 10);
+        if (token) {
+          driveAccessToken = token;
+          const expiresAt = Date.now() + (expiresIn * 1000);
+          localStorage.setItem('il_drive_token', token);
+          localStorage.setItem('il_drive_token_expiry', String(expiresAt));
+          setSyncStatus('ok', '✓ Signed in to Google Drive', localStorage.getItem('il_last_sync') || '');
+        }
+        clearInterval(checkInterval);
+        iframe.remove();
+      }
+    } catch(e) {
+      // Cross-origin error means Google hasn't redirected yet — keep waiting
+    }
+  }, 500);
+  // Give up after 15 seconds if no response
+  setTimeout(() => { clearInterval(checkInterval); iframe.remove(); }, 15000);
+}
+
+// Check every 10 minutes — refresh token if within 15 minutes of expiry
+setInterval(() => {
+  const expiry = localStorage.getItem('il_drive_token_expiry');
+  if (!expiry || !driveAccessToken) return;
+  const msLeft = parseInt(expiry) - Date.now();
+  if (msLeft < 15 * 60 * 1000 && msLeft > 0) { // less than 15 min left
+    silentTokenRefresh();
+  }
+}, 10 * 60 * 1000);
+
 </script>
+
+<!-- ADD EXERCISE MODAL -->
+<div id="add-ex-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:600;align-items:center;justify-content:center">
+  <div style="background:var(--dark2);border:1px solid var(--border2);border-radius:4px;padding:1.25rem;width:340px;max-width:95vw;max-height:80vh;display:flex;flex-direction:column;gap:12px">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:var(--white)">Add Exercise</div>
+    <input id="add-ex-inp" type="text" list="add-ex-list" placeholder="Exercise name..." style="background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:10px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:14px;width:100%">
+    <datalist id="add-ex-list"></datalist>
+    <div style="display:flex;align-items:center;gap:8px">
+      <span style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--mid)">Sets:</span>
+      <input id="add-ex-sets" type="number" value="3" min="1" max="10" style="background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-size:14px;width:70px">
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="confirmAddExercise()" style="flex:1;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;background:var(--accent);color:var(--white);border:none;cursor:pointer;border-radius:2px">Add</button>
+      <button onclick="closeAddExercise()" style="padding:12px 16px;font-family:'Bebas Neue',sans-serif;font-size:16px;background:none;border:1px solid var(--steel2);color:var(--mid);cursor:pointer;border-radius:2px">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<div id="tab-settings" style="display:none">
+  <div class="sec-lbl" style="margin-top:0">&#x1F464; My Profile</div>
+  <div class="card" style="margin-bottom:1.25rem">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div>
+        <div class="cf-lbl">Name</div>
+        <input id="prf-name" type="text" placeholder="Your name" style="width:100%;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:14px">
+      </div>
+      <div>
+        <div class="cf-lbl">Age</div>
+        <input id="prf-age" type="number" placeholder="36" min="13" max="100" style="width:100%;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:14px">
+      </div>
+      <div>
+        <div class="cf-lbl">Height (inches)</div>
+        <input id="prf-height" type="number" placeholder="74" min="48" max="96" style="width:100%;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:14px">
+      </div>
+      <div>
+        <div class="cf-lbl">Goal Weight (lbs)</div>
+        <input id="prf-goal" type="number" placeholder="225" min="100" max="500" style="width:100%;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:14px">
+      </div>
+      <div>
+        <div class="cf-lbl">Gender</div>
+        <select id="prf-gender" style="width:100%;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:14px">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+      <div>
+        <div class="cf-lbl">Goal</div>
+        <select id="prf-goaltype" style="width:100%;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:14px">
+          <option value="recomp">Recomp (cut + muscle)</option>
+          <option value="cut">Cut (lose fat)</option>
+          <option value="bulk">Bulk (gain muscle)</option>
+          <option value="maintain">Maintain</option>
+        </select>
+      </div>
+    </div>
+    <button onclick="saveProfile()" style="width:100%;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:var(--accent);color:var(--white);border:none;cursor:pointer;border-radius:2px">Save Profile</button>
+    <div id="prf-saved" style="display:none;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--green2);letter-spacing:1px;margin-top:6px">✓ Profile saved</div>
+  </div>
+
+  <div class="sec-lbl">&#x23F1; Workout Preferences</div>
+  <div class="card" style="margin-bottom:1.25rem">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+      <div>
+        <div class="cf-lbl">Rest Timer (seconds)</div>
+        <input id="pref-rest" type="number" placeholder="70" min="10" max="600" style="width:100%;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:14px">
+      </div>
+      <div>
+        <div class="cf-lbl">Daily Step Goal</div>
+        <input id="pref-steps" type="number" placeholder="12000" min="1000" max="50000" style="width:100%;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:14px">
+      </div>
+    </div>
+    <button onclick="savePrefs()" style="width:100%;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:var(--accent);color:var(--white);border:none;cursor:pointer;border-radius:2px">Save Preferences</button>
+    <div id="prefs-saved" style="display:none;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--green2);letter-spacing:1px;margin-top:6px">✓ Preferences saved</div>
+  </div>
+
+  <div class="sec-lbl">&#x1F3A8; Theme</div>
+  <div class="card" style="margin-bottom:1.25rem">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <div class="theme-swatch" style="background:#E8380D" onclick="setAccentColor('#E8380D','#FF5733')" title="Red (Default)"></div>
+      <div class="theme-swatch" style="background:#2A9AD4" onclick="setAccentColor('#2A9AD4','#4AB0EA')" title="Blue"></div>
+      <div class="theme-swatch" style="background:#22B05A" onclick="setAccentColor('#22B05A','#3ACC6A')" title="Green"></div>
+      <div class="theme-swatch" style="background:#A855F7" onclick="setAccentColor('#A855F7','#C084FC')" title="Purple"></div>
+      <div class="theme-swatch" style="background:#F59E0B" onclick="setAccentColor('#F59E0B','#FBBF24')" title="Gold"></div>
+      <div class="theme-swatch" style="background:#14B8A6" onclick="setAccentColor('#14B8A6','#2DD4BF')" title="Teal"></div>
+      <div class="theme-swatch" style="background:#EF4444" onclick="setAccentColor('#EF4444','#FCA5A5')" title="Crimson"></div>
+      <div class="theme-swatch" style="background:#F97316" onclick="setAccentColor('#F97316','#FB923C')" title="Orange"></div>
+      <button id="mode-toggle-btn2" onclick="toggleLightMode()" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;background:none;border:1px solid var(--border2);color:var(--mid);padding:6px 12px;cursor:pointer;border-radius:2px;text-transform:uppercase">&#x2600; Light Mode</button>
+    </div>
+  </div>
+
+  <div class="sec-lbl">&#x1F3B5; Music</div>
+  <div class="card" style="margin-bottom:1.25rem">
+    <div class="cf-lbl">Music app or playlist URL</div>
+    <div style="display:flex;gap:8px;margin-top:4px">
+      <input id="pref-music-url" type="url" placeholder="https://www.pandora.com" style="flex:1;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:13px">
+      <input id="pref-music-label" type="text" placeholder="Pandora" maxlength="20" style="width:90px;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:13px">
+    </div>
+    <button onclick="saveMusicPref()" style="width:100%;margin-top:8px;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:var(--accent);color:var(--white);border:none;cursor:pointer;border-radius:2px">Save Music Link</button>
+    <div id="music-saved" style="display:none;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--green2);letter-spacing:1px;margin-top:6px">✓ Music link saved — tap 🎵 in the header to open</div>
+  </div>
+
+  <div class="sec-lbl">&#x2601; Google Drive Sync</div>
+  <div class="card" style="margin-bottom:1.25rem">
+    <div id="sync-status-bar2" style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding:.65rem .9rem;border-radius:2px;background:var(--dark3);border:1px solid var(--border2)">
+      <div id="sync-dot2" style="width:8px;height:8px;border-radius:50%;background:var(--steel2);flex-shrink:0"></div>
+      <div id="sync-status-txt2" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--mid);flex:1">Not signed in</div>
+    </div>
+    <button onclick="driveSignIn()" style="width:100%;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:linear-gradient(135deg,#4285F4,#34A853);border:none;color:#fff;cursor:pointer;border-radius:2px;margin-bottom:8px">&#x1F511; Sign In with Google</button>
+    <div style="display:flex;gap:8px">
+      <button onclick="syncNow()" style="flex:1;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;background:none;border:1px solid rgba(42,154,212,.4);color:var(--blue2);cursor:pointer;border-radius:2px">&#x2191; Save to Drive</button>
+      <button onclick="loadFromDrive()" style="flex:1;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;background:none;border:1px solid rgba(42,154,212,.4);color:var(--blue2);cursor:pointer;border-radius:2px">&#x2193; Load from Drive</button>
+      <button onclick="driveSignOut()" style="padding:10px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;background:none;border:1px solid var(--border2);color:var(--mid);cursor:pointer;border-radius:2px">Sign Out</button>
+    </div>
+  </div>
+
+  <div class="sec-lbl">&#x1F4BE; Backup & Restore</div>
+  <div class="card" style="margin-bottom:1.25rem">
+    <div class="settings-row"><button class="settings-btn exp" onclick="exportData()">&#x1F4E4; Export Backup</button><button class="settings-btn imp" onclick="document.getElementById('import-input2').click()">&#x1F4E5; Import Backup</button><input type="file" id="import-input2" accept=".json" style="display:none" onchange="importData(event)"></div>
+    <div class="settings-note">Export saves a local JSON file as a manual backup. Import restores from a previous export.</div>
+  </div>
+</div>
 </body>
 </html>
