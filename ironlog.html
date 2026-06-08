@@ -752,6 +752,38 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
 @keyframes nearBadge{0%,100%{box-shadow:0 0 4px rgba(212,168,67,.3)}50%{box-shadow:0 0 12px rgba(212,168,67,.8)}}
 .sdg-badge.near-unlock{animation:nearBadge 2s ease-in-out infinite;border-color:rgba(212,168,67,.8)!important}
 
+
+/* ── CALENDAR ─────────────────────────────────────────────────────── */
+.cal-day{
+  aspect-ratio:1;background:var(--dark2);border:1px solid var(--border);border-radius:3px;
+  cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;
+  padding:4px 2px 3px;transition:border-color .15s,background .15s;position:relative;overflow:hidden;
+  min-height:48px;
+}
+.cal-day:hover{border-color:var(--accent);background:var(--dark3);}
+.cal-day.today{border-color:var(--accent);background:rgba(232,56,13,.08);}
+.cal-day.empty{background:none;border-color:transparent;cursor:default;pointer-events:none;}
+.cal-day.has-workout{border-color:rgba(232,56,13,.4);}
+.cal-num{font-family:'Bebas Neue',sans-serif;font-size:15px;color:var(--white);line-height:1;}
+.cal-day.today .cal-num{color:var(--accent);}
+.cal-day.other-month .cal-num{color:var(--steel2);}
+.cal-dots{display:flex;gap:2px;flex-wrap:wrap;justify-content:center;margin-top:2px;}
+.cal-dot{width:5px;height:5px;border-radius:50%;}
+/* Day detail modal */
+.cal-modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:700;display:flex;align-items:flex-end;justify-content:center;}
+.cal-modal{background:var(--dark2);border:1px solid var(--border2);border-radius:6px 6px 0 0;width:100%;max-width:520px;max-height:88vh;overflow-y:auto;padding:0 0 2rem;}
+.cal-modal-hdr{position:sticky;top:0;background:var(--dark2);padding:1rem 1.25rem .75rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;z-index:1;}
+.cal-modal-date{font-family:'Bebas Neue',sans-serif;font-size:24px;letter-spacing:3px;color:var(--white);}
+.cal-modal-close{background:none;border:none;color:var(--mid);font-size:22px;cursor:pointer;padding:0 4px;line-height:1;}
+.cal-section{padding:.75rem 1.25rem;border-bottom:1px solid var(--border);}
+.cal-section:last-child{border-bottom:none;}
+.cal-section-title{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--mid);text-transform:uppercase;margin-bottom:.5rem;}
+.cal-row{display:flex;justify-content:space-between;align-items:center;padding:3px 0;}
+.cal-row-lbl{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--mid);}
+.cal-row-val{font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--white);font-weight:600;}
+.cal-workout-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--accent);}
+.cal-ex-row{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--light);padding:2px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
+.cal-empty-msg{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--steel2);padding:.25rem 0;}
 </style>
 </head>
 <body>
@@ -764,10 +796,7 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   <div class="hdr-mid">
     <div class="lifted-wrap"><div><div class="lifted-lbl">Total Lifted</div><div class="lifted-val" id="h-lifted">0 lbs</div><div class="lifted-track"><div class="lifted-bar" id="h-lifted-fill" style="width:0%"></div></div><div class="lifted-goal">to 1,000,000 lbs</div></div></div>
     <div id="sess-timer" class="sess-timer" style="display:none">00:00</div>
-    <a href="https://www.pandora.com" target="_blank" data-music-link title="Open Music" style="display:flex;align-items:center;gap:5px;background:var(--dark3);border:1px solid rgba(0,150,255,.3);border-radius:20px;padding:4px 10px;cursor:pointer;text-decoration:none;margin-left:8px">
-      <span style="font-size:14px">🎵</span>
-      <span class="music-lbl" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:#00B0FF;white-space:nowrap">Pandora</span>
-    </a>
+
   </div>
   <div class="hdr-right">
     <div id="hdr-sync-pill" onclick="showTab('settings')" title="Tap to open Settings & Sync" style="display:flex;align-items:center;gap:5px;background:var(--dark3);border:1px solid var(--border2);border-radius:20px;padding:4px 10px;cursor:pointer;margin-bottom:3px;transition:border-color .2s">
@@ -820,9 +849,8 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   <button class="nav-tab" data-tab="fuel" onclick="showTab('fuel')">&#x1F957; Fuel</button>
   <button class="nav-tab" data-tab="body" onclick="showTab('body')">&#x2696; Body</button>
   <button class="nav-tab" data-tab="records" onclick="showTab('records')">&#x1F3C6; Records</button>
-  <button class="nav-tab" data-tab="history" onclick="showTab('history')">&#x1F4CB; History</button>
+  <button class="nav-tab" data-tab="history" onclick="showTab('history')">&#x1F4C5; History</button>
   <button class="nav-tab" data-tab="achievements" onclick="showTab('achievements')">&#x1F947; Badges</button>
-  <button class="nav-tab" data-tab="week" onclick="showTab('week')">&#x1F4C5; Week</button>
   <button class="nav-tab" data-tab="bible" onclick="showTab('bible')">&#x271F; Bible</button>
   <button class="nav-tab" data-tab="advisor" onclick="showTab('advisor')">&#x1F9E0; Advisor</button>
 <button class="nav-tab" data-tab="settings" onclick="showTab('settings')">&#x2699; Settings</button>
@@ -973,44 +1001,45 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
 
 <!-- HISTORY TAB -->
 <div id="tab-history" style="display:none">
-  <div class="ht-toggle">
-    <button id="ht-sess-btn" class="ht-btn active" onclick="switchHistView('sessions')">Sessions</button>
-    <button id="ht-day-btn" class="ht-btn" onclick="switchHistView('daylog')">Day Log</button>
-    <button id="ht-prog-btn" class="ht-btn" onclick="switchHistView('progress')">Progress</button>
+  <!-- Calendar month nav -->
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
+    <button onclick="calNav(-1)" style="background:none;border:1px solid var(--border2);color:var(--mid);font-size:18px;padding:4px 14px;cursor:pointer;border-radius:2px">‹</button>
+    <div id="cal-month-lbl" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white)"></div>
+    <button onclick="calNav(1)" style="background:none;border:1px solid var(--border2);color:var(--mid);font-size:18px;padding:4px 14px;cursor:pointer;border-radius:2px">›</button>
   </div>
-  <div id="hist-session-view">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem;flex-wrap:wrap;gap:8px">
-      <div id="hist-count" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;color:var(--mid)"></div>
-      <select id="hist-filter" onchange="renderHistory()" style="background:var(--dark3);border:1px solid var(--steel2);color:var(--white);font-family:'Barlow Condensed',sans-serif;font-size:12px;padding:5px 8px;border-radius:2px;outline:none">
-        <option value="all">All Days</option>
-        <option value="chest">Chest</option><option value="back">Back</option>
-        <option value="shoulders">Shoulders</option><option value="legs">Legs</option>
-        <option value="arms">Arms</option><option value="cardio-day">Cardio</option>
-      </select>
+  <!-- Day-of-week headers -->
+  <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px">
+    <div style="text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid);padding:2px 0">SUN</div>
+    <div style="text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid);padding:2px 0">MON</div>
+    <div style="text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid);padding:2px 0">TUE</div>
+    <div style="text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid);padding:2px 0">WED</div>
+    <div style="text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid);padding:2px 0">THU</div>
+    <div style="text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid);padding:2px 0">FRI</div>
+    <div style="text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid);padding:2px 0">SAT</div>
+  </div>
+  <!-- Calendar grid -->
+  <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>
+  <!-- Hidden elements kept for JS chart rendering compatibility -->
+  <div style="display:none">
+    <div id="hist-count"></div>
+    <div id="hist-session-view"><div id="history-list"></div></div>
+    <div id="hist-day-view"><div id="daylog-list"></div></div>
+    <div id="hist-prog-view">
+      <canvas id="vol-chart"></canvas>
+      <canvas id="bw-chart"></canvas>
+      <canvas id="steps-chart"></canvas>
+      <canvas id="energy-chart"></canvas>
     </div>
-    <div id="history-list"></div>
-  </div>
-  <div id="hist-day-view" style="display:none"><div id="daylog-list"></div></div>
-  <div id="hist-prog-view" style="display:none">
-    <div class="sec-lbl" style="margin-top:0">Volume Over Time</div>
-    <div class="chart-box"><div class="chart-wrap"><canvas id="vol-chart"></canvas></div></div>
-    <div class="sec-lbl">Body Weight</div>
-    <div class="chart-box"><div class="chart-wrap"><canvas id="bw-chart"></canvas></div></div>
-    <div class="sec-lbl">Steps</div>
-    <div class="chart-box"><div class="chart-wrap"><canvas id="steps-chart"></canvas></div></div>
-    <div class="sec-lbl">Energy Levels</div>
-    <div class="chart-box"><div class="chart-wrap"><canvas id="energy-chart"></canvas></div></div>
+    <select id="hist-filter"></select>
+    <div id="week-now"></div>
+    <div id="week-last"></div>
   </div>
 </div>
 
 <div id="tab-achievements" style="display:none"><div class="sec-lbl" style="margin-top:0">Achievements</div><div id="ach-grid" class="ach-grid"></div></div>
 
+<!-- Week tab removed — merged into History tab -->
 <div id="tab-week" style="display:none">
-  <div class="sec-lbl" style="margin-top:0">This Week</div>
-  <div class="week-grid" id="week-now"></div>
-  <div class="sec-lbl">Last Week</div>
-  <div class="week-grid" id="week-last"></div>
-  <!-- Sync status dots (hidden elements kept for JS compatibility) -->
   <div style="display:none">
     <div id="sync-dot"></div>
     <div id="sync-status-txt"></div>
@@ -1406,7 +1435,7 @@ const DEFAULT_SUPPS=[
 const BADGE_CLS={chest:'b-chest',tri:'b-tri',legs:'b-legs',back:'b-back',bi:'b-bi',shoulder:'b-shoulder',core:'b-core'};
 const BADGE_LBL={chest:'Chest',tri:'Triceps',legs:'Legs',back:'Back',bi:'Biceps',shoulder:'Shoulder',core:'Core'};
 const DAY_LABEL={chest:'Chest + Triceps',back:'Back + Biceps',shoulders:'Shoulders + Triceps',legs:'Leg Day',arms:'Arm Day','cardio-day':'Cardio'};
-const ALL_TABS=['workout','fuel','body','records','history','achievements','week','bible','advisor','settings'];
+const ALL_TABS=['workout','fuel','body','records','history','achievements','bible','advisor','settings'];
 const DAILY_TABS=['fuel','body','bible'];
 
 const VERSES=[
@@ -1572,7 +1601,7 @@ function saveDaySummary(dateKey){
   const cardio=cardioLog[dateKey]||[];
   daySummaryLog[dateKey]={
     date:dateKey,displayDate:fmtDisplay(dateKey),
-    steps,stepGoalHit:steps>=STEP_GOAL_LIVE_LIVE,
+    steps,stepGoalHit:steps>=STEP_GOAL_LIVE,
     nutrition:{cal:Math.round(nt.cal),protein:Math.round(nt.protein*10)/10,carbs:Math.round(nt.carbs*10)/10,fat:Math.round(nt.fat*10)/10},
     supplements:{done:suppDone,total:allSIds.length,pct:allSIds.length>0?Math.round(suppDone/allSIds.length*100):0},
     energy:energyLog[dateKey]||null,bodyWeight:bwLog[dateKey]||null,
@@ -1634,35 +1663,6 @@ function openCalendar(){
   const ov=document.getElementById('cal-overlay');if(ov)ov.style.display='flex';
 }
 function closeCalendar(e){if(e&&e.target!==document.getElementById('cal-overlay'))return;const ov=document.getElementById('cal-overlay');if(ov)ov.style.display='none';}
-function calNav(delta){calMonth+=delta;if(calMonth>11){calMonth=0;calYear++;}if(calMonth<0){calMonth=11;calYear--;}renderCalendar();}
-function renderCalendar(){
-  const lbl=document.getElementById('cal-month');
-  const grid=document.getElementById('cal-grid');
-  if(!lbl||!grid)return;
-  lbl.textContent=new Date(calYear,calMonth,1).toLocaleDateString('en-US',{month:'long',year:'numeric'});
-  const dataDates=new Set([
-    ...Object.keys(stepsLog).filter(k=>stepsLog[k]>0),
-    ...Object.keys(nutrData).filter(k=>(nutrData[k]?.checked||[]).length>0),
-    ...history.map(e=>e.dateISO).filter(Boolean),
-    ...Object.keys(cardioLog).filter(k=>(cardioLog[k]||[]).length>0),
-    ...Object.keys(bwLog),...Object.keys(daySummaryLog),
-  ]);
-  const dows=['Su','Mo','Tu','We','Th','Fr','Sa'];
-  let html=dows.map(d=>`<div class="cal-dow">${d}</div>`).join('');
-  const firstDay=new Date(calYear,calMonth,1).getDay();
-  const daysInMonth=new Date(calYear,calMonth+1,0).getDate();
-  for(let i=0;i<firstDay;i++)html+='<div></div>';
-  for(let day=1;day<=daysInMonth;day++){
-    const d=new Date(calYear,calMonth,day);
-    const k=localKey(d);
-    const isToday=k===TODAY_KEY,isActive=k===ACTIVE_DATE,hasData=dataDates.has(k),isFuture=k>TODAY_KEY;
-    let cls='cal-d';
-    if(isToday)cls+=' today-d';if(isActive)cls+=' active-d';if(hasData)cls+=' has-d';if(isFuture)cls+=' future-d';
-    const click=isFuture?'':`onclick="pickCalDay('${k}')"`;
-    html+=`<div class="${cls}" ${click}>${day}</div>`;
-  }
-  grid.innerHTML=html;
-}
 function pickCalDay(k){const ov=document.getElementById('cal-overlay');if(ov)ov.style.display='none';setActiveDate(k);}
 
 // ── TIMER / BELL ────────────────────────────────────────────────────────
@@ -2436,7 +2436,7 @@ function renderBodyTab(){
     const maxSteps=Math.max(...cols.map(c=>c.steps),STEP_GOAL_LIVE,1);
     wsg.innerHTML=`<div class="wk-steps-grid">${cols.map(c=>{
       const pct=Math.round((c.steps/maxSteps)*100);
-      const goalHit=c.steps>=STEP_GOAL_LIVE_LIVE;
+      const goalHit=c.steps>=STEP_GOAL_LIVE;
       const isT=c.isToday;
       const barCls='wk-step-bar'+(goalHit?' goal-hit':'')+(isT?' today-col':'');
       const numCls='wk-step-num'+(goalHit?' goal-hit':'')+(isT?' today-col':'');
@@ -2597,7 +2597,7 @@ function renderDayLog(){
     MEAL_PLAN.forEach(m=>m.items.forEach(i=>{if((nd.checked||[]).includes(i.id)){nt.cal+=i.cal||0;nt.protein+=i.protein||0;nt.carbs+=i.carbs||0;nt.fat+=i.fat||0;}}));
     (nd.custom||[]).forEach(f=>{nt.cal+=f.cal||0;nt.protein+=f.protein||0;nt.carbs+=f.carbs||0;nt.fat+=f.fat||0;});
 
-    const stepGoal=steps>=STEP_GOAL_LIVE_LIVE;
+    const stepGoal=steps>=STEP_GOAL_LIVE;
     const tv=workout?Math.round((workout.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0)):0;
 
     // Status tags
@@ -3706,7 +3706,10 @@ function closeEditModal(){
 // ── WEEKLY ────────────────────────────────────────────────────────────────
 function toggleRestDay(key){if(restDays[key])delete restDays[key];else restDays[key]=true;saveStorage();renderWeekly();}
 function renderWeekly(){
-  try{renderWeeklyChallenge();}catch(e){}renderWeekGrid('week-now',0);renderWeekGrid('week-last',-7);}
+  try{renderWeeklyChallenge();}catch(e){}
+  // Week grids now inside hidden compat section — calendar is the primary view
+  try{renderWeekGrid('week-now',0);renderWeekGrid('week-last',-7);}catch(e){}
+}
 function renderWeekGrid(elId,offset){
   const el=document.getElementById(elId);if(!el)return;el.innerHTML='';
   const today3=new Date(),dow=today3.getDay();
@@ -3741,7 +3744,7 @@ function showTab(tab){
   if(tab==='fuel'){renderNutrition();renderSupplements();}
   else if(tab==='body')renderBodyTab();
   else if(tab==='records'){renderRecordsTab();}
-  else if(tab==='history'){switchHistView('sessions');}
+  else if(tab==='history'){renderCalendar();}
   else if(tab==='achievements')renderAchievements();
   else if(tab==='week')renderWeekly();
   else if(tab==='bible')renderBibleTab();
@@ -4285,6 +4288,7 @@ try {
   const _lastDay = localStorage.getItem('il_last_day') || 'chest';
   switchDay(_lastDay);
   updateStats();renderAchievements();setQuote();
+  calYear=new Date().getFullYear();calMonth=new Date().getMonth();
   // Badge tracking initialized after Drive load (or after 5s fallback) — see initBadgeTracking()
   // Restore Google sign-in token if previously signed in and not expired
   const savedToken = localStorage.getItem('il_drive_token');
@@ -4683,7 +4687,7 @@ document.getElementById('add-ex-modal')?.addEventListener('click',function(e){if
 
 // ── SETTINGS: PROFILE + PREFS ────────────────────────────────────────────
 let userProfile = { name:'', age:36, heightIn:74, goalWeight:225, gender:'male', goalType:'recomp' };
-let userPrefs   = { restTimer:70, stepGoal:12000, musicUrl:'https://www.pandora.com', musicLabel:'Pandora' };
+let userPrefs   = { restTimer:70, stepGoal:12000 };
 
 function loadUserSettings(){
   try{
@@ -4692,7 +4696,6 @@ function loadUserSettings(){
     // Apply live values
     DEFAULT_REST_LIVE = userPrefs.restTimer;
     STEP_GOAL_LIVE    = userPrefs.stepGoal;
-    applyMusicLink();
   }catch(e){}
 }
 
@@ -4724,22 +4727,7 @@ function savePrefs(){
   updateStepDisplay();
 }
 
-function saveMusicPref(){
-  userPrefs.musicUrl   = document.getElementById('pref-music-url')?.value.trim()||userPrefs.musicUrl;
-  userPrefs.musicLabel = document.getElementById('pref-music-label')?.value.trim()||userPrefs.musicLabel;
-  try{localStorage.setItem('il_prefs',JSON.stringify(userPrefs));}catch(e){}
-  applyMusicLink();
-  const el=document.getElementById('music-saved');if(el){el.style.display='block';setTimeout(()=>el.style.display='none',2500);}
-}
 
-function applyMusicLink(){
-  const link=document.querySelector('a[data-music-link]');
-  if(link){
-    link.href=userPrefs.musicUrl||'https://www.pandora.com';
-    const lbl=link.querySelector('.music-lbl');
-    if(lbl)lbl.textContent=userPrefs.musicLabel||'Music';
-  }
-}
 
 function populateSettingsTab(){
   try{
@@ -4750,8 +4738,7 @@ function populateSettingsTab(){
     f('prf-goal',     userProfile.goalWeight);
     f('pref-rest',    userPrefs.restTimer);
     f('pref-steps',   userPrefs.stepGoal);
-    f('pref-music-url',   userPrefs.musicUrl);
-    f('pref-music-label', userPrefs.musicLabel);
+
     const gs=document.getElementById('prf-gender');    if(gs)gs.value=userProfile.gender;
     const gt=document.getElementById('prf-goaltype');  if(gt)gt.value=userProfile.goalType;
     // Sync dots mirror
@@ -4764,6 +4751,234 @@ function populateSettingsTab(){
   }catch(e){}
 }
 
+
+// ── CALENDAR ──────────────────────────────────────────────────────────────
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth(); // 0-indexed
+
+function calNav(dir) {
+  calMonth += dir;
+  if (calMonth > 11) { calMonth = 0; calYear++; }
+  if (calMonth < 0)  { calMonth = 11; calYear--; }
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const grid = document.getElementById('cal-grid');
+  const lbl  = document.getElementById('cal-month-lbl');
+  if (!grid || !lbl) return;
+
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  lbl.textContent = MONTHS[calMonth] + ' ' + calYear;
+
+  const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+  const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+
+  grid.innerHTML = '';
+
+  // Leading empty cells (prev month days, greyed)
+  for (let i = 0; i < firstDay; i++) {
+    const day = daysInPrev - firstDay + 1 + i;
+    const d = new Date(calYear, calMonth - 1, day);
+    const key = localKey(d);
+    grid.appendChild(buildCalDay(day, key, true));
+  }
+
+  // Current month days
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(calYear, calMonth, day);
+    const key = localKey(d);
+    grid.appendChild(buildCalDay(day, key, false));
+  }
+
+  // Trailing empty cells to complete the last row
+  const total = firstDay + daysInMonth;
+  const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
+  for (let i = 1; i <= trailing; i++) {
+    const d = new Date(calYear, calMonth + 1, i);
+    const key = localKey(d);
+    grid.appendChild(buildCalDay(i, key, true));
+  }
+}
+
+function buildCalDay(dayNum, key, otherMonth) {
+  const isToday = key === TODAY_KEY;
+  const workout = history.find(h => h.dateISO === key);
+  const steps   = stepsLog[key] || 0;
+  const bw      = bwLog[key];
+  const nd      = nutrData[key] || { checked: [], custom: [] };
+  const sd      = suppData[key] || { checked: [] };
+  const bl      = bibleLog[key];
+  const cardio  = (cardioLog[key] || []).length > 0;
+
+  // Calculate logged calories
+  let loggedCal = 0;
+  MEAL_PLAN.forEach(m => m.items.forEach(i => { if ((nd.checked||[]).includes(i.id)) loggedCal += i.cal||0; }));
+  (nd.custom||[]).forEach(f => loggedCal += f.cal||0);
+
+  const hasData = workout || steps > 0 || bw || loggedCal > 0 || (sd.checked||[]).length > 0 || bl?.read;
+
+  const div = document.createElement('div');
+  div.className = 'cal-day' + (isToday ? ' today' : '') + (otherMonth ? ' other-month' : '') + (workout ? ' has-workout' : '');
+  if (!otherMonth && hasData) div.onclick = () => openCalDay(key);
+  else if (!otherMonth) div.onclick = () => openCalDay(key);
+
+  // Dot indicators
+  const DAY_COLORS = { chest:'#E8380D', back:'#2A9AD4', shoulders:'#A855F7', legs:'#22B05A', arms:'#F59E0B', 'cardio-day':'#14B8A6' };
+  let dots = '';
+  if (workout)  dots += `<div class="cal-dot" style="background:${DAY_COLORS[workout.day]||'var(--accent)'}"></div>`;
+  if (cardio && !workout) dots += `<div class="cal-dot" style="background:var(--teal)"></div>`;
+  if (steps >= STEP_GOAL_LIVE) dots += `<div class="cal-dot" style="background:var(--green2)"></div>`;
+  if (loggedCal > 0) dots += `<div class="cal-dot" style="background:var(--gold)"></div>`;
+  if (bl?.read)  dots += `<div class="cal-dot" style="background:#a78bfa"></div>`;
+  if ((sd.checked||[]).length > 0) dots += `<div class="cal-dot" style="background:#34d399"></div>`;
+
+  div.innerHTML = `<div class="cal-num">${dayNum}</div><div class="cal-dots">${dots}</div>`;
+  return div;
+}
+
+function openCalDay(key) {
+  // Remove existing modal
+  document.getElementById('cal-day-modal')?.remove();
+
+  const isToday = key === TODAY_KEY;
+  const displayDate = isToday ? 'TODAY — ' + fmtDisplay(key) : fmtDisplay(key);
+
+  const workout = history.find(h => h.dateISO === key);
+  const steps   = stepsLog[key] || 0;
+  const bw      = bwLog[key];
+  const energy  = energyLog[key];
+  const nd      = nutrData[key] || { checked: [], custom: [] };
+  const sd      = suppData[key] || { checked: [] };
+  const bl      = bibleLog[key];
+  const cardioSessions = cardioLog[key] || [];
+  const cfg     = suppConfig || DEFAULT_SUPPS;
+
+  // Nutrition totals
+  let nt = { cal:0, protein:0, carbs:0, fat:0 };
+  MEAL_PLAN.forEach(m => m.items.forEach(i => {
+    if ((nd.checked||[]).includes(i.id)) { nt.cal+=i.cal||0; nt.protein+=i.protein||0; nt.carbs+=i.carbs||0; nt.fat+=i.fat||0; }
+  }));
+  (nd.custom||[]).forEach(f => { nt.cal+=f.cal||0; nt.protein+=f.protein||0; nt.carbs+=f.carbs||0; nt.fat+=f.fat||0; });
+
+  const suppTotal = cfg.flatMap(g=>g.items).length;
+  const suppDone  = (sd.checked||[]).filter(id => cfg.flatMap(g=>g.items.map(i=>i.id)).includes(id)).length;
+
+  let html = `<div class="cal-modal-overlay" id="cal-day-modal" onclick="if(event.target===this)closeCalDay()">
+  <div class="cal-modal">
+    <div class="cal-modal-hdr">
+      <div class="cal-modal-date">${displayDate}</div>
+      <button class="cal-modal-close" onclick="closeCalDay()">✕</button>
+    </div>`;
+
+  // ── WORKOUT ──
+  html += `<div class="cal-section">
+    <div class="cal-section-title">💪 Workout</div>`;
+  if (workout) {
+    const vol = Math.round((workout.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0));
+    const sets = (workout.exercises||[]).filter(e=>e.done).length;
+    html += `<div class="cal-workout-name">${DAY_LABEL[workout.day]||workout.day}</div>`;
+    html += `<div class="cal-row"><span class="cal-row-lbl">Volume</span><span class="cal-row-val">${vol.toLocaleString()} lbs</span></div>`;
+    html += `<div class="cal-row"><span class="cal-row-lbl">Sets completed</span><span class="cal-row-val">${sets}</span></div>`;
+    if (workout.duration) html += `<div class="cal-row"><span class="cal-row-lbl">Duration</span><span class="cal-row-val">${fmtDur(workout.duration)}</span></div>`;
+    // Exercise breakdown
+    const exNames = [...new Set((workout.exercises||[]).filter(e=>e.done).map(e=>e.name))];
+    if (exNames.length) {
+      html += `<div style="margin-top:.5rem">`;
+      exNames.forEach(name => {
+        const exSets = (workout.exercises||[]).filter(e=>e.name===name&&e.done);
+        const best = Math.max(...exSets.map(e=>e.weight||0));
+        const totalVol = exSets.reduce((a,e)=>a+(e.vol||0),0);
+        html += `<div class="cal-ex-row"><span>${name}</span><span style="color:var(--mid)">${exSets.length} sets · ${best>0?best+'lb max · ':'' }${totalVol.toLocaleString()} lbs</span></div>`;
+      });
+      html += `</div>`;
+    }
+    if (workout.notes) html += `<div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--mid);margin-top:.5rem;font-style:italic">"${workout.notes}"</div>`;
+  } else if (cardioSessions.length) {
+    const totalMin = cardioSessions.reduce((a,c)=>a+c.duration,0);
+    html += `<div class="cal-workout-name">Cardio</div>`;
+    html += `<div class="cal-row"><span class="cal-row-lbl">Duration</span><span class="cal-row-val">${totalMin} min</span></div>`;
+    cardioSessions.forEach(c => {
+      html += `<div class="cal-ex-row"><span>${c.type}</span><span style="color:var(--mid)">${c.duration} min${c.calories?` · ${c.calories} cal`:''}</span></div>`;
+    });
+  } else {
+    html += `<div class="cal-empty-msg">No workout logged</div>`;
+  }
+  html += `</div>`;
+
+  // ── STEPS + BODY ──
+  html += `<div class="cal-section">
+    <div class="cal-section-title">👟 Steps & Body</div>
+    <div class="cal-row"><span class="cal-row-lbl">Steps</span><span class="cal-row-val" style="color:${steps>=STEP_GOAL_LIVE?'var(--green2)':'var(--white)'}">${steps>0?steps.toLocaleString():'—'}${steps>=STEP_GOAL_LIVE?' ✓':''}</span></div>
+    <div class="cal-row"><span class="cal-row-lbl">Body Weight</span><span class="cal-row-val">${bw?bw+' lbs':'—'}</span></div>
+    <div class="cal-row"><span class="cal-row-lbl">Energy Level</span><span class="cal-row-val">${energy?energy+'/10':'—'}</span></div>
+  </div>`;
+
+  // ── NUTRITION ──
+  html += `<div class="cal-section">
+    <div class="cal-section-title">🥗 Nutrition</div>`;
+  if (nt.cal > 0) {
+    html += `<div class="cal-row"><span class="cal-row-lbl">Calories</span><span class="cal-row-val">${Math.round(nt.cal).toLocaleString()}</span></div>`;
+    html += `<div class="cal-row"><span class="cal-row-lbl">Protein</span><span class="cal-row-val" style="color:var(--green2)">${Math.round(nt.protein)}g</span></div>`;
+    html += `<div class="cal-row"><span class="cal-row-lbl">Carbs</span><span class="cal-row-val">${Math.round(nt.carbs)}g</span></div>`;
+    html += `<div class="cal-row"><span class="cal-row-lbl">Fat</span><span class="cal-row-val">${Math.round(nt.fat)}g</span></div>`;
+    // Custom foods
+    if ((nd.custom||[]).length) {
+      html += `<div style="margin-top:.4rem">`;
+      nd.custom.forEach(f => {
+        html += `<div class="cal-ex-row"><span>${f.name}</span><span style="color:var(--mid)">${f.cal} cal · P:${f.protein}g</span></div>`;
+      });
+      html += `</div>`;
+    }
+  } else {
+    html += `<div class="cal-empty-msg">No nutrition logged</div>`;
+  }
+  html += `</div>`;
+
+  // ── SUPPLEMENTS ──
+  html += `<div class="cal-section">
+    <div class="cal-section-title">💊 Supplements</div>`;
+  if (suppDone > 0) {
+    html += `<div class="cal-row"><span class="cal-row-lbl">Taken</span><span class="cal-row-val" style="color:${suppDone===suppTotal?'var(--green2)':'var(--white)'}">${suppDone} / ${suppTotal}${suppDone===suppTotal?' ✓':''}</span></div>`;
+    cfg.forEach(group => {
+      const groupItems = group.items.filter(i => (sd.checked||[]).includes(i.id));
+      if (groupItems.length) {
+        groupItems.forEach(i => {
+          html += `<div class="cal-ex-row"><span>${i.name}</span><span style="color:var(--green2)">✓</span></div>`;
+        });
+      }
+    });
+  } else {
+    html += `<div class="cal-empty-msg">No supplements logged</div>`;
+  }
+  html += `</div>`;
+
+  // ── BIBLE ──
+  html += `<div class="cal-section">
+    <div class="cal-section-title">✝ Bible Reading</div>`;
+  if (bl?.read) {
+    html += `<div class="cal-row"><span class="cal-row-lbl">Status</span><span class="cal-row-val" style="color:#a78bfa">✓ Completed</span></div>`;
+    if (bl.book) html += `<div class="cal-row"><span class="cal-row-lbl">Reading</span><span class="cal-row-val">${bl.book}${bl.chapter?' Ch. '+bl.chapter:''}</span></div>`;
+    if (bl.notes) html += `<div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--mid);margin-top:.4rem;font-style:italic">"${bl.notes}"</div>`;
+  } else {
+    html += `<div class="cal-empty-msg">No reading logged</div>`;
+  }
+  html += `</div>`;
+
+  html += `</div></div>`;
+
+  const el = document.createElement('div');
+  el.innerHTML = html;
+  document.body.appendChild(el.firstElementChild);
+}
+
+function closeCalDay() {
+  document.getElementById('cal-day-modal')?.remove();
+}
+
+// Close modal on back button (mobile)
+window.addEventListener('popstate', closeCalDay);
 </script>
 
 <!-- ADD EXERCISE MODAL -->
@@ -4853,17 +5068,6 @@ function populateSettingsTab(){
       <div class="theme-swatch" style="background:#F97316" onclick="setAccentColor('#F97316','#FB923C')" title="Orange"></div>
       <button id="mode-toggle-btn2" onclick="toggleLightMode()" style="font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1.5px;background:none;border:1px solid var(--border2);color:var(--mid);padding:6px 12px;cursor:pointer;border-radius:2px;text-transform:uppercase">&#x2600; Light Mode</button>
     </div>
-  </div>
-
-  <div class="sec-lbl">&#x1F3B5; Music</div>
-  <div class="card" style="margin-bottom:1.25rem">
-    <div class="cf-lbl">Music app or playlist URL</div>
-    <div style="display:flex;gap:8px;margin-top:4px">
-      <input id="pref-music-url" type="url" placeholder="https://www.pandora.com" style="flex:1;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:13px">
-      <input id="pref-music-label" type="text" placeholder="Pandora" maxlength="20" style="width:90px;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:13px">
-    </div>
-    <button onclick="saveMusicPref()" style="width:100%;margin-top:8px;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:var(--accent);color:var(--white);border:none;cursor:pointer;border-radius:2px">Save Music Link</button>
-    <div id="music-saved" style="display:none;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--green2);letter-spacing:1px;margin-top:6px">✓ Music link saved — tap 🎵 in the header to open</div>
   </div>
 
   <div class="sec-lbl">&#x2601; Google Drive Sync</div>
