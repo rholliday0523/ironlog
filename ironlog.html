@@ -1003,9 +1003,9 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
 <div id="tab-history" style="display:none">
   <!-- Calendar month nav -->
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem">
-    <button onclick="calNav(-1)" style="background:none;border:1px solid var(--border2);color:var(--mid);font-size:18px;padding:4px 14px;cursor:pointer;border-radius:2px">‹</button>
-    <div id="cal-month-lbl" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white)"></div>
-    <button onclick="calNav(1)" style="background:none;border:1px solid var(--border2);color:var(--mid);font-size:18px;padding:4px 14px;cursor:pointer;border-radius:2px">›</button>
+    <button onclick="histCalNav(-1)" style="background:none;border:1px solid var(--border2);color:var(--mid);font-size:18px;padding:4px 14px;cursor:pointer;border-radius:2px">‹</button>
+    <div id="hist-cal-month-lbl" style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white)"></div>
+    <button onclick="histCalNav(1)" style="background:none;border:1px solid var(--border2);color:var(--mid);font-size:18px;padding:4px 14px;cursor:pointer;border-radius:2px">›</button>
   </div>
   <!-- Day-of-week headers -->
   <div style="display:grid;grid-template-columns:repeat(7,1fr);gap:2px;margin-bottom:2px">
@@ -1018,7 +1018,7 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
     <div style="text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:1px;color:var(--mid);padding:2px 0">SAT</div>
   </div>
   <!-- Calendar grid -->
-  <div id="cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>
+  <div id="hist-cal-grid" style="display:grid;grid-template-columns:repeat(7,1fr);gap:3px"></div>
   <!-- Hidden elements kept for JS chart rendering compatibility -->
   <div style="display:none">
     <div id="hist-count"></div>
@@ -3744,7 +3744,7 @@ function showTab(tab){
   if(tab==='fuel'){renderNutrition();renderSupplements();}
   else if(tab==='body')renderBodyTab();
   else if(tab==='records'){renderRecordsTab();}
-  else if(tab==='history'){renderCalendar();}
+  else if(tab==='history'){renderHistCalendar();}
   else if(tab==='achievements')renderAchievements();
   else if(tab==='week')renderWeekly();
   else if(tab==='bible')renderBibleTab();
@@ -4288,7 +4288,7 @@ try {
   const _lastDay = localStorage.getItem('il_last_day') || 'chest';
   switchDay(_lastDay);
   updateStats();renderAchievements();setQuote();
-  calYear=new Date().getFullYear();calMonth=new Date().getMonth();
+  histCalYear=new Date().getFullYear();histCalMonth=new Date().getMonth();
   // Badge tracking initialized after Drive load (or after 5s fallback) — see initBadgeTracking()
   // Restore Google sign-in token if previously signed in and not expired
   const savedToken = localStorage.getItem('il_drive_token');
@@ -4753,41 +4753,41 @@ function populateSettingsTab(){
 
 
 // ── CALENDAR ──────────────────────────────────────────────────────────────
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth(); // 0-indexed
+let histCalYear = new Date().getFullYear();
+let histCalMonth = new Date().getMonth(); // 0-indexed
 
-function calNav(dir) {
-  calMonth += dir;
-  if (calMonth > 11) { calMonth = 0; calYear++; }
-  if (calMonth < 0)  { calMonth = 11; calYear--; }
-  renderCalendar();
+function histCalNav(dir) {
+  histCalMonth += dir;
+  if (histCalMonth > 11) { histCalMonth = 0; histCalYear++; }
+  if (histCalMonth < 0)  { histCalMonth = 11; histCalYear--; }
+  renderHistCalendar();
 }
 
-function renderCalendar() {
-  const grid = document.getElementById('cal-grid');
-  const lbl  = document.getElementById('cal-month-lbl');
+function renderHistCalendar() {
+  const grid = document.getElementById('hist-cal-grid');
+  const lbl  = document.getElementById('hist-cal-month-lbl');
   if (!grid || !lbl) return;
 
   const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
-  lbl.textContent = MONTHS[calMonth] + ' ' + calYear;
+  lbl.textContent = MONTHS[histCalMonth] + ' ' + histCalYear;
 
-  const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
-  const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
-  const daysInPrev  = new Date(calYear, calMonth, 0).getDate();
+  const firstDay = new Date(histCalYear, histCalMonth, 1).getDay(); // 0=Sun
+  const daysInMonth = new Date(histCalYear, histCalMonth + 1, 0).getDate();
+  const daysInPrev  = new Date(histCalYear, histCalMonth, 0).getDate();
 
   grid.innerHTML = '';
 
   // Leading empty cells (prev month days, greyed)
   for (let i = 0; i < firstDay; i++) {
     const day = daysInPrev - firstDay + 1 + i;
-    const d = new Date(calYear, calMonth - 1, day);
+    const d = new Date(histCalYear, histCalMonth - 1, day);
     const key = localKey(d);
     grid.appendChild(buildCalDay(day, key, true));
   }
 
   // Current month days
   for (let day = 1; day <= daysInMonth; day++) {
-    const d = new Date(calYear, calMonth, day);
+    const d = new Date(histCalYear, histCalMonth, day);
     const key = localKey(d);
     grid.appendChild(buildCalDay(day, key, false));
   }
@@ -4796,7 +4796,7 @@ function renderCalendar() {
   const total = firstDay + daysInMonth;
   const trailing = total % 7 === 0 ? 0 : 7 - (total % 7);
   for (let i = 1; i <= trailing; i++) {
-    const d = new Date(calYear, calMonth + 1, i);
+    const d = new Date(histCalYear, histCalMonth + 1, i);
     const key = localKey(d);
     grid.appendChild(buildCalDay(i, key, true));
   }
@@ -4839,31 +4839,28 @@ function buildCalDay(dayNum, key, otherMonth) {
 }
 
 function openCalDay(key) {
-  // Remove existing modal
   document.getElementById('cal-day-modal')?.remove();
+  _calEditKey = key;
 
   const isToday = key === TODAY_KEY;
   const displayDate = isToday ? 'TODAY — ' + fmtDisplay(key) : fmtDisplay(key);
-
   const workout = history.find(h => h.dateISO === key);
   const steps   = stepsLog[key] || 0;
-  const bw      = bwLog[key];
-  const energy  = energyLog[key];
-  const nd      = nutrData[key] || { checked: [], custom: [] };
-  const sd      = suppData[key] || { checked: [] };
-  const bl      = bibleLog[key];
+  const bw      = bwLog[key] || '';
+  const energy  = energyLog[key] || '';
+  const nd      = nutrData[key] || { checked:[], custom:[] };
+  const sd      = suppData[key] || { checked:[] };
+  const bl      = bibleLog[key] || {};
   const cardioSessions = cardioLog[key] || [];
   const cfg     = suppConfig || DEFAULT_SUPPS;
 
   // Nutrition totals
-  let nt = { cal:0, protein:0, carbs:0, fat:0 };
-  MEAL_PLAN.forEach(m => m.items.forEach(i => {
-    if ((nd.checked||[]).includes(i.id)) { nt.cal+=i.cal||0; nt.protein+=i.protein||0; nt.carbs+=i.carbs||0; nt.fat+=i.fat||0; }
-  }));
-  (nd.custom||[]).forEach(f => { nt.cal+=f.cal||0; nt.protein+=f.protein||0; nt.carbs+=f.carbs||0; nt.fat+=f.fat||0; });
+  let nt = {cal:0,protein:0,carbs:0,fat:0};
+  MEAL_PLAN.forEach(m=>m.items.forEach(i=>{if((nd.checked||[]).includes(i.id)){nt.cal+=i.cal||0;nt.protein+=i.protein||0;nt.carbs+=i.carbs||0;nt.fat+=i.fat||0;}}));
+  (nd.custom||[]).forEach(f=>{nt.cal+=f.cal||0;nt.protein+=f.protein||0;nt.carbs+=f.carbs||0;nt.fat+=f.fat||0;});
 
-  const suppTotal = cfg.flatMap(g=>g.items).length;
-  const suppDone  = (sd.checked||[]).filter(id => cfg.flatMap(g=>g.items.map(i=>i.id)).includes(id)).length;
+  const iStyle = 'width:100%;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:8px 10px;border-radius:2px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;outline:none;box-sizing:border-box';
+  const saveBtn = (fn, label='Save') => `<button onclick="${fn}" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:1.5px;text-transform:uppercase;background:var(--accent);border:none;color:var(--white);padding:7px 14px;cursor:pointer;border-radius:2px;white-space:nowrap">${label}</button>`;
 
   let html = `<div class="cal-modal-overlay" id="cal-day-modal" onclick="if(event.target===this)closeCalDay()">
   <div class="cal-modal">
@@ -4872,105 +4869,246 @@ function openCalDay(key) {
       <button class="cal-modal-close" onclick="closeCalDay()">✕</button>
     </div>`;
 
-  // ── WORKOUT ──
-  html += `<div class="cal-section">
-    <div class="cal-section-title">💪 Workout</div>`;
-  if (workout) {
-    const vol = Math.round((workout.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0));
-    const sets = (workout.exercises||[]).filter(e=>e.done).length;
-    html += `<div class="cal-workout-name">${DAY_LABEL[workout.day]||workout.day}</div>`;
-    html += `<div class="cal-row"><span class="cal-row-lbl">Volume</span><span class="cal-row-val">${vol.toLocaleString()} lbs</span></div>`;
-    html += `<div class="cal-row"><span class="cal-row-lbl">Sets completed</span><span class="cal-row-val">${sets}</span></div>`;
-    if (workout.duration) html += `<div class="cal-row"><span class="cal-row-lbl">Duration</span><span class="cal-row-val">${fmtDur(workout.duration)}</span></div>`;
-    // Exercise breakdown
-    const exNames = [...new Set((workout.exercises||[]).filter(e=>e.done).map(e=>e.name))];
-    if (exNames.length) {
-      html += `<div style="margin-top:.5rem">`;
-      exNames.forEach(name => {
-        const exSets = (workout.exercises||[]).filter(e=>e.name===name&&e.done);
-        const best = Math.max(...exSets.map(e=>e.weight||0));
-        const totalVol = exSets.reduce((a,e)=>a+(e.vol||0),0);
-        html += `<div class="cal-ex-row"><span>${name}</span><span style="color:var(--mid)">${exSets.length} sets · ${best>0?best+'lb max · ':'' }${totalVol.toLocaleString()} lbs</span></div>`;
-      });
-      html += `</div>`;
-    }
-    if (workout.notes) html += `<div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--mid);margin-top:.5rem;font-style:italic">"${workout.notes}"</div>`;
-  } else if (cardioSessions.length) {
-    const totalMin = cardioSessions.reduce((a,c)=>a+c.duration,0);
-    html += `<div class="cal-workout-name">Cardio</div>`;
-    html += `<div class="cal-row"><span class="cal-row-lbl">Duration</span><span class="cal-row-val">${totalMin} min</span></div>`;
-    cardioSessions.forEach(c => {
-      html += `<div class="cal-ex-row"><span>${c.type}</span><span style="color:var(--mid)">${c.duration} min${c.calories?` · ${c.calories} cal`:''}</span></div>`;
-    });
-  } else {
-    html += `<div class="cal-empty-msg">No workout logged</div>`;
-  }
-  html += `</div>`;
-
-  // ── STEPS + BODY ──
+  // ── STEPS & BODY ──
   html += `<div class="cal-section">
     <div class="cal-section-title">👟 Steps & Body</div>
-    <div class="cal-row"><span class="cal-row-lbl">Steps</span><span class="cal-row-val" style="color:${steps>=STEP_GOAL_LIVE?'var(--green2)':'var(--white)'}">${steps>0?steps.toLocaleString():'—'}${steps>=STEP_GOAL_LIVE?' ✓':''}</span></div>
-    <div class="cal-row"><span class="cal-row-lbl">Body Weight</span><span class="cal-row-val">${bw?bw+' lbs':'—'}</span></div>
-    <div class="cal-row"><span class="cal-row-lbl">Energy Level</span><span class="cal-row-val">${energy?energy+'/10':'—'}</span></div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+      <input id="ced-steps" type="number" value="${steps||''}" placeholder="Steps" style="${iStyle}">
+      ${saveBtn("calSaveSteps()")}
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:8px;align-items:center">
+      <input id="ced-bw" type="number" step="0.1" value="${bw}" placeholder="Body weight (lbs)" style="${iStyle}">
+      ${saveBtn("calSaveBW()")}
+    </div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <select id="ced-energy" style="${iStyle}">
+        <option value="">Energy level...</option>
+        ${[1,2,3,4,5,6,7,8,9,10].map(n=>`<option value="${n}"${energy==n?' selected':''}>${n}/10</option>`).join('')}
+      </select>
+      ${saveBtn("calSaveEnergy()")}
+    </div>
   </div>`;
 
   // ── NUTRITION ──
   html += `<div class="cal-section">
-    <div class="cal-section-title">🥗 Nutrition</div>`;
-  if (nt.cal > 0) {
-    html += `<div class="cal-row"><span class="cal-row-lbl">Calories</span><span class="cal-row-val">${Math.round(nt.cal).toLocaleString()}</span></div>`;
-    html += `<div class="cal-row"><span class="cal-row-lbl">Protein</span><span class="cal-row-val" style="color:var(--green2)">${Math.round(nt.protein)}g</span></div>`;
-    html += `<div class="cal-row"><span class="cal-row-lbl">Carbs</span><span class="cal-row-val">${Math.round(nt.carbs)}g</span></div>`;
-    html += `<div class="cal-row"><span class="cal-row-lbl">Fat</span><span class="cal-row-val">${Math.round(nt.fat)}g</span></div>`;
-    // Custom foods
-    if ((nd.custom||[]).length) {
-      html += `<div style="margin-top:.4rem">`;
-      nd.custom.forEach(f => {
-        html += `<div class="cal-ex-row"><span>${f.name}</span><span style="color:var(--mid)">${f.cal} cal · P:${f.protein}g</span></div>`;
-      });
-      html += `</div>`;
-    }
-  } else {
-    html += `<div class="cal-empty-msg">No nutrition logged</div>`;
+    <div class="cal-section-title">🥗 Nutrition${nt.cal>0?` <span style="color:var(--accent);font-size:11px">${Math.round(nt.cal)} cal · ${Math.round(nt.protein)}g P</span>`:''}
+    </div>
+    <div class="cal-section-title" style="margin-bottom:.4rem;margin-top:.25rem">Meal Plan Items</div>`;
+  cfg.length;
+  MEAL_PLAN.forEach(m=>{
+    html+=`<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);letter-spacing:1px;margin:.4rem 0 .2rem">${m.label}</div>`;
+    m.items.forEach(i=>{
+      const checked=(nd.checked||[]).includes(i.id);
+      html+=`<label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--light)">
+        <input type="checkbox" data-meal-id="${i.id}" ${checked?'checked':''} onchange="calToggleMeal('${i.id}',this.checked)" style="accent-color:var(--accent);width:16px;height:16px">
+        ${i.name} <span style="color:var(--mid);margin-left:auto">${i.cal}cal</span>
+      </label>`;
+    });
+  });
+  html+=`<div class="cal-section-title" style="margin-top:.75rem;margin-bottom:.4rem">Custom Foods</div>`;
+  if((nd.custom||[]).length){
+    nd.custom.forEach((f,i)=>{
+      html+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--border);font-family:'Barlow Condensed',sans-serif;font-size:13px">
+        <span style="color:var(--light)">${f.name}</span>
+        <span style="color:var(--mid);margin:0 8px">${f.cal}cal · P:${f.protein}g</span>
+        <button onclick="calDeleteFood(${i})" style="background:none;border:none;color:var(--accent);cursor:pointer;font-size:14px;padding:0 4px">✕</button>
+      </div>`;
+    });
   }
-  html += `</div>`;
+  html+=`<div style="margin-top:.5rem">
+    <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:4px;margin-bottom:4px">
+      <input id="ced-fname" type="text" placeholder="Food name" style="${iStyle}">
+      <input id="ced-fcal" type="number" placeholder="Cal" style="${iStyle}">
+      <input id="ced-fpro" type="number" placeholder="Prot" style="${iStyle}">
+      <input id="ced-ffat" type="number" placeholder="Fat" style="${iStyle}">
+    </div>
+    ${saveBtn("calAddFood()",'+ Add Food')}
+  </div>
+  </div>`;
 
   // ── SUPPLEMENTS ──
   html += `<div class="cal-section">
     <div class="cal-section-title">💊 Supplements</div>`;
-  if (suppDone > 0) {
-    html += `<div class="cal-row"><span class="cal-row-lbl">Taken</span><span class="cal-row-val" style="color:${suppDone===suppTotal?'var(--green2)':'var(--white)'}">${suppDone} / ${suppTotal}${suppDone===suppTotal?' ✓':''}</span></div>`;
-    cfg.forEach(group => {
-      const groupItems = group.items.filter(i => (sd.checked||[]).includes(i.id));
-      if (groupItems.length) {
-        groupItems.forEach(i => {
-          html += `<div class="cal-ex-row"><span>${i.name}</span><span style="color:var(--green2)">✓</span></div>`;
-        });
-      }
+  cfg.forEach(group=>{
+    html+=`<div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);letter-spacing:1px;margin:.4rem 0 .2rem">${group.label}</div>`;
+    group.items.forEach(i=>{
+      const checked=(sd.checked||[]).includes(i.id);
+      html+=`<label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--light)">
+        <input type="checkbox" ${checked?'checked':''} onchange="calToggleSupp('${i.id}',this.checked)" style="accent-color:var(--green2);width:16px;height:16px">
+        ${i.name}
+      </label>`;
     });
+  });
+  html+=`</div>`;
+
+  // ── WORKOUT (view + edit notes) ──
+  html += `<div class="cal-section">
+    <div class="cal-section-title">💪 Workout</div>`;
+  if(workout){
+    const vol=Math.round((workout.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0));
+    const sets=(workout.exercises||[]).filter(e=>e.done).length;
+    html+=`<div class="cal-workout-name">${DAY_LABEL[workout.day]||workout.day}</div>`;
+    html+=`<div class="cal-row"><span class="cal-row-lbl">Volume</span><span class="cal-row-val">${vol.toLocaleString()} lbs</span></div>`;
+    html+=`<div class="cal-row"><span class="cal-row-lbl">Sets</span><span class="cal-row-val">${sets}</span></div>`;
+    if(workout.duration)html+=`<div class="cal-row"><span class="cal-row-lbl">Duration</span><span class="cal-row-val">${fmtDur(workout.duration)}</span></div>`;
+    const exNames=[...new Set((workout.exercises||[]).filter(e=>e.done).map(e=>e.name))];
+    if(exNames.length){
+      html+=`<div style="margin-top:.5rem">`;
+      exNames.forEach(name=>{
+        const exSets=(workout.exercises||[]).filter(e=>e.name===name&&e.done);
+        const best=Math.max(...exSets.map(e=>e.weight||0));
+        html+=`<div class="cal-ex-row"><span>${name}</span><span style="color:var(--mid)">${exSets.length} sets${best>0?' · '+best+'lb max':''}</span></div>`;
+      });
+      html+=`</div>`;
+    }
+    html+=`<div style="margin-top:.75rem">
+      <div class="cal-section-title" style="margin-bottom:.3rem">Workout Notes</div>
+      <textarea id="ced-wnotes" rows="2" placeholder="Notes..." style="${iStyle};resize:vertical">${workout.notes||''}</textarea>
+      <div style="margin-top:4px">${saveBtn("calSaveWorkoutNotes()")}</div>
+    </div>`;
+  } else if(cardioSessions.length){
+    const totalMin=cardioSessions.reduce((a,c)=>a+c.duration,0);
+    html+=`<div class="cal-workout-name">Cardio — ${totalMin} min</div>`;
+    cardioSessions.forEach(c=>{html+=`<div class="cal-ex-row"><span>${c.type}</span><span style="color:var(--mid)">${c.duration} min</span></div>`;});
   } else {
-    html += `<div class="cal-empty-msg">No supplements logged</div>`;
+    html+=`<div class="cal-empty-msg" style="margin-bottom:.5rem">No workout logged for this day</div>`;
   }
-  html += `</div>`;
+  // Add cardio session
+  html+=`<div style="margin-top:.75rem">
+    <div class="cal-section-title" style="margin-bottom:.4rem">Log Cardio</div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:4px;margin-bottom:4px">
+      <select id="ced-ctype" style="${iStyle}">
+        <option value="">Activity...</option>
+        <option>Incline Walk</option><option>Treadmill Run</option><option>Outdoor Walk</option>
+        <option>Outdoor Run</option><option>Stationary Bike</option><option>Elliptical</option>
+        <option>Rowing Machine</option><option>Stair Climber</option><option>HIIT</option>
+        <option>Jump Rope</option><option>Swimming</option><option>Custom</option>
+      </select>
+      <input id="ced-cdur" type="number" placeholder="Min" style="${iStyle}">
+    </div>
+    ${saveBtn("calAddCardio()",'+ Add Cardio')}
+  </div>
+  </div>`;
 
   // ── BIBLE ──
-  html += `<div class="cal-section">
-    <div class="cal-section-title">✝ Bible Reading</div>`;
-  if (bl?.read) {
-    html += `<div class="cal-row"><span class="cal-row-lbl">Status</span><span class="cal-row-val" style="color:#a78bfa">✓ Completed</span></div>`;
-    if (bl.book) html += `<div class="cal-row"><span class="cal-row-lbl">Reading</span><span class="cal-row-val">${bl.book}${bl.chapter?' Ch. '+bl.chapter:''}</span></div>`;
-    if (bl.notes) html += `<div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--mid);margin-top:.4rem;font-style:italic">"${bl.notes}"</div>`;
-  } else {
-    html += `<div class="cal-empty-msg">No reading logged</div>`;
-  }
-  html += `</div>`;
+  const bookOpts = [...OT_BOOKS,...NT_BOOKS].map(b=>`<option value="${b}"${bl.book===b?' selected':''}>${b}</option>`).join('');
+  html+=`<div class="cal-section">
+    <div class="cal-section-title">✝ Bible Reading</div>
+    <label style="display:flex;align-items:center;gap:8px;padding:4px 0;cursor:pointer;font-family:'Barlow Condensed',sans-serif;font-size:14px;color:var(--light);margin-bottom:.5rem">
+      <input type="checkbox" id="ced-bible-read" ${bl.read?'checked':''} onchange="calToggleBibleRead(this.checked)" style="accent-color:#a78bfa;width:18px;height:18px">
+      Marked as read
+    </label>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:4px;margin-bottom:4px">
+      <select id="ced-bbook" style="${iStyle}">${bookOpts?`<option value="">Book...</option>${bookOpts}`:'<option value="">Book...</option>'}</select>
+      <input id="ced-bchap" type="number" placeholder="Chapter" value="${bl.chapter||''}" style="${iStyle}">
+    </div>
+    <textarea id="ced-bnotes" rows="2" placeholder="Notes, reflections..." style="${iStyle};resize:vertical;margin-bottom:4px">${bl.notes||''}</textarea>
+    ${saveBtn("calSaveBible()",'Save Reading')}
+  </div>`;
 
-  html += `</div></div>`;
+  html+=`</div></div>`;
 
-  const el = document.createElement('div');
-  el.innerHTML = html;
+  const el=document.createElement('div');
+  el.innerHTML=html;
   document.body.appendChild(el.firstElementChild);
+}
+
+let _calEditKey = '';
+
+function calRefresh(){ openCalDay(_calEditKey); renderHistCalendar(); }
+
+function calSaveSteps(){
+  const v=parseInt(document.getElementById('ced-steps')?.value)||0;
+  stepsLog[_calEditKey]=v;
+  try{localStorage.setItem('il_steps',JSON.stringify(stepsLog));}catch(e){}
+  scheduleAutoSync(); calRefresh();
+}
+function calSaveBW(){
+  const v=parseFloat(document.getElementById('ced-bw')?.value)||0;
+  if(v>0){bwLog[_calEditKey]=v;try{localStorage.setItem('il_bw',JSON.stringify(bwLog));}catch(e){}}
+  scheduleAutoSync(); calRefresh();
+}
+function calSaveEnergy(){
+  const v=parseInt(document.getElementById('ced-energy')?.value)||0;
+  if(v>0){energyLog[_calEditKey]=v;try{localStorage.setItem('il_energy',JSON.stringify(energyLog));}catch(e){}}
+  scheduleAutoSync(); calRefresh();
+}
+function calToggleMeal(id, checked){
+  if(!nutrData[_calEditKey]) nutrData[_calEditKey]={checked:[],custom:[]};
+  const arr=nutrData[_calEditKey].checked||[];
+  if(checked){if(!arr.includes(id))arr.push(id);}
+  else{nutrData[_calEditKey].checked=arr.filter(x=>x!==id);}
+  nutrData[_calEditKey].checked=nutrData[_calEditKey].checked||arr;
+  if(checked&&!nutrData[_calEditKey].checked.includes(id))nutrData[_calEditKey].checked.push(id);
+  try{localStorage.setItem('il_nutr',JSON.stringify(nutrData));}catch(e){}
+  scheduleAutoSync();
+  // Update nutrition total in header without full re-render
+  _calUpdateNutrTotal();
+}
+function _calUpdateNutrTotal(){
+  // lightweight total update
+  const nd=nutrData[_calEditKey]||{checked:[],custom:[]};
+  let cal=0,pro=0;
+  MEAL_PLAN.forEach(m=>m.items.forEach(i=>{if((nd.checked||[]).includes(i.id)){cal+=i.cal||0;pro+=i.protein||0;}}));
+  (nd.custom||[]).forEach(f=>{cal+=f.cal||0;pro+=f.protein||0;});
+}
+function calToggleSupp(id, checked){
+  if(!suppData[_calEditKey]) suppData[_calEditKey]={checked:[]};
+  const arr=suppData[_calEditKey].checked||[];
+  if(checked){if(!arr.includes(id))arr.push(id);}
+  else{suppData[_calEditKey].checked=arr.filter(x=>x!==id);}
+  if(!suppData[_calEditKey].checked)suppData[_calEditKey].checked=arr;
+  try{localStorage.setItem('il_supp_data',JSON.stringify(suppData));}catch(e){}
+  scheduleAutoSync();
+}
+function calAddFood(){
+  const name=(document.getElementById('ced-fname')?.value||'').trim();
+  const cal=parseFloat(document.getElementById('ced-fcal')?.value)||0;
+  const pro=parseFloat(document.getElementById('ced-fpro')?.value)||0;
+  const fat=parseFloat(document.getElementById('ced-ffat')?.value)||0;
+  if(!name||!cal){const inp=document.getElementById('ced-fname');if(inp){inp.style.borderColor='var(--accent)';setTimeout(()=>inp.style.borderColor='',1500);}return;}
+  if(!nutrData[_calEditKey])nutrData[_calEditKey]={checked:[],custom:[]};
+  if(!nutrData[_calEditKey].custom)nutrData[_calEditKey].custom=[];
+  nutrData[_calEditKey].custom.push({id:'cf-'+Date.now(),name,cal,protein:pro,carbs:0,fat});
+  try{localStorage.setItem('il_nutr',JSON.stringify(nutrData));}catch(e){}
+  scheduleAutoSync(); calRefresh();
+}
+function calDeleteFood(idx){
+  if(!nutrData[_calEditKey]?.custom)return;
+  nutrData[_calEditKey].custom.splice(idx,1);
+  try{localStorage.setItem('il_nutr',JSON.stringify(nutrData));}catch(e){}
+  scheduleAutoSync(); calRefresh();
+}
+function calSaveWorkoutNotes(){
+  const w=history.find(h=>h.dateISO===_calEditKey);
+  if(!w)return;
+  w.notes=document.getElementById('ced-wnotes')?.value||'';
+  saveStorage(); scheduleAutoSync(); calRefresh();
+}
+function calAddCardio(){
+  const type=document.getElementById('ced-ctype')?.value||'';
+  const dur=parseInt(document.getElementById('ced-cdur')?.value)||0;
+  if(!type||!dur)return;
+  if(!cardioLog[_calEditKey])cardioLog[_calEditKey]=[];
+  cardioLog[_calEditKey].push({type,duration:dur,intensity:'',calories:0,date:_calEditKey});
+  try{localStorage.setItem('il_cardio',JSON.stringify(cardioLog));}catch(e){}
+  scheduleAutoSync(); calRefresh();
+}
+function calToggleBibleRead(checked){
+  if(!bibleLog[_calEditKey])bibleLog[_calEditKey]={};
+  bibleLog[_calEditKey].read=checked;
+  try{localStorage.setItem('il_bible',JSON.stringify(bibleLog));}catch(e){}
+  scheduleAutoSync();
+}
+function calSaveBible(){
+  const book=document.getElementById('ced-bbook')?.value||'';
+  const chap=parseInt(document.getElementById('ced-bchap')?.value)||0;
+  const notes=document.getElementById('ced-bnotes')?.value||'';
+  const read=document.getElementById('ced-bible-read')?.checked||false;
+  if(!bibleLog[_calEditKey])bibleLog[_calEditKey]={};
+  bibleLog[_calEditKey]={...bibleLog[_calEditKey],read,book,chapter:chap,notes};
+  try{localStorage.setItem('il_bible',JSON.stringify(bibleLog));}catch(e){}
+  scheduleAutoSync(); calRefresh();
 }
 
 function closeCalDay() {
