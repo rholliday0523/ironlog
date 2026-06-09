@@ -784,6 +784,51 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
 .cal-workout-name{font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;color:var(--accent);}
 .cal-ex-row{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--light);padding:2px 0;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;}
 .cal-empty-msg{font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--steel2);padding:.25rem 0;}
+
+/* ── CLAUDE COACH ──────────────────────────────────────────────────────── */
+.claude-msg { display:flex; gap:8px; align-items:flex-start; }
+.claude-msg.user { flex-direction:row-reverse; }
+.claude-bubble {
+  background:var(--dark3); border:1px solid var(--border2); border-radius:12px;
+  padding:10px 14px; font-family:'Barlow Condensed',sans-serif; font-size:14px;
+  color:var(--light); line-height:1.5; max-width:88%; white-space:pre-wrap;
+  word-break:break-word;
+}
+.claude-msg.user .claude-bubble {
+  background:linear-gradient(135deg,rgba(232,56,13,.2),rgba(168,85,247,.15));
+  border-color:rgba(232,56,13,.3); color:var(--white);
+}
+.claude-msg.assistant .claude-bubble { border-color:rgba(168,85,247,.25); }
+.claude-typing .claude-bubble { color:var(--mid); font-style:italic; }
+.claude-quick {
+  font-family:'Barlow Condensed',sans-serif; font-size:11px; letter-spacing:1px;
+  background:var(--dark3); border:1px solid var(--border2); color:var(--mid);
+  padding:6px 10px; cursor:pointer; border-radius:20px; white-space:nowrap;
+  transition:all .15s;
+}
+.claude-quick:hover { border-color:var(--accent); color:var(--accent); }
+
+/* ── HOME TAB ───────────────────────────────────────────────────────────── */
+.home-card {
+  background:var(--dark2);border:1px solid var(--border2);border-radius:4px;
+  padding:.75rem;display:flex;align-items:center;gap:10px;
+  transition:border-color .15s,background .15s;
+}
+.home-card:hover { border-color:var(--accent);background:var(--dark3); }
+.home-card-icon {
+  width:36px;height:36px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-size:18px;flex-shrink:0;
+}
+.home-card-lbl { font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:var(--mid);text-transform:uppercase; }
+.home-card-val { font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--white);line-height:1.1; }
+.home-card-sub { font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--steel2); }
+.home-check { font-size:16px;color:var(--green2);flex-shrink:0;font-weight:700; }
+.home-action-btn {
+  padding:12px;font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;
+  text-transform:uppercase;background:var(--dark2);border:1px solid;cursor:pointer;
+  border-radius:3px;transition:all .15s;
+}
+.home-action-btn:hover { background:var(--dark3); }
 </style>
 </head>
 <body>
@@ -845,7 +890,8 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
 <div class="header-glow-bar"></div>
 <div class="header-glow-bar"></div>
 <div class="main-nav">
-  <button class="nav-tab active" data-tab="workout" onclick="showTab('workout')">&#x26A1; Workout</button>
+  <button class="nav-tab" data-tab="home" onclick="showTab('home')">&#x2302; Home</button>
+  <button class="nav-tab" data-tab="workout" onclick="showTab('workout')">&#x26A1; Workout</button>
   <button class="nav-tab" data-tab="fuel" onclick="showTab('fuel')">&#x1F957; Fuel</button>
   <button class="nav-tab" data-tab="body" onclick="showTab('body')">&#x2696; Body</button>
   <button class="nav-tab" data-tab="records" onclick="showTab('records')">&#x1F3C6; Records</button>
@@ -854,6 +900,48 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   <button class="nav-tab" data-tab="bible" onclick="showTab('bible')">&#x271F; Bible</button>
   <button class="nav-tab" data-tab="advisor" onclick="showTab('advisor')">&#x1F9E0; Advisor</button>
 <button class="nav-tab" data-tab="settings" onclick="showTab('settings')">&#x2699; Settings</button>
+<button class="nav-tab" data-tab="claude" onclick="showTab('claude')">&#x1F916; Coach</button>
+</div>
+
+
+<div id="tab-home" style="display:none">
+  <div style="margin-bottom:1.25rem">
+    <div id="home-greeting" style="font-family:'Bebas Neue',sans-serif;font-size:32px;letter-spacing:4px;color:var(--white);line-height:1"></div>
+    <div id="home-date" style="font-family:'Barlow Condensed',sans-serif;font-size:13px;letter-spacing:2px;color:var(--mid);margin-top:2px"></div>
+    <div id="home-quote" style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--steel2);margin-top:6px;font-style:italic;border-left:2px solid var(--accent);padding-left:10px"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1rem">
+    <div class="home-card" onclick="showTab('workout')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(232,56,13,.15);color:var(--accent)">&#x26A1;</div><div style="flex:1"><div class="home-card-lbl">Workout</div><div id="hc-workout" class="home-card-val">&#x2014;</div><div id="hc-workout-sub" class="home-card-sub">Tap to start</div></div><div id="hc-workout-check" class="home-check" style="display:none">&#x2713;</div></div>
+    <div class="home-card" onclick="showTab('fuel')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(34,176,90,.15);color:var(--green2)">&#x1F957;</div><div style="flex:1"><div class="home-card-lbl">Nutrition</div><div id="hc-nutrition" class="home-card-val">&#x2014;</div><div id="hc-nutrition-sub" class="home-card-sub">Log your meals</div></div><div id="hc-nutrition-check" class="home-check" style="display:none">&#x2713;</div></div>
+    <div class="home-card" onclick="showTab('body')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(42,154,212,.15);color:var(--blue2)">&#x1F45F;</div><div style="flex:1"><div class="home-card-lbl">Steps</div><div id="hc-steps" class="home-card-val">0</div><div id="hc-steps-sub" class="home-card-sub">of 12,000</div></div><div id="hc-steps-check" class="home-check" style="display:none">&#x2713;</div></div>
+    <div class="home-card" onclick="showTab('fuel')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(168,85,247,.15);color:#a855f7">&#x1F48A;</div><div style="flex:1"><div class="home-card-lbl">Supplements</div><div id="hc-supps" class="home-card-val">&#x2014;</div><div id="hc-supps-sub" class="home-card-sub">Log your stack</div></div><div id="hc-supps-check" class="home-check" style="display:none">&#x2713;</div></div>
+    <div class="home-card" onclick="showTab('body')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(212,168,67,.15);color:var(--gold)">&#x2696;&#xFE0F;</div><div style="flex:1"><div class="home-card-lbl">Body Weight</div><div id="hc-bw" class="home-card-val">&#x2014;</div><div id="hc-bw-sub" class="home-card-sub">Log today</div></div><div id="hc-bw-check" class="home-check" style="display:none">&#x2713;</div></div>
+    <div class="home-card" onclick="showTab('bible')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(167,139,250,.15);color:#a78bfa">&#x271D;</div><div style="flex:1"><div class="home-card-lbl">Bible Reading</div><div id="hc-bible" class="home-card-val">&#x2014;</div><div id="hc-bible-sub" class="home-card-sub">Daily reading</div></div><div id="hc-bible-check" class="home-check" style="display:none">&#x2713;</div></div>
+  </div>
+  <div style="background:var(--dark2);border:1px solid var(--border2);border-radius:4px;padding:.9rem 1rem;margin-bottom:1rem">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.5rem">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--mid)">TODAY'S SCORE</div>
+      <div id="home-score-val" style="font-family:'Bebas Neue',sans-serif;font-size:24px;color:var(--accent)">0</div>
+    </div>
+    <div style="background:var(--dark3);border-radius:20px;height:8px;overflow:hidden"><div id="home-score-bar" style="height:100%;border-radius:20px;background:linear-gradient(90deg,var(--accent),#a855f7);width:0%;transition:width .6s ease"></div></div>
+    <div id="home-score-lbl" style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid);margin-top:4px;text-align:right">Keep pushing</div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:1rem">
+    <div style="background:var(--dark2);border:1px solid var(--border2);border-radius:4px;padding:.75rem;text-align:center"><div style="font-size:20px;margin-bottom:2px">&#x1F525;</div><div id="home-streak" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--accent)">0</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);letter-spacing:1px">STREAK</div></div>
+    <div style="background:var(--dark2);border:1px solid var(--border2);border-radius:4px;padding:.75rem;text-align:center"><div style="font-size:20px;margin-bottom:2px">&#x1F3CB;&#xFE0F;</div><div id="home-workouts" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--white)">0</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);letter-spacing:1px">WORKOUTS</div></div>
+    <div style="background:var(--dark2);border:1px solid var(--border2);border-radius:4px;padding:.75rem;text-align:center"><div style="font-size:20px;margin-bottom:2px">&#x2696;&#xFE0F;</div><div id="home-goal-dist" style="font-family:'Bebas Neue',sans-serif;font-size:26px;color:var(--green2)">&#x2014;</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);letter-spacing:1px">LBS TO GOAL</div></div>
+  </div>
+  <div style="margin-bottom:1rem">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--mid);margin-bottom:.4rem">&#x1F4DD; TODAY'S NOTE</div>
+    <textarea id="home-note" placeholder="How are you feeling today? Goals, intentions, thoughts..." rows="3" style="width:100%;background:var(--dark2);border:1px solid var(--border2);color:var(--white);padding:10px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:14px;resize:none;outline:none;line-height:1.4;box-sizing:border-box" oninput="saveHomeNote()"></textarea>
+  </div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--mid);margin-bottom:.5rem">QUICK ACTIONS</div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1.5rem">
+    <button onclick="showTab('workout')" class="home-action-btn" style="border-color:rgba(232,56,13,.4);color:var(--accent)">&#x26A1; Start Workout</button>
+    <button onclick="showTab('fuel')" class="home-action-btn" style="border-color:rgba(34,176,90,.4);color:var(--green2)">&#x1F957; Log Nutrition</button>
+    <button onclick="showTab('body')" class="home-action-btn" style="border-color:rgba(42,154,212,.4);color:var(--blue2)">&#x1F45F; Log Steps</button>
+    <button onclick="showTab('claude')" class="home-action-btn" style="border-color:rgba(168,85,247,.4);color:#a855f7">&#x1F916; Ask Coach</button>
+  </div>
 </div>
 
 <div id="tab-workout">
@@ -990,6 +1078,20 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
     <div class="bw-stats" id="bw-stats"></div>
   </div>
   <div class="chart-box"><div class="chart-wrap"><canvas id="bw-chart"></canvas></div></div>
+
+  <div class="sec-lbl">Weight Trend &amp; Goal Projection</div>
+  <div class="card" style="margin-bottom:.75rem">
+    <div id="bw-proj-stats"></div>
+    <div class="chart-wrap" style="height:180px;margin-top:.75rem"><canvas id="bw-projection-chart"></canvas></div>
+  </div>
+
+  <div class="sec-lbl">Weekly Muscle Heatmap</div>
+  <div class="card" style="margin-bottom:.75rem">
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid);letter-spacing:1px;margin-bottom:.6rem">LAST 7 DAYS — TRAINING VOLUME BY MUSCLE GROUP</div>
+    <div id="muscle-heatmap" style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:.6rem"></div>
+    <div id="heatmap-legend" style="display:flex;gap:12px;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);flex-wrap:wrap"></div>
+  </div>
+
   <div class="sec-lbl">Energy Level</div>
   <div class="card"><div class="energy-lbl">How is your energy today? (1 = depleted, 10 = on fire)</div><div class="energy-btns" id="energy-btns"></div></div>
   <div class="chart-box"><div class="chart-wrap"><canvas id="energy-chart"></canvas></div></div>
@@ -1158,6 +1260,8 @@ var STEP_GOAL_LIVE    = 12000;
 let TODAY_KEY = localKey();
 let histCalYear = new Date().getFullYear();
 let histCalMonth = new Date().getMonth();
+let userProfile = { name:'', age:36, heightIn:74, goalWeight:225, gender:'male', goalType:'recomp' };
+let userPrefs   = { restTimer:70, stepGoal:12000 };
 let ACTIVE_DATE = TODAY_KEY;
 let lastCheckedDate = TODAY_KEY;
 let cardioDateKey = TODAY_KEY;
@@ -1440,7 +1544,19 @@ const DEFAULT_SUPPS=[
 const BADGE_CLS={chest:'b-chest',tri:'b-tri',legs:'b-legs',back:'b-back',bi:'b-bi',shoulder:'b-shoulder',core:'b-core'};
 const BADGE_LBL={chest:'Chest',tri:'Triceps',legs:'Legs',back:'Back',bi:'Biceps',shoulder:'Shoulder',core:'Core'};
 const DAY_LABEL={chest:'Chest + Triceps',back:'Back + Biceps',shoulders:'Shoulders + Triceps',legs:'Leg Day',arms:'Arm Day','cardio-day':'Cardio'};
-const ALL_TABS=['workout','fuel','body','records','history','achievements','bible','advisor','settings'];
+const HOME_QUOTES = [
+  "No one who conquers the weights stays the same.",
+  "Pain is temporary. PRs are forever.",
+  "You built for this. Now prove it.",
+  "The bar doesn't lie. Neither does the mirror.",
+  "Every set is a deposit in your future self.",
+  "Psalms 27:1 — The Lord is my light and my salvation.",
+  "Iron sharpens iron.",
+  "Discipline is choosing what you want most over what you want now.",
+  "The only bad workout is the one that didn't happen.",
+  "Be the hardest worker in the room. Every room."
+];
+const ALL_TABS=['home','workout','fuel','body','records','history','achievements','bible','advisor','settings','claude'];
 const DAILY_TABS=['fuel','body','bible'];
 
 const VERSES=[
@@ -1782,6 +1898,17 @@ function scrollToNextEx(currentExId){
 
 // ── WORKOUT ─────────────────────────────────────────────────────────────
 function getAllEx(day){return day==='cardio-day'?[]:(DAYS[day]?.sections||[]).flatMap(s=>s.exercises);}
+
+// Get sets from the most recent logged session for a given exercise ID
+function getLastSessionSets(exId){
+  for(let i=0;i<history.length;i++){
+    const h=history[i];
+    if(h.dateISO===TODAY_KEY) continue; // skip today's in-progress session
+    const sets=(h.exercises||[]).filter(e=>e.id===exId&&e.done);
+    if(sets.length) return sets;
+  }
+  return [];
+}
 // ── DRAFT WORKOUT PERSISTENCE ────────────────────────────────────────────
 function saveDraft(){
   if(currentDay==='cardio-day')return;
@@ -1853,6 +1980,7 @@ function renderExercises(){
     const lbl=document.createElement('div');lbl.className='sec-lbl';lbl.textContent=sec.label;list.appendChild(lbl);
     sec.exercises.forEach(ex=>list.appendChild(buildCard(ex)));
   });
+  setTimeout(updatePOSuggestions, 50);
 }
 
 function buildCard(ex){
@@ -1879,6 +2007,7 @@ function buildCard(ex){
   <div class="badges"><span class="badge ${bc}">${bl}</span>${ssHtml}<span class="badge b-pr" id="prb-${ex.id}" style="display:none">&#x1F3C6; PR</span></div>
 </div>
 <div class="ex-hint">${ex.hint}</div>
+<div id="po-sugg-${ex.id}" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:.5px;padding:3px 0 4px;min-height:18px"></div>
 ${lastHtml}
 <datalist id="${listId}">${opts}</datalist>
 <div class="col-hdr"><span>#</span><span>Weight (lbs)</span><span>Reps</span><span>RPE</span><span>Rest</span><span>&#x2713;</span></div>
@@ -2482,6 +2611,9 @@ function renderBodyTab(){
   if(energyChart)energyChart.destroy();
   const ec=document.getElementById('energy-chart');
   if(ec&&eE.length){energyChart=new Chart(ec,{type:'line',data:{labels:eE.map(e=>e[0].slice(5)),datasets:[{data:eE.map(e=>e[1]),borderColor:'var(--gold)',backgroundColor:'rgba(212,168,67,0.08)',borderWidth:2,pointRadius:4,fill:true,tension:.3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{ticks:{color:tc,font:{size:10}},grid:{color:gc}},y:{min:1,max:10,ticks:{color:tc,font:{size:10},stepSize:1},grid:{color:gc}}}}});}
+  // Premium features
+  try{renderBWTrendProjection();}catch(e){console.warn('BW projection:',e);}
+  try{renderMuscleHeatmap();}catch(e){console.warn('Heatmap:',e);}
 }
 
 // ── PR BOARD ──────────────────────────────────────────────────────────────
@@ -3755,6 +3887,14 @@ function showTab(tab){
   else if(tab==='bible')renderBibleTab();
   else if(tab==='advisor'){renderAdvisorTab();renderMonthlyTab();}
   else if(tab==='settings'){populateSettingsTab();}
+  else if(tab==='home'){renderHomeTab();}
+  else if(tab==='claude'){
+    // Refresh context display when opening coach
+    const msgs=document.getElementById('claude-messages');
+    if(msgs&&msgs.children.length===0){
+      appendClaudeMsg('assistant',"Hey! I'm your Iron Coach. I have full access to your workouts, nutrition, body weight, PRs, and progress. Ask me anything!");
+    }
+  }
 }
 
 // ── SWIPE GESTURES ────────────────────────────────────────────────────────
@@ -3976,6 +4116,7 @@ function renderBibleLog(){
 }
 
 // ── SUPABASE SYNC ────────────────────────────────────────────────────────
+const ANTHROPIC_KEY = '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';
 const SB_URL = 'https://cswmkmnoehmohkwtttfv.supabase.co';
 const SB_KEY = 'sb_publishable_HYmvzPvkaI0p8MWb8eOYng_JEawxY5r';
 const SB_USER_ID = 'ryan'; // single-user app
@@ -4138,10 +4279,22 @@ async function loadFromSupabase() {
       ? new Date(localStorage.getItem('il_device_last_save')).getTime() : 0;
     const cloudIsNewer = cloudTime > localTime;
 
-    // History: always union — never lose a session
-    remoteHistory.forEach(s => {
-      if (!history.find(x => x.dateISO === s.dateISO && x.day === s.day)) history.push(s);
-    });
+    // History merge:
+    // If cloud is newer (another device saved after us) — take cloud history as base, then add any local-only sessions
+    // If local is newer — union (add any cloud sessions we're missing)
+    if (cloudIsNewer && remoteHistory.length > 0) {
+      // Start from cloud, add any local sessions not in cloud
+      const merged = [...remoteHistory];
+      history.forEach(s => {
+        if (!merged.find(x => x.dateISO === s.dateISO && x.day === s.day)) merged.push(s);
+      });
+      history = merged;
+    } else {
+      // Start from local, add any cloud sessions not in local
+      remoteHistory.forEach(s => {
+        if (!history.find(x => x.dateISO === s.dateISO && x.day === s.day)) history.push(s);
+      });
+    }
     history.sort((a,b) => b.dateISO.localeCompare(a.dateISO));
 
     // Game: take whichever has more progress
@@ -4179,6 +4332,7 @@ async function loadFromSupabase() {
 
     _saveStorageCore(); saveSC();
     updateStats(); renderAchievements(); switchDay(currentDay);
+    try{renderHomeTab();}catch(e){}
     const timeStr = new Date(d.synced_at).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
     setSyncStatus('ok', '✓ Synced', timeStr);
     if (!_appReady) initBadgeTracking();
@@ -4229,6 +4383,8 @@ try {
   try{updateStats();}catch(e){console.warn('updateStats startup:',e);}
   try{renderAchievements();}catch(e){}
   try{setQuote();}catch(e){}
+  // Show home tab by default
+  showTab('home');
   histCalYear=new Date().getFullYear();histCalMonth=new Date().getMonth();
 
   // Show connected immediately — Supabase needs no sign-in
@@ -4258,7 +4414,7 @@ try {
       })():false;
       if(!hasDraft) loadFromSupabase();
     } catch(e) {}
-  }, 3 * 60 * 1000);
+  }, 60 * 1000); // poll every 60 seconds for near real-time sync
 
 } catch(e) { console.error('Init error:',e); }
 startClock();
@@ -4626,8 +4782,7 @@ function deleteExerciseCard(id){
 document.getElementById('add-ex-modal')?.addEventListener('click',function(e){if(e.target===this)closeAddExercise();});
 
 // ── SETTINGS: PROFILE + PREFS ────────────────────────────────────────────
-let userProfile = { name:'', age:36, heightIn:74, goalWeight:225, gender:'male', goalType:'recomp' };
-let userPrefs   = { restTimer:70, stepGoal:12000 };
+// userProfile and userPrefs declared near top
 
 function loadUserSettings(){
   try{
@@ -4668,6 +4823,9 @@ function savePrefs(){
 
 
 function populateSettingsTab(){
+  // Set default date for photo import to today
+  const dateInp = document.getElementById('photo-import-date');
+  if (dateInp && !dateInp.value) dateInp.value = TODAY_KEY;
   try{
     const f=(id,val)=>{const e=document.getElementById(id);if(e)e.value=val;};
     f('prf-name',     userProfile.name);
@@ -5281,6 +5439,835 @@ function calSaveAll(){
   renderHistCalendar();
   setTimeout(()=>closeCalDay(),800);
 }
+
+// ══════════════════════════════════════════════════════════════════════════
+// ── PREMIUM FEATURES ──────────────────────────────────────────────────────
+// ══════════════════════════════════════════════════════════════════════════
+
+// ── 1. PROGRESSIVE OVERLOAD SUGGESTIONS ───────────────────────────────────
+function updatePOSuggestions(){
+  if(!DAYS[currentDay]) return;
+  getAllEx(currentDay).forEach(ex => {
+    const el = document.getElementById('po-sugg-' + ex.id);
+    if (!el) return;
+    const prev = getLastSessionSets(ex.id);
+    if (!prev.length) { el.innerHTML = '<span style="color:var(--steel2);font-size:11px">First time — log your starting weight</span>'; return; }
+    const maxW  = Math.max(...prev.map(s => parseFloat(s.weight)||0));
+    const avgR  = Math.round(prev.reduce((a,s) => a+(parseInt(s.reps)||0), 0) / prev.length);
+    const totalS= prev.length;
+    // Suggest +2.5lbs if they averaged top of rep range, otherwise same weight
+    const hintReps = parseInt((ex.hint||'').match(/(\d+)\s*rep/)?.[1]||'99');
+    const readyForMore = avgR >= hintReps && maxW > 0;
+    const suggest = readyForMore ? Math.round((maxW + 2.5) * 2) / 2 : maxW;
+    const arrow   = readyForMore ? ' <span style="color:var(--green2)">↑ +2.5lbs</span>' : '';
+    el.innerHTML = `<span style="color:var(--mid);font-size:11px">Last: ${totalS} sets × ${avgR} reps @ ${maxW}lbs</span><span style="color:var(--accent);font-weight:700;margin-left:8px;font-size:12px">→ ${suggest}lbs${arrow}</span>`;
+  });
+}
+
+// ── 2. MUSCLE GROUP HEATMAP ────────────────────────────────────────────────
+// Maps each workout day to muscle groups with volume weight
+const MUSCLE_MAP = {
+  chest:     { chest:3, triceps:2, front_delt:1 },
+  back:      { back:3, biceps:2, core:1 },
+  shoulders: { shoulders:3, triceps:2, rear_delt:1 },
+  legs:      { quads:3, hamstrings:2, glutes:2, core:1 },
+  arms:      { biceps:3, triceps:3, core:1 },
+  'cardio-day': { cardio:1 }
+};
+const MUSCLE_LABELS = {
+  chest:'Chest', triceps:'Triceps', front_delt:'Front Delt',
+  back:'Back', biceps:'Biceps', core:'Core',
+  shoulders:'Shoulders', rear_delt:'Rear Delt',
+  quads:'Quads', hamstrings:'Hamstrings', glutes:'Glutes',
+  cardio:'Cardio'
+};
+
+function renderMuscleHeatmap(){
+  const container = document.getElementById('muscle-heatmap');
+  if (!container) return;
+
+  // Count sets per muscle group over last 7 days
+  const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
+  const cutoffKey = localKey(cutoff);
+
+  const volume = {}; // muscle -> total sets this week
+  history.filter(h => (h.dateISO||'') >= cutoffKey).forEach(h => {
+    const map = MUSCLE_MAP[h.day] || {};
+    Object.entries(map).forEach(([muscle, weight]) => {
+      const sets = (h.exercises||[]).filter(e=>e.done).length;
+      volume[muscle] = (volume[muscle]||0) + (sets * weight);
+    });
+  });
+
+  const allMuscles = Object.keys(MUSCLE_LABELS);
+  const maxVol = Math.max(...allMuscles.map(m => volume[m]||0), 1);
+
+  const getColor = (v) => {
+    if (!v) return 'rgba(255,255,255,0.04)';
+    const pct = v / maxVol;
+    if (pct >= 0.75) return 'rgba(232,56,13,0.85)';
+    if (pct >= 0.5)  return 'rgba(232,56,13,0.55)';
+    if (pct >= 0.25) return 'rgba(232,56,13,0.3)';
+    return 'rgba(232,56,13,0.12)';
+  };
+  const getLabel = (v) => {
+    if (!v) return 'Not trained';
+    if (v/maxVol >= 0.75) return 'Heavy';
+    if (v/maxVol >= 0.5)  return 'Moderate';
+    if (v/maxVol >= 0.25) return 'Light';
+    return 'Minimal';
+  };
+
+  container.innerHTML = allMuscles.map(m => {
+    const v = volume[m]||0;
+    const color = getColor(v);
+    const label = getLabel(v);
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px">
+      <div style="width:52px;height:52px;border-radius:4px;background:${color};border:1px solid rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.5px">${v?v:''}</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);text-align:center;line-height:1.1">${MUSCLE_LABELS[m]}</div>
+    </div>`;
+  }).join('');
+
+  // Update legend
+  const leg = document.getElementById('heatmap-legend');
+  if (leg) leg.innerHTML = `
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:rgba(232,56,13,0.85);border-radius:2px;display:inline-block"></span>Heavy</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:rgba(232,56,13,0.55);border-radius:2px;display:inline-block"></span>Moderate</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:rgba(232,56,13,0.12);border-radius:2px;display:inline-block"></span>Light</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;background:rgba(255,255,255,0.04);border-radius:2px;display:inline-block"></span>Rest</span>`;
+}
+
+// ── 3. BODY WEIGHT TREND + GOAL PROJECTION ────────────────────────────────
+function renderBWTrendProjection(){
+  const canvas = document.getElementById('bw-projection-chart');
+  if (!canvas) return;
+  if (window._bwProjChart) { window._bwProjChart.destroy(); window._bwProjChart = null; }
+
+  const bwE = Object.entries(bwLog).sort((a,b) => a[0].localeCompare(b[0]));
+  if (bwE.length < 2) {
+    canvas.parentElement.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:13px;color:var(--mid);padding:1rem 0;text-align:center">Log at least 2 body weight entries to see projection</div>';
+    return;
+  }
+
+  const goalW = userProfile.goalWeight || 225;
+
+  // Calculate weekly rate using linear regression
+  const n = bwE.length;
+  const xs = bwE.map((_,i) => i);
+  const ys = bwE.map(e => e[1]);
+  const xMean = xs.reduce((a,b)=>a+b,0)/n;
+  const yMean = ys.reduce((a,b)=>a+b,0)/n;
+  const slope = xs.reduce((a,x,i)=>a+(x-xMean)*(ys[i]-yMean),0) / xs.reduce((a,x)=>a+(x-xMean)**2,0);
+  // slope is lbs per entry; convert to weekly
+  const daysPerEntry = 7; // approximate
+  const weeklyRate = slope * 7;
+
+  // Project forward to goal
+  const lastVal = ys[n-1];
+  const lastDate = new Date(bwE[n-1][0] + 'T12:00:00');
+  const labels = bwE.map(e => e[0].slice(5));
+  const actuals = bwE.map(e => e[1]);
+  const projLabels = [...labels];
+  const projData = new Array(n).fill(null);
+
+  if (weeklyRate < -0.05) { // losing weight
+    let projVal = lastVal;
+    let projDate = new Date(lastDate);
+    let weeks = 0;
+    while (projVal > goalW && weeks < 104) { // max 2 years
+      projDate.setDate(projDate.getDate() + 7);
+      projVal = Math.max(goalW, projVal + weeklyRate);
+      projLabels.push(localKey(projDate).slice(5));
+      projData.push(Math.round(projVal * 10)/10);
+      weeks++;
+    }
+  }
+
+  const gc = 'rgba(255,255,255,0.05)', tc = '#666';
+  window._bwProjChart = new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: projLabels,
+      datasets: [
+        {
+          label: 'Actual',
+          data: [...actuals, ...new Array(projLabels.length - labels.length).fill(null)],
+          borderColor: 'var(--green2)',
+          backgroundColor: 'rgba(34,176,90,0.1)',
+          borderWidth: 2, pointRadius: 3, fill: true, tension: .3
+        },
+        {
+          label: 'Projected',
+          data: projData,
+          borderColor: 'rgba(212,168,67,0.7)',
+          borderDash: [5,5],
+          backgroundColor: 'rgba(212,168,67,0.05)',
+          borderWidth: 2, pointRadius: 2, fill: false, tension: .3
+        },
+        {
+          label: 'Goal',
+          data: new Array(projLabels.length).fill(goalW),
+          borderColor: 'rgba(232,56,13,0.4)',
+          borderDash: [3,3],
+          borderWidth: 1, pointRadius: 0, fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { color: '#666', font: { size: 10 }, boxWidth: 12 } }
+      },
+      scales: {
+        x: { ticks: { color: tc, font: { size: 9 }, maxTicksLimit: 8 }, grid: { color: gc } },
+        y: { ticks: { color: tc, font: { size: 10 } }, grid: { color: gc } }
+      }
+    }
+  });
+
+  // Update projection stats
+  const statsEl = document.getElementById('bw-proj-stats');
+  if (statsEl) {
+    const toGo = Math.max(0, lastVal - goalW).toFixed(1);
+    const rateStr = weeklyRate < 0 ? (weeklyRate).toFixed(2) + ' lbs/wk' : '+' + weeklyRate.toFixed(2) + ' lbs/wk';
+    const weeksLeft = weeklyRate < -0.05 ? Math.ceil((lastVal - goalW) / Math.abs(weeklyRate)) : null;
+    const etaStr = weeksLeft ? `~${weeksLeft} weeks` : '—';
+    statsEl.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:.75rem">
+        <div style="text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--green2)">${lastVal}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid)">Current</div></div>
+        <div style="text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold)">${toGo}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid)">lbs to goal</div></div>
+        <div style="text-align:center"><div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--accent)">${etaStr}</div><div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid)">to ${goalW} lbs</div></div>
+      </div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid);text-align:center;margin-top:4px">Trend: ${rateStr}</div>`;
+  }
+}
+
+// ── 4. WEEKLY CHECK-IN PROMPT ─────────────────────────────────────────────
+function checkWeeklyCheckIn(){
+  const today = new Date();
+  if (today.getDay() !== 0) return; // Sunday only
+  const thisWeekKey = localKey(today);
+  const lastCheckin = localStorage.getItem('il_last_checkin');
+  if (lastCheckin === thisWeekKey) return; // already done this Sunday
+
+  // Build weekly summary
+  const ws = getWeekStart();
+  const wHistory = history.filter(h => (h.dateISO||'') >= ws);
+  const wWorkouts = wHistory.length;
+  const wVol = wHistory.reduce((a,h) => a + (h.exercises||[]).filter(e=>e.done).reduce((b,e)=>b+e.vol,0), 0);
+  const wDates = Object.keys(stepsLog).filter(k => k >= ws);
+  const wStepsGoal = wDates.filter(k => stepsLog[k] >= STEP_GOAL_LIVE).length;
+  const wBwEntries = Object.entries(bwLog).filter(([k]) => k >= ws);
+  const startW = wBwEntries[0]?.[1] || 0;
+  const endW   = wBwEntries[wBwEntries.length-1]?.[1] || 0;
+  const wChange = startW && endW ? (endW - startW).toFixed(1) : null;
+
+  const modal = document.createElement('div');
+  modal.id = 'weekly-checkin-modal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:800;display:flex;align-items:center;justify-content:center;padding:1rem';
+  modal.innerHTML = `<div style="background:var(--dark2);border:1px solid var(--accent);border-radius:6px;padding:1.5rem;width:100%;max-width:400px;max-height:90vh;overflow-y:auto">
+    <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;color:var(--accent);margin-bottom:.25rem">WEEKLY CHECK-IN</div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--mid);letter-spacing:2px;margin-bottom:1rem">${today.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'})}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:1rem">
+      <div style="background:var(--dark3);padding:.75rem;border-radius:4px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--green2)">${wWorkouts}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid)">Workouts</div>
+      </div>
+      <div style="background:var(--dark3);padding:.75rem;border-radius:4px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--accent)">${Math.round(wVol/1000)}k</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid)">lbs lifted</div>
+      </div>
+      <div style="background:var(--dark3);padding:.75rem;border-radius:4px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:var(--blue2)">${wStepsGoal}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid)">Step goals hit</div>
+      </div>
+      <div style="background:var(--dark3);padding:.75rem;border-radius:4px;text-align:center">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;color:${wChange&&parseFloat(wChange)<0?'var(--green2)':wChange?'var(--accent)':'var(--mid)'}">${wChange?wChange+'lbs':'—'}</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid)">Weight change</div>
+      </div>
+    </div>
+    <div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--mid);margin-bottom:1rem">How did this week feel overall?</div>
+    <div style="display:flex;gap:6px;margin-bottom:1rem;flex-wrap:wrap">
+      ${['💪 Strong','😤 Grinded','😐 Average','😴 Tired','🔥 Best week yet'].map(l=>`<button onclick="this.parentElement.querySelectorAll('button').forEach(b=>b.style.background='');this.style.background='var(--accent)'" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;background:var(--dark3);border:1px solid var(--border2);color:var(--white);padding:8px 12px;cursor:pointer;border-radius:20px">${l}</button>`).join('')}
+    </div>
+    <textarea id="wci-notes" placeholder="Notes for this week... what worked, what didn't..." rows="3" style="width:100%;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:10px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:14px;margin-bottom:1rem;resize:none"></textarea>
+    <button onclick="dismissWeeklyCheckIn()" style="width:100%;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:4px;background:var(--accent);border:none;color:var(--white);cursor:pointer;border-radius:3px">✓ LOG THIS WEEK</button>
+  </div>`;
+  document.body.appendChild(modal);
+}
+
+function dismissWeeklyCheckIn(){
+  const today = localKey(new Date());
+  localStorage.setItem('il_last_checkin', today);
+  document.getElementById('weekly-checkin-modal')?.remove();
+}
+
+// ── 5. STREAK PROTECTION WARNING ─────────────────────────────────────────
+function checkStreakProtection(){
+  if (game.streak < 2) return; // no streak to protect
+
+  const today = new Date();
+  const hour  = today.getHours();
+  if (hour < 17) return; // only warn after 5pm
+
+  const todayKey = localKey(today);
+  const lastWarnKey = localStorage.getItem('il_streak_warn');
+  if (lastWarnKey === todayKey) return; // already warned today
+
+  // Check if already worked out today
+  const workedOutToday = history.some(h => h.dateISO === todayKey);
+  if (workedOutToday) return;
+
+  // Check if today is even a planned workout day (not a rest day)
+  const restToday = restDays[todayKey];
+  if (restToday) return;
+
+  localStorage.setItem('il_streak_warn', todayKey);
+
+  const pill = document.createElement('div');
+  pill.style.cssText = 'position:fixed;top:70px;left:50%;transform:translateX(-50%);background:linear-gradient(135deg,var(--dark2),var(--dark3));border:1px solid var(--gold);border-radius:4px;padding:.75rem 1.25rem;z-index:500;display:flex;align-items:center;gap:12px;max-width:340px;width:90%;box-shadow:0 4px 20px rgba(0,0,0,.5)';
+  pill.innerHTML = `
+    <div style="font-size:24px">🔥</div>
+    <div style="flex:1">
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--gold)">${game.streak}-DAY STREAK AT RISK</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--mid)">No workout logged today. Don't break the chain.</div>
+    </div>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:var(--mid);font-size:18px;cursor:pointer;padding:0">✕</button>`;
+  document.body.appendChild(pill);
+  setTimeout(() => pill.remove(), 8000);
+}
+
+// ── WIRE ALL PREMIUM FEATURES ─────────────────────────────────────────────
+// Check streak protection on load and every 30 min
+setTimeout(checkStreakProtection, 3000);
+setInterval(checkStreakProtection, 30 * 60 * 1000);
+
+// Weekly check-in on Sunday
+setTimeout(checkWeeklyCheckIn, 4000);
+
+
+// ── IRON COACH (Claude AI) ────────────────────────────────────────────────
+let _claudeHistory = []; // conversation history for context
+
+function buildUserContext() {
+  // Build a rich context snapshot from the user's actual data
+  const bwE = Object.entries(bwLog).sort((a,b) => a[0].localeCompare(b[0]));
+  const currW = bwE.length ? bwE[bwE.length-1][1] : null;
+  const startW = bwE.length ? bwE[0][1] : null;
+  const lostW  = (startW && currW) ? Math.round((startW - currW)*10)/10 : 0;
+
+  // Recent workouts (last 7)
+  const recentW = history.slice(0,7).map(h => {
+    const vol = (h.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0);
+    const sets = (h.exercises||[]).filter(e=>e.done).length;
+    return `  - ${h.dateISO} ${DAY_LABEL[h.day]||h.day}: ${sets} sets, ${Math.round(vol).toLocaleString()} lbs volume${h.notes?' ("'+h.notes+'")'  :''}`;
+  }).join('\n');
+
+  // PRs
+  const prMap = {};
+  history.forEach(h => (h.exercises||[]).forEach(e => {
+    if(!prMap[e.name]||e.weight>prMap[e.name].w) prMap[e.name]={w:e.weight,r:e.reps};
+  }));
+  const prList = Object.entries(prMap).slice(0,10).map(([n,v])=>`  - ${n}: ${v.w}lbs × ${v.r} reps`).join('\n');
+
+  // This week nutrition
+  const ws = getWeekStart();
+  const wNutr = Object.entries(nutrData).filter(([k])=>k>=ws);
+  const avgChecked = wNutr.length ? Math.round(wNutr.reduce((a,[,v])=>a+(v.checked||[]).length,0)/wNutr.length) : 0;
+
+  // Steps this week
+  const wSteps = Object.entries(stepsLog).filter(([k])=>k>=ws);
+  const avgSteps = wSteps.length ? Math.round(wSteps.reduce((a,[,v])=>a+v,0)/wSteps.length) : 0;
+  const stepsGoalHit = wSteps.filter(([,v])=>v>=STEP_GOAL_LIVE).length;
+
+  // Today's nutrition
+  const todayNd = nutrData[TODAY_KEY]||{checked:[],custom:[]};
+  let todayCal=0, todayPro=0;
+  MEAL_PLAN.forEach(m=>m.items.forEach(i=>{if((todayNd.checked||[]).includes(i.id)){todayCal+=i.cal||0;todayPro+=i.protein||0;}}));
+  (todayNd.custom||[]).forEach(f=>{todayCal+=f.cal||0;todayPro+=f.protein||0;});
+
+  const profile = userProfile || {};
+  const goal = profile.goalWeight || 225;
+  const age  = profile.age || 36;
+  const ht   = profile.heightIn ? `${Math.floor(profile.heightIn/12)}'${profile.heightIn%12}"` : '6\'2"';
+
+  return `You are Iron Coach, a personal AI trainer built into the IronLog fitness app. You have complete access to this user's real fitness data. Be direct, specific, and motivating. Use their actual numbers. Keep responses concise and actionable — this is a mobile app.
+
+USER PROFILE:
+- Name: ${profile.name || 'Ryan'}
+- Age: ${age}, Height: ${ht}
+- Current weight: ${currW ? currW+'lbs' : 'not logged'}
+- Starting weight: ${startW ? startW+'lbs' : 'unknown'}
+- Lost so far: ${lostW > 0 ? lostW+'lbs' : '0lbs'}
+- Goal weight: ${goal}lbs (${currW ? Math.max(0,currW-goal).toFixed(1)+' lbs to go' : 'unknown'})
+- Goal type: ${profile.goalType || 'recomp'}
+- Calorie target: ${MACRO_TARGETS.cal} cal, Protein: ${MACRO_TARGETS.protein}g
+
+TODAY (${TODAY_KEY}):
+- Calories logged: ${Math.round(todayCal)} / ${MACRO_TARGETS.cal}
+- Protein logged: ${Math.round(todayPro)}g / ${MACRO_TARGETS.protein}g
+- Steps: ${stepsLog[TODAY_KEY]||0} / ${STEP_GOAL_LIVE}
+- Body weight: ${bwLog[TODAY_KEY]||'not logged today'}
+- Energy: ${energyLog[TODAY_KEY]||'not logged'}/10
+- Workout saved: ${history.some(h=>h.dateISO===TODAY_KEY)?'Yes':'No'}
+
+THIS WEEK:
+- Workouts: ${history.filter(h=>(h.dateISO||'')>=ws).length}
+- Avg steps: ${avgSteps.toLocaleString()} (goal hit ${stepsGoalHit}/${wSteps.length} days)
+- Avg meal plan compliance: ${avgChecked} items/day
+
+RECENT WORKOUTS (last 7):
+${recentW || '  No recent workouts'}
+
+PERSONAL RECORDS (top lifts):
+${prList || '  No PRs recorded yet'}
+
+TOTAL STATS:
+- Total workouts: ${game.totalWorkouts||0}
+- Total volume lifted: ${((game.totalLifted||0)/1000).toFixed(1)}k lbs
+- Current streak: ${game.streak||0} days
+- Level: ${game.level||1}`;
+}
+
+async function claudeAsk(customMsg) {
+  const inp = document.getElementById('claude-input');
+  const msg = customMsg || (inp ? inp.value.trim() : '');
+  if (!msg) return;
+
+  // Clear input and quick prompts
+  if (inp) inp.value = '';
+  const qp = document.getElementById('claude-quick-prompts');
+  if (qp) qp.style.display = 'none';
+
+  // Add user message to UI
+  appendClaudeMsg('user', msg);
+  _claudeHistory.push({ role: 'user', content: msg });
+
+  // Typing indicator
+  const typingId = 'typing-' + Date.now();
+  appendClaudeMsg('assistant', '...', typingId, true);
+
+  // Disable send btn
+  const btn = document.getElementById('claude-send-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '...'; }
+
+  try {
+    const systemPrompt = buildUserContext();
+
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: _claudeHistory
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.content?.[0]?.text || 'Sorry, I had trouble responding. Try again.';
+
+    // Remove typing indicator and add real response
+    document.getElementById(typingId)?.remove();
+    appendClaudeMsg('assistant', reply);
+    _claudeHistory.push({ role: 'assistant', content: reply });
+
+    // Keep history to last 10 exchanges (20 messages)
+    if (_claudeHistory.length > 20) _claudeHistory = _claudeHistory.slice(-20);
+
+  } catch(e) {
+    document.getElementById(typingId)?.remove();
+    appendClaudeMsg('assistant', 'Connection error. Make sure you\'re online and try again.');
+    console.error('Claude API error:', e);
+  }
+
+  if (btn) { btn.disabled = false; btn.textContent = 'Send'; }
+
+  // Scroll to bottom
+  const msgs = document.getElementById('claude-messages');
+  if (msgs) msgs.scrollTop = msgs.scrollHeight;
+}
+
+function claudeQuickAsk(msg) {
+  claudeAsk(msg);
+}
+
+function appendClaudeMsg(role, text, id, isTyping) {
+  const msgs = document.getElementById('claude-messages');
+  if (!msgs) return;
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'claude-msg ' + role + (isTyping ? ' claude-typing' : '');
+  if (id) wrapper.id = id;
+
+  // Avatar
+  const avatar = document.createElement('div');
+  avatar.style.cssText = `width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;${role==='assistant'?'background:linear-gradient(135deg,var(--accent),#a855f7)':'background:var(--dark3);border:1px solid var(--border2)'}`;
+  avatar.textContent = role === 'assistant' ? '🤖' : '👤';
+
+  const bubble = document.createElement('div');
+  bubble.className = 'claude-bubble';
+  bubble.textContent = text;
+
+  if (role === 'user') {
+    wrapper.appendChild(bubble);
+    wrapper.appendChild(avatar);
+  } else {
+    wrapper.appendChild(avatar);
+    wrapper.appendChild(bubble);
+  }
+
+  msgs.appendChild(wrapper);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// ── HOME TAB ──────────────────────────────────────────────────────────────
+// HOME_QUOTES moved to top
+
+function renderHomeTab() {
+  const now = new Date();
+  const hour = now.getHours();
+  const name = (userProfile?.name || 'Ryan').split(' ')[0].toUpperCase();
+
+  // Greeting
+  const greet = hour < 12 ? 'GOOD MORNING' : hour < 17 ? 'GOOD AFTERNOON' : 'GOOD EVENING';
+  const greetEl = document.getElementById('home-greeting');
+  if (greetEl) greetEl.textContent = greet + ', ' + name;
+
+  // Date
+  const dateEl = document.getElementById('home-date');
+  if (dateEl) dateEl.textContent = now.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' }).toUpperCase();
+
+  // Quote
+  const qEl = document.getElementById('home-quote');
+  if (qEl) {
+    const dayIdx = now.getDate() % HOME_QUOTES.length;
+    qEl.textContent = HOME_QUOTES[dayIdx];
+  }
+
+  // ── TODAY CARDS ──
+  // Workout
+  const todayWorkout = history.find(h => h.dateISO === TODAY_KEY);
+  const wEl = document.getElementById('hc-workout');
+  const wSub = document.getElementById('hc-workout-sub');
+  const wCheck = document.getElementById('hc-workout-check');
+  if (todayWorkout) {
+    const vol = Math.round((todayWorkout.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0));
+    if (wEl) wEl.textContent = DAY_LABEL[todayWorkout.day] || todayWorkout.day;
+    if (wSub) wSub.textContent = vol.toLocaleString() + ' lbs · Done';
+    if (wCheck) wCheck.style.display = 'block';
+  } else {
+    const nextDay = localStorage.getItem('il_last_day') || 'chest';
+    if (wEl) wEl.textContent = DAY_LABEL[nextDay] || nextDay;
+    if (wSub) wSub.textContent = 'Not started';
+    if (wCheck) wCheck.style.display = 'none';
+  }
+
+  // Nutrition
+  const nd = nutrData[TODAY_KEY] || { checked:[], custom:[] };
+  let todayCal = 0, todayPro = 0;
+  MEAL_PLAN.forEach(m => m.items.forEach(i => {
+    if ((nd.checked||[]).includes(i.id)) { todayCal += i.cal||0; todayPro += i.protein||0; }
+  }));
+  (nd.custom||[]).forEach(f => { todayCal += f.cal||0; todayPro += f.protein||0; });
+  const nEl = document.getElementById('hc-nutrition');
+  const nSub = document.getElementById('hc-nutrition-sub');
+  const nCheck = document.getElementById('hc-nutrition-check');
+  if (todayCal > 0) {
+    if (nEl) nEl.textContent = Math.round(todayCal).toLocaleString() + ' cal';
+    if (nSub) nSub.textContent = Math.round(todayPro) + 'g protein';
+    if (nCheck) nCheck.style.display = todayCal >= MACRO_TARGETS.cal * 0.8 ? 'block' : 'none';
+  } else {
+    if (nEl) nEl.textContent = '0 cal';
+    if (nSub) nSub.textContent = 'Nothing logged yet';
+    if (nCheck) nCheck.style.display = 'none';
+  }
+
+  // Steps
+  const steps = stepsLog[TODAY_KEY] || 0;
+  const sEl = document.getElementById('hc-steps');
+  const sSub = document.getElementById('hc-steps-sub');
+  const sCheck = document.getElementById('hc-steps-check');
+  const sSubEl2 = document.getElementById('hc-steps-sub');
+  if (sEl) sEl.textContent = steps.toLocaleString();
+  if (sSub) sSub.textContent = 'of ' + STEP_GOAL_LIVE.toLocaleString();
+  if (sCheck) sCheck.style.display = steps >= STEP_GOAL_LIVE ? 'block' : 'none';
+
+  // Supplements
+  const sd = suppData[TODAY_KEY] || { checked:[] };
+  const cfg = suppConfig || DEFAULT_SUPPS;
+  const totalSupps = cfg.flatMap(g=>g.items).length;
+  const doneSupps = (sd.checked||[]).filter(id => cfg.flatMap(g=>g.items.map(i=>i.id)).includes(id)).length;
+  const suppEl = document.getElementById('hc-supps');
+  const suppSub = document.getElementById('hc-supps-sub');
+  const suppCheck = document.getElementById('hc-supps-check');
+  if (suppEl) suppEl.textContent = doneSupps + ' / ' + totalSupps;
+  if (suppSub) suppSub.textContent = doneSupps === totalSupps ? 'Full stack done' : doneSupps + ' taken so far';
+  if (suppCheck) suppCheck.style.display = doneSupps === totalSupps ? 'block' : 'none';
+
+  // Body weight
+  const bw = bwLog[TODAY_KEY];
+  const bwEl = document.getElementById('hc-bw');
+  const bwSub = document.getElementById('hc-bw-sub');
+  const bwCheck = document.getElementById('hc-bw-check');
+  const goalW = userProfile?.goalWeight || 225;
+  if (bw) {
+    if (bwEl) bwEl.textContent = bw + ' lbs';
+    if (bwSub) bwSub.textContent = Math.max(0, bw - goalW).toFixed(1) + ' lbs from goal';
+    if (bwCheck) bwCheck.style.display = 'block';
+  } else {
+    if (bwEl) bwEl.textContent = '—';
+    if (bwSub) bwSub.textContent = 'Not logged today';
+    if (bwCheck) bwCheck.style.display = 'none';
+  }
+
+  // Bible
+  const bl = bibleLog[TODAY_KEY] || {};
+  const blEl = document.getElementById('hc-bible');
+  const blSub = document.getElementById('hc-bible-sub');
+  const blCheck = document.getElementById('hc-bible-check');
+  if (bl.read) {
+    if (blEl) blEl.textContent = bl.book ? bl.book + (bl.chapter?' '+bl.chapter:'') : 'Done';
+    if (blSub) blSub.textContent = 'Reading complete';
+    if (blCheck) blCheck.style.display = 'block';
+  } else {
+    if (blEl) blEl.textContent = '—';
+    if (blSub) blSub.textContent = 'Not read today';
+    if (blCheck) blCheck.style.display = 'none';
+  }
+
+  // ── DAILY SCORE ──
+  let score = 0;
+  if (todayWorkout) score += 25;
+  if (todayCal >= MACRO_TARGETS.cal * 0.8) score += 25;
+  if (todayPro >= MACRO_TARGETS.protein * 0.8) score += 15;
+  if (steps >= STEP_GOAL_LIVE) score += 15;
+  if (doneSupps >= totalSupps * 0.8) score += 10;
+  if (bl.read) score += 10;
+  const scoreEl = document.getElementById('home-score-val');
+  const scoreBar = document.getElementById('home-score-bar');
+  const scoreLbl = document.getElementById('home-score-lbl');
+  if (scoreEl) scoreEl.textContent = score;
+  if (scoreBar) scoreBar.style.width = score + '%';
+  if (scoreLbl) {
+    const lbl = score >= 90 ? '🔥 Elite day' : score >= 75 ? '💪 Strong day' : score >= 50 ? '👍 Decent day' : score >= 25 ? '📈 Building' : 'Get after it';
+    scoreLbl.textContent = lbl;
+    if (scoreEl) scoreEl.style.color = score >= 90 ? 'var(--green2)' : score >= 75 ? 'var(--gold)' : 'var(--accent)';
+  }
+
+  // ── STREAK + STATS ──
+  const streakEl = document.getElementById('home-streak');
+  const wktEl = document.getElementById('home-workouts');
+  const goalEl = document.getElementById('home-goal-dist');
+  if (streakEl) streakEl.textContent = game.streak || 0;
+  if (wktEl) wktEl.textContent = game.totalWorkouts || 0;
+  const bwEntries = Object.entries(bwLog).sort((a,b)=>a[0].localeCompare(b[0]));
+  const latestBW = bwEntries.length ? bwEntries[bwEntries.length-1][1] : null;
+  if (goalEl) goalEl.textContent = latestBW ? Math.max(0, latestBW - goalW).toFixed(1) : '—';
+
+  // ── NOTE ──
+  const noteEl = document.getElementById('home-note');
+  if (noteEl) {
+    const saved = localStorage.getItem('il_home_note_' + TODAY_KEY);
+    noteEl.value = saved || '';
+  }
+}
+
+function saveHomeNote() {
+  const noteEl = document.getElementById('home-note');
+  if (noteEl) {
+    try { localStorage.setItem('il_home_note_' + TODAY_KEY, noteEl.value); } catch(e) {}
+  }
+}
+
+// ── WORKOUT PHOTO IMPORT ──────────────────────────────────────────────────
+let _photoImportData = null; // parsed workout ready to confirm
+let _photoBase64 = null;
+
+function handleWorkoutPhoto(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const preview = document.getElementById('photo-preview');
+  const previewWrap = document.getElementById('photo-preview-wrap');
+  const processBtn = document.getElementById('photo-process-btn');
+  const pickBtn = document.getElementById('photo-pick-btn');
+
+  // Show preview
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    if (preview) { preview.src = dataUrl; }
+    if (previewWrap) previewWrap.style.display = 'block';
+    if (processBtn) processBtn.style.display = 'block';
+    if (pickBtn) pickBtn.textContent = '📷 Change Photo';
+    // Store base64 (strip data URL prefix)
+    _photoBase64 = dataUrl.split(',')[1];
+    _photoImportData = null;
+    const resultEl = document.getElementById('photo-result');
+    const confirmBtn = document.getElementById('photo-confirm-btn');
+    if (resultEl) resultEl.style.display = 'none';
+    if (confirmBtn) confirmBtn.style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+}
+
+async function processWorkoutPhoto() {
+  if (!_photoBase64) return;
+
+  const statusEl = document.getElementById('photo-status');
+  const processBtn = document.getElementById('photo-process-btn');
+  const resultEl = document.getElementById('photo-result');
+  const confirmBtn = document.getElementById('photo-confirm-btn');
+
+  const dateVal = document.getElementById('photo-import-date')?.value || TODAY_KEY;
+  const dayVal  = document.getElementById('photo-import-day')?.value || 'chest';
+
+  if (statusEl) { statusEl.style.display = 'block'; statusEl.style.color = 'var(--gold)'; statusEl.textContent = '🤖 Reading your workout... this takes a few seconds'; }
+  if (processBtn) { processBtn.disabled = true; processBtn.textContent = 'Reading...'; }
+  if (resultEl) resultEl.style.display = 'none';
+  if (confirmBtn) confirmBtn.style.display = 'none';
+
+  const prompt = `You are reading a handwritten or printed workout log photo. Extract ALL exercises, sets, weights, and reps you can see.
+
+Return ONLY a valid JSON object in this exact format, nothing else:
+{
+  "exercises": [
+    {
+      "name": "Exercise Name",
+      "sets": [
+        { "weight": 100, "reps": 10, "rpe": "" },
+        { "weight": 105, "reps": 8, "rpe": "" }
+      ]
+    }
+  ],
+  "notes": "any notes visible in the image",
+  "duration": 0
+}
+
+Rules:
+- If weight is bodyweight or not shown, use 0
+- If reps unclear, use your best estimate
+- Include every exercise you can read
+- notes field: include any text that looks like session notes
+- Return ONLY the JSON, no explanation, no markdown`;
+
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        messages: [{
+          role: 'user',
+          content: [
+            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: _photoBase64 } },
+            { type: 'text', text: prompt }
+          ]
+        }]
+      })
+    });
+
+    const data = await response.json();
+    const raw = data.content?.[0]?.text || '';
+
+    // Parse JSON from response
+    let parsed;
+    try {
+      const clean = raw.replace(/```json|```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      throw new Error('Could not read the workout from this image. Try a clearer photo.');
+    }
+
+    if (!parsed.exercises || !parsed.exercises.length) {
+      throw new Error('No exercises found in the image. Make sure the workout is clearly visible.');
+    }
+
+    // Build history entry
+    const dateObj = new Date(dateVal + 'T12:00:00');
+    const dateStr = dateObj.toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' });
+    const sets = [];
+    let totalVol = 0;
+
+    parsed.exercises.forEach(ex => {
+      const exId = ex.name.toLowerCase().replace(/\s+/g, '-');
+      (ex.sets || []).forEach((s, idx) => {
+        const w = parseFloat(s.weight) || 0;
+        const r = parseInt(s.reps) || 0;
+        const vol = w * r;
+        totalVol += vol;
+        sets.push({ id: exId, name: ex.name, set: idx+1, weight: w, reps: r, rpe: s.rpe||'', done: true, vol });
+      });
+      // Add to exercise library
+      if (!exLibrary.includes(ex.name)) exLibrary.push(ex.name);
+    });
+
+    _photoImportData = {
+      date: dateStr,
+      dateISO: dateVal,
+      day: dayVal,
+      exercises: sets,
+      notes: parsed.notes || 'Imported from photo',
+      duration: parsed.duration || 0,
+      _imported: true
+    };
+
+    // Show preview of what was read
+    let previewHtml = `<div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;letter-spacing:2px;color:var(--mid);margin-bottom:.5rem">FOUND ${parsed.exercises.length} EXERCISES · ${sets.length} TOTAL SETS</div>`;
+    parsed.exercises.forEach(ex => {
+      previewHtml += `<div style="margin-bottom:.5rem">
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;color:var(--accent)">${ex.name}</div>`;
+      (ex.sets||[]).forEach((s,i) => {
+        previewHtml += `<div style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--light);padding:1px 0">Set ${i+1}: ${s.weight > 0 ? s.weight+'lbs' : 'BW'} × ${s.reps} reps</div>`;
+      });
+      previewHtml += `</div>`;
+    });
+    if (parsed.notes) previewHtml += `<div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--mid);margin-top:.25rem;font-style:italic">Notes: ${parsed.notes}</div>`;
+
+    if (resultEl) { resultEl.innerHTML = previewHtml; resultEl.style.display = 'block'; }
+    if (confirmBtn) confirmBtn.style.display = 'block';
+    if (statusEl) { statusEl.style.color = 'var(--green2)'; statusEl.textContent = '✓ Workout read successfully — review below and confirm to add'; }
+
+  } catch(e) {
+    if (statusEl) { statusEl.style.color = 'var(--accent)'; statusEl.textContent = '✗ ' + (e.message || 'Something went wrong. Try again.'); }
+    console.error('Photo import error:', e);
+  }
+
+  if (processBtn) { processBtn.disabled = false; processBtn.textContent = '🤖 Read Workout with AI'; }
+}
+
+function confirmPhotoImport() {
+  if (!_photoImportData) return;
+
+  // Remove any existing entry for same date+day
+  const existIdx = history.findIndex(h => h.dateISO === _photoImportData.dateISO && h.day === _photoImportData.day);
+  if (existIdx !== -1) history.splice(existIdx, 1);
+
+  history.push(_photoImportData);
+  history.sort((a,b) => b.dateISO.localeCompare(a.dateISO));
+
+  // Update game stats
+  game.totalWorkouts = (game.totalWorkouts||0) + 1;
+  game.totalSets     = (game.totalSets||0) + _photoImportData.exercises.length;
+  game.totalLifted   = (game.totalLifted||0) + _photoImportData.exercises.reduce((a,e)=>a+e.vol,0);
+
+  saveStorage();
+  scheduleAutoSync();
+
+  const confirmBtn = document.getElementById('photo-confirm-btn');
+  const statusEl   = document.getElementById('photo-status');
+  if (confirmBtn) { confirmBtn.textContent = '✓ Added to History!'; confirmBtn.style.background = 'var(--green2)'; setTimeout(()=>{ confirmBtn.style.display='none'; confirmBtn.textContent='✓ Add to My History'; confirmBtn.style.background='var(--green2)'; },3000); }
+  if (statusEl) { statusEl.style.color='var(--green2)'; statusEl.textContent='✓ Workout saved to ' + _photoImportData.date; }
+
+  // Reset for next photo
+  _photoImportData = null;
+  _photoBase64 = null;
+  const photoInput = document.getElementById('workout-photo-input');
+  if (photoInput) photoInput.value = '';
+}
 </script>
 
 <!-- ADD EXERCISE MODAL -->
@@ -5390,6 +6377,72 @@ function calSaveAll(){
     <div class="settings-row"><button class="settings-btn exp" onclick="exportData()">&#x1F4E4; Export Backup</button><button class="settings-btn imp" onclick="document.getElementById('import-input2').click()">&#x1F4E5; Import Backup</button><input type="file" id="import-input2" accept=".json" style="display:none" onchange="importData(event)"></div>
     <div class="settings-note">Export saves a local JSON file as a manual backup. Import restores from a previous export.</div>
   </div>
+
+  <div class="sec-lbl">&#x1F4F8; Import Workout From Photo</div>
+  <div class="card" style="margin-bottom:1.25rem">
+    <div class="settings-note" style="margin-bottom:.75rem">Take a photo of a handwritten or printed workout log. Claude will read it and automatically add it to your history.</div>
+    <div style="display:flex;gap:8px;margin-bottom:.75rem;align-items:center">
+      <input type="date" id="photo-import-date" style="flex:1;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:9px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:14px" value="">
+      <select id="photo-import-day" style="flex:1;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:9px;border-radius:2px;font-family:'Barlow Condensed',sans-serif;font-size:14px">
+        <option value="chest">Chest + Triceps</option>
+        <option value="back">Back + Biceps</option>
+        <option value="shoulders">Shoulders + Triceps</option>
+        <option value="legs">Leg Day</option>
+        <option value="arms">Arm Day</option>
+        <option value="cardio-day">Cardio</option>
+      </select>
+    </div>
+    <input type="file" id="workout-photo-input" accept="image/*" capture="environment" style="display:none" onchange="handleWorkoutPhoto(event)">
+    <button onclick="document.getElementById('workout-photo-input').click()" style="width:100%;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:var(--dark3);border:2px dashed var(--steel2);color:var(--mid);cursor:pointer;border-radius:2px;margin-bottom:8px" id="photo-pick-btn">
+      &#x1F4F7; Choose Photo or Take Picture
+    </button>
+    <div id="photo-preview-wrap" style="display:none;margin-bottom:.75rem">
+      <img id="photo-preview" style="width:100%;max-height:200px;object-fit:contain;border-radius:3px;border:1px solid var(--border2)">
+    </div>
+    <button onclick="processWorkoutPhoto()" id="photo-process-btn" style="display:none;width:100%;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:linear-gradient(135deg,var(--accent),#a855f7);border:none;color:var(--white);cursor:pointer;border-radius:2px">
+      &#x1F916; Read Workout with AI
+    </button>
+    <div id="photo-status" style="display:none;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;text-align:center;padding:.5rem;margin-top:.5rem"></div>
+    <div id="photo-result" style="display:none;margin-top:.75rem;background:var(--dark3);border:1px solid var(--border2);border-radius:3px;padding:.75rem;max-height:300px;overflow-y:auto"></div>
+    <button onclick="confirmPhotoImport()" id="photo-confirm-btn" style="display:none;width:100%;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:var(--green2);border:none;color:var(--white);cursor:pointer;border-radius:2px;margin-top:.5rem">
+      &#x2713; Add to My History
+    </button>
+  </div>
+</div>
+
+<!-- CLAUDE COACH TAB -->
+<div id="tab-claude" style="display:none">
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+    <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a855f7);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🤖</div>
+    <div>
+      <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white)">IRON COACH</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid);letter-spacing:1px">Powered by Claude AI · Knows your data</div>
+    </div>
+  </div>
+
+  <!-- Chat messages -->
+  <div id="claude-messages" style="display:flex;flex-direction:column;gap:10px;margin-bottom:1rem;min-height:200px;max-height:60vh;overflow-y:auto;padding:4px 0">
+    <div class="claude-msg assistant">
+      <div class="claude-bubble">Hey! I'm your Iron Coach. I have full access to your workouts, nutrition, body weight, PRs, and progress. Ask me anything — training advice, form tips, nutrition questions, or just how your week is looking. What's on your mind?</div>
+    </div>
+  </div>
+
+  <!-- Quick prompts -->
+  <div id="claude-quick-prompts" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.75rem">
+    <button class="claude-quick" onclick="claudeQuickAsk('How is my progress looking this week?')">📊 This week</button>
+    <button class="claude-quick" onclick="claudeQuickAsk('What should I focus on in my next workout?')">🏋️ Next workout</button>
+    <button class="claude-quick" onclick="claudeQuickAsk('Am I hitting my protein and calorie targets?')">🥗 Nutrition check</button>
+    <button class="claude-quick" onclick="claudeQuickAsk('How is my weight loss progressing toward my goal?')">⚖️ Weight trend</button>
+    <button class="claude-quick" onclick="claudeQuickAsk('What are my current personal records?')">🏆 My PRs</button>
+    <button class="claude-quick" onclick="claudeQuickAsk('Give me a motivational breakdown of my stats')">🔥 Hype me up</button>
+  </div>
+
+  <!-- Input -->
+  <div style="display:flex;gap:8px;align-items:flex-end">
+    <textarea id="claude-input" placeholder="Ask your coach anything..." rows="2" style="flex:1;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:10px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:14px;resize:none;outline:none;line-height:1.4" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();claudeAsk();}"></textarea>
+    <button onclick="claudeAsk()" id="claude-send-btn" style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;background:linear-gradient(135deg,var(--accent),#a855f7);border:none;color:var(--white);cursor:pointer;border-radius:3px;white-space:nowrap;flex-shrink:0">Send</button>
+  </div>
+  <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--steel2);margin-top:4px;letter-spacing:.5px">Press Enter to send · Shift+Enter for new line</div>
 </div>
 </body>
 </html>
