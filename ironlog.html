@@ -1152,7 +1152,12 @@ function fmtDisplay(k) {
 
 // ── STATE ───────────────────────────────────────────────────────────────
 const STEP_GOAL = 12000, DEFAULT_REST = 70; // legacy — use STEP_GOAL_LIVE and DEFAULT_REST_LIVE
+// Live vars — updated by Settings, used everywhere
+var DEFAULT_REST_LIVE = 70;
+var STEP_GOAL_LIVE    = 12000;
 let TODAY_KEY = localKey();
+let histCalYear = new Date().getFullYear();
+let histCalMonth = new Date().getMonth();
 let ACTIVE_DATE = TODAY_KEY;
 let lastCheckedDate = TODAY_KEY;
 let cardioDateKey = TODAY_KEY;
@@ -1502,10 +1507,10 @@ function loadStorage() {
     const bc=localStorage.getItem('il_bible_ch'); if(bc) bibleChapters=JSON.parse(bc);
     const hNames=new Set(history.flatMap(s=>(s.exercises||[]).map(e=>e.name).filter(Boolean)));
     hNames.forEach(n=>{if(!exLibrary.includes(n))exLibrary.push(n);});
-    saveStorage();
+    _saveStorageCore();
   } catch(e) { console.error('loadStorage:',e); }
 }
-function saveStorage() {
+function _saveStorageCore() {
   try {
     localStorage.setItem('il_hist',JSON.stringify(history));
     localStorage.setItem('il_game',JSON.stringify(game));
@@ -2081,7 +2086,7 @@ function saveWorkout(){
     const lastS=game.lastSaved?new Date(game.lastSaved):null;
     if(lastS){const diff=(new Date()-lastS)/(86400000);game.streak=diff<3?game.streak+1:1;}else game.streak=1;
     game.lastSaved=new Date().toISOString();
-    _origSaveStorage();savedToday=true;stopSessTimer();haptic('success');clearDraft();
+    _saveStorageCore();savedToday=true;stopSessTimer();haptic('success');clearDraft();
     finalizeSave(xpE,prevLvl,totalMin+' min',fmtDur(sessSeconds));
     scheduleAutoSync();
     return;
@@ -2105,7 +2110,7 @@ function saveWorkout(){
   const lastS=game.lastSaved?new Date(game.lastSaved):null;
   if(lastS){const diff=(new Date()-lastS)/(86400000);game.streak=diff<3?game.streak+1:1;}else game.streak=1;
   game.lastSaved=new Date().toISOString();
-  _origSaveStorage();savedToday=true;stopSessTimer();clearDraft();
+  _saveStorageCore();savedToday=true;stopSessTimer();clearDraft();
   checkMilestones(prevLifted,game.totalLifted);
   finalizeSave(xpE,prevLvl,totalVol.toLocaleString()+' lbs',fmtDur(sessSeconds));
   todayPRs=0;
@@ -3590,7 +3595,7 @@ function recalcGameStats(){
   const xpTotal=totalSets*10+(game.totalPRs||0)*25;
   game.level=1; game.xp=xpTotal;
   while(game.xp>=game.level*100){game.xp-=game.level*100;game.level++;}
-  _origSaveStorage();
+  _saveStorageCore();
   updateStats();renderAchievements();
 }
 
@@ -3970,356 +3975,291 @@ function renderBibleLog(){
   }).join('');
 }
 
-// ── GOOGLE DRIVE SYNC (OAuth – works on any browser/device) ──────────────
-const GAPI_CLIENT_ID = '955360920616-kpahkqapceh4lml88pog76ugfgfcucap.apps.googleusercontent.com';
-const GAPI_SCOPE = 'https://www.googleapis.com/auth/drive.file';
-const SYNC_FILENAME = 'ironlog-sync.json';
-let driveAccessToken = null;
-let driveFileId = localStorage.getItem('il_drive_file_id') || null;
+// ── SUPABASE SYNC ────────────────────────────────────────────────────────
+const SB_URL = 'https://cswmkmnoehmohkwtttfv.supabase.co';
+const SB_KEY = 'sb_publishable_HYmvzPvkaI0p8MWb8eOYng_JEawxY5r';
+const SB_USER_ID = 'ryan'; // single-user app
+
 let syncInProgress = false;
 let autoSyncTimer = null;
+let _sbReady = false; // true once initial load completes
 
+// ── STATUS UI ────────────────────────────────────────────────────────────
 function setSyncStatus(state, msg, sub) {
-  const dot = document.getElementById('sync-dot');
-  const txt = document.getElementById('sync-status-txt');
+  const dot  = document.getElementById('sync-dot');
+  const txt  = document.getElementById('sync-status-txt');
   const last = document.getElementById('sync-last');
   const hDot = document.getElementById('hdr-sync-dot');
   const hLbl = document.getElementById('hdr-sync-lbl');
   const pill = document.getElementById('hdr-sync-pill');
+  const dot2 = document.getElementById('sync-dot2');
+  const txt2 = document.getElementById('sync-status-txt2');
   const colors = { ok:'#22B05A', error:'#E8380D', syncing:'#D4A843', idle:'#444' };
   const color = colors[state] || colors.idle;
-  if (dot) dot.style.background = color;
+  if (dot)  dot.style.background  = color;
   if (hDot) hDot.style.background = color;
-  if (txt) txt.textContent = msg;
+  if (dot2) dot2.style.background = color;
+  if (txt)  txt.textContent  = msg;
+  if (txt2) txt2.textContent = msg;
   if (last) last.textContent = sub || '';
   if (hLbl) {
-    if (state==='ok') hLbl.textContent = sub ? 'Synced ' + sub : 'Synced';
+    if      (state==='ok')      hLbl.textContent = sub ? 'Synced ' + sub : 'Synced';
     else if (state==='syncing') hLbl.textContent = 'Syncing…';
-    else if (state==='error') hLbl.textContent = 'Sync error';
-    else hLbl.textContent = 'Not signed in';
+    else if (state==='error')   hLbl.textContent = 'Sync error';
+    else                        hLbl.textContent = 'Offline';
   }
-  if (pill) pill.style.borderColor = state==='ok' ? 'rgba(34,176,90,.35)' : state==='error' ? 'rgba(232,56,13,.35)' : state==='syncing' ? 'rgba(212,168,67,.35)' : 'var(--border2)';
-  // Mirror to Settings tab sync indicators
-  const dot2=document.getElementById('sync-dot2');const txt2=document.getElementById('sync-status-txt2');
-  if(dot2)dot2.style.background=color;if(txt2)txt2.textContent=msg;
+  if (pill) pill.style.borderColor =
+    state==='ok'      ? 'rgba(34,176,90,.35)'  :
+    state==='error'   ? 'rgba(232,56,13,.35)'  :
+    state==='syncing' ? 'rgba(212,168,67,.35)' : 'var(--border2)';
 }
 
-function driveSignIn() {
-  const REDIRECT_URI = 'https://rholliday0523.github.io/ironlog/ironlog.html';
-  const params = new URLSearchParams({
-    client_id: GAPI_CLIENT_ID,
-    redirect_uri: REDIRECT_URI,
-    response_type: 'token',
-    scope: GAPI_SCOPE,
-    prompt: 'consent'
+// ── HELPERS ───────────────────────────────────────────────────────────────
+function sbHeaders() {
+  return {
+    'Content-Type':  'application/json',
+    'apikey':        SB_KEY,
+    'Authorization': 'Bearer ' + SB_KEY,
+    'Prefer':        'return=minimal'
+  };
+}
+
+async function sbUpsert(table, row) {
+  const res = await fetch(`${SB_URL}/rest/v1/${table}`, {
+    method:  'POST',
+    mode:    'cors',
+    headers: {
+      'Content-Type':  'application/json',
+      'apikey':        SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Prefer':        'resolution=merge-duplicates,return=minimal'
+    },
+    body: JSON.stringify(row)
   });
-  const authUrl = 'https://accounts.google.com/o/oauth2/v2/auth?' + params.toString();
-  // Save current state so we can restore after redirect
-  localStorage.setItem('il_pre_auth', '1');
-  // Redirect the whole page to Google sign-in — works on all browsers including mobile
-  window.location.href = authUrl;
+  if (!res.ok) {
+    const err = await res.text().catch(()=>'');
+    throw new Error(`sbUpsert ${table}: ${res.status} ${err}`);
+  }
 }
 
-function driveSignOut() {
-  driveAccessToken = null;
-  driveFileId = null;
-  localStorage.removeItem('il_drive_token');
-  localStorage.removeItem('il_drive_token_expiry');
-  localStorage.removeItem('il_drive_file_id');
-  setSyncStatus('idle', 'Signed out');
-}
-
-async function findDriveFile() {
-  if (!driveAccessToken) return null;
-  try {
-    const res = await fetch(
-      `https://www.googleapis.com/drive/v3/files?q=name='${SYNC_FILENAME}'+and+trashed=false&fields=files(id,name,modifiedTime)`,
-      { headers: { Authorization: 'Bearer ' + driveAccessToken } }
-    );
-    if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — please sign in again'); return null; }
-    const data = await res.json();
-    if (data.files && data.files.length > 0) {
-      driveFileId = data.files[0].id;
-      localStorage.setItem('il_drive_file_id', driveFileId);
-      return driveFileId;
+async function sbSelect(table, filter) {
+  const url = `${SB_URL}/rest/v1/${table}?${filter || ''}`;
+  const res = await fetch(url, {
+    method:  'GET',
+    mode:    'cors',
+    headers: {
+      'apikey':        SB_KEY,
+      'Authorization': 'Bearer ' + SB_KEY,
+      'Content-Type':  'application/json'
     }
-  } catch(e) { console.error('findDriveFile:', e); }
-  return null;
+  });
+  if (!res.ok) throw new Error(`sbSelect ${table}: ${res.status}`);
+  return res.json();
 }
 
+// ── SYNC NOW (push everything to Supabase) ────────────────────────────────
 async function syncNow() {
-  if (!driveAccessToken) { setSyncStatus('idle', 'Tap Sign In with Google first'); return; }
   if (syncInProgress) return;
   syncInProgress = true;
-  setSyncStatus('syncing', 'Saving to Google Drive…');
+  setSyncStatus('syncing', 'Saving…');
   try {
-    const payload = JSON.stringify({
-      history, game, nutrData, suppData, bwLog, stepsLog, energyLog,
-      restDays, cardioLog, macroTargets: MACRO_TARGETS, suppConfig,
-      daySummaryLog, foodLibrary, exLibrary, bibleLog, bibleChapters,
-      _syncedAt: new Date().toISOString(), _version: 3
-    });
-
-    if (!driveFileId) await findDriveFile();
-
-    if (driveFileId) {
-      // Update existing file
-      const res = await fetch(
-        `https://www.googleapis.com/upload/drive/v3/files/${driveFileId}?uploadType=media`,
-        { method: 'PATCH', headers: { Authorization: 'Bearer ' + driveAccessToken, 'Content-Type': 'application/json' }, body: payload }
-      );
-      if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — sign in again'); syncInProgress = false; return; }
-    } else {
-      // Create new file
-      const meta = JSON.stringify({ name: SYNC_FILENAME, mimeType: 'application/json' });
-      const boundary = 'ironlog_boundary';
-      const body = `--${boundary}
-Content-Type: application/json
-
-${meta}
---${boundary}
-Content-Type: application/json
-
-${payload}
---${boundary}--`;
-      const res = await fetch(
-        'https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart',
-        { method: 'POST', headers: { Authorization: 'Bearer ' + driveAccessToken, 'Content-Type': `multipart/related; boundary=${boundary}` }, body }
-      );
-      if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — sign in again'); syncInProgress = false; return; }
-      const data = await res.json();
-      driveFileId = data.id;
-      localStorage.setItem('il_drive_file_id', driveFileId);
-    }
-
-    const timeStr = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-    const isoStr = new Date().toISOString();
+    const payload = {
+      user_id:      SB_USER_ID,
+      history:      JSON.stringify(history),
+      game:         JSON.stringify(game),
+      nutr_data:    JSON.stringify(nutrData),
+      supp_data:    JSON.stringify(suppData),
+      bw_log:       JSON.stringify(bwLog),
+      steps_log:    JSON.stringify(stepsLog),
+      energy_log:   JSON.stringify(energyLog),
+      rest_days:    JSON.stringify(restDays),
+      cardio_log:   JSON.stringify(cardioLog),
+      macro_targets:JSON.stringify(MACRO_TARGETS),
+      supp_config:  JSON.stringify(suppConfig),
+      day_summary:  JSON.stringify(daySummaryLog),
+      food_library: JSON.stringify(foodLibrary),
+      ex_library:   JSON.stringify(exLibrary),
+      bible_log:    JSON.stringify(bibleLog),
+      bible_chapters:JSON.stringify(bibleChapters),
+      user_profile: JSON.stringify(userProfile),
+      user_prefs:   JSON.stringify(userPrefs),
+      synced_at:    new Date().toISOString()
+    };
+    await sbUpsert('ironlog_data', payload);
+    const timeStr = new Date().toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
     localStorage.setItem('il_last_sync', timeStr);
-    localStorage.setItem('il_last_sync_iso', isoStr);
-    localStorage.setItem('il_device_last_save', isoStr); // stamp when THIS device last wrote Drive
-    setSyncStatus('ok', '✓ Saved to Google Drive', timeStr);
+    localStorage.setItem('il_device_last_save', new Date().toISOString());
+    setSyncStatus('ok', '✓ Saved', timeStr);
   } catch(e) {
     console.error('syncNow:', e);
-    setSyncStatus('error', '✗ Sync failed — check connection');
+    setSyncStatus('error', '✗ Save failed — check connection');
   }
   syncInProgress = false;
 }
 
-async function loadFromDrive() {
-  if (!driveAccessToken) { setSyncStatus('idle', 'Tap Sign In with Google first'); return; }
+// ── LOAD FROM SUPABASE ────────────────────────────────────────────────────
+async function loadFromSupabase() {
   if (syncInProgress) return;
   syncInProgress = true;
-  setSyncStatus('syncing', 'Loading from Google Drive…');
+  setSyncStatus('syncing', 'Loading…');
   try {
-    if (!driveFileId) await findDriveFile();
-    if (!driveFileId) { setSyncStatus('idle', 'No sync file found — tap Save to Drive first'); syncInProgress = false; return; }
-
-    const res = await fetch(
-      `https://www.googleapis.com/drive/v3/files/${driveFileId}?alt=media`,
-      { headers: { Authorization: 'Bearer ' + driveAccessToken } }
-    );
-    if (res.status === 401) { driveAccessToken = null; setSyncStatus('idle', 'Session expired — sign in again'); syncInProgress = false; return; }
-
-    const d = await res.json();
-    // TIMESTAMP-BASED MERGE
-    // Drive._syncedAt = when Drive file was last written (by any device)
-    // il_device_last_save = when THIS device last wrote to Drive
-    // If Drive is newer than our last save → another device updated it → Drive wins
-    // If Drive is older → we are the newest → local wins
-    const driveTime = d._syncedAt ? new Date(d._syncedAt).getTime() : 0;
-    const ourLastSave = localStorage.getItem('il_device_last_save') ? new Date(localStorage.getItem('il_device_last_save')).getTime() : 0;
-    const driveHasNewerData = driveTime > ourLastSave;
-
-    // History: always union — never lose sessions from either device
-    if (d.history) {
-      d.history.forEach(s => {
-        if (!history.find(x => x.dateISO === s.dateISO && x.day === s.day)) history.push(s);
-      });
-      history.sort((a,b) => b.dateISO.localeCompare(a.dateISO));
+    const rows = await sbSelect('ironlog_data', `user_id=eq.${SB_USER_ID}&limit=1`);
+    if (!rows || !rows.length) {
+      setSyncStatus('ok', '✓ Connected — no cloud data yet');
+      syncInProgress = false;
+      if (!_appReady) initBadgeTracking();
+      return;
     }
-    // Game: take whichever has MORE total workouts
-    if (d.game && (d.game.totalWorkouts||0) > (game.totalWorkouts||0)) game = { ...game, ...d.game };
+    const d = rows[0];
+    const parse = (v) => { try { return v ? JSON.parse(v) : null; } catch(e) { return null; } };
 
-    // Date-keyed logs:
-    // If Drive has newer data (another device synced after us) → Drive wins for all dates
-    // If we are newer → only fill gaps (add dates we don't have locally)
-    const mergeLog = (local, remote) => {
+    const remoteHistory      = parse(d.history)       || [];
+    const remoteGame         = parse(d.game)           || {};
+    const remoteNutrData     = parse(d.nutr_data)      || {};
+    const remoteSuppData     = parse(d.supp_data)      || {};
+    const remoteBwLog        = parse(d.bw_log)         || {};
+    const remoteStepsLog     = parse(d.steps_log)      || {};
+    const remoteEnergyLog    = parse(d.energy_log)     || {};
+    const remoteRestDays     = parse(d.rest_days)      || {};
+    const remoteCardioLog    = parse(d.cardio_log)     || {};
+    const remoteMacros       = parse(d.macro_targets);
+    const remoteSuppConfig   = parse(d.supp_config);
+    const remoteDaySummary   = parse(d.day_summary)    || {};
+    const remoteFoodLibrary  = parse(d.food_library)   || [];
+    const remoteExLibrary    = parse(d.ex_library)     || [];
+    const remoteBibleLog     = parse(d.bible_log)      || {};
+    const remoteBibleChapters= parse(d.bible_chapters) || {};
+    const remoteProfile      = parse(d.user_profile);
+    const remotePrefs        = parse(d.user_prefs);
+
+    // Determine which is newer: cloud or local
+    const cloudTime = d.synced_at ? new Date(d.synced_at).getTime() : 0;
+    const localTime = localStorage.getItem('il_device_last_save')
+      ? new Date(localStorage.getItem('il_device_last_save')).getTime() : 0;
+    const cloudIsNewer = cloudTime > localTime;
+
+    // History: always union — never lose a session
+    remoteHistory.forEach(s => {
+      if (!history.find(x => x.dateISO === s.dateISO && x.day === s.day)) history.push(s);
+    });
+    history.sort((a,b) => b.dateISO.localeCompare(a.dateISO));
+
+    // Game: take whichever has more progress
+    if (remoteGame && (remoteGame.totalWorkouts||0) > (game.totalWorkouts||0))
+      game = { ...game, ...remoteGame };
+
+    // Date-keyed logs: cloud wins if newer, else only fill gaps
+    const merge = (local, remote) => {
       if (!remote) return;
       Object.entries(remote).forEach(([k,v]) => {
-        if (local[k] === undefined || local[k] === null) {
-          local[k] = v; // always fill gaps
-        } else if (driveHasNewerData) {
-          local[k] = v; // Drive is from another device that saved after us
-        }
-        // else: local is newer (we saved after Drive was written) → keep local
+        if (local[k] === undefined || local[k] === null) local[k] = v;
+        else if (cloudIsNewer) local[k] = v;
       });
     };
-    mergeLog(nutrData, d.nutrData);
-    mergeLog(suppData, d.suppData);
-    mergeLog(bwLog, d.bwLog);
-    mergeLog(energyLog, d.energyLog);
-    mergeLog(restDays, d.restDays);
-    mergeLog(cardioLog, d.cardioLog);
-    mergeLog(daySummaryLog, d.daySummaryLog);
-    mergeLog(bibleLog, d.bibleLog);
-    mergeLog(bibleChapters, d.bibleChapters);
-    // Steps: always take higher (can't un-walk steps)
-    if (d.stepsLog) Object.entries(d.stepsLog).forEach(([k,v])=>{ if(!stepsLog[k] || v > stepsLog[k]) stepsLog[k]=v; });
-    // Settings: Drive wins if it has newer data, else keep local
-    if (d.macroTargets && driveHasNewerData) MACRO_TARGETS = { ...MACRO_TARGETS, ...d.macroTargets };
-    if (d.suppConfig && (driveHasNewerData || !suppConfig)) suppConfig = d.suppConfig;
-    if (d.foodLibrary && (driveHasNewerData || !foodLibrary.length)) foodLibrary = d.foodLibrary;
-    if (d.exLibrary && d.exLibrary.length > exLibrary.length) exLibrary = d.exLibrary;
-    saveStorage(); saveSC();
+    merge(nutrData,     remoteNutrData);
+    merge(suppData,     remoteSuppData);
+    merge(bwLog,        remoteBwLog);
+    merge(energyLog,    remoteEnergyLog);
+    merge(restDays,     remoteRestDays);
+    merge(cardioLog,    remoteCardioLog);
+    merge(daySummaryLog,remoteDaySummary);
+    merge(bibleLog,     remoteBibleLog);
+    merge(bibleChapters,remoteBibleChapters);
+    // Steps: always take higher
+    Object.entries(remoteStepsLog).forEach(([k,v]) => {
+      if (!stepsLog[k] || v > stepsLog[k]) stepsLog[k] = v;
+    });
+    // Settings: cloud wins if newer
+    if (remoteMacros && cloudIsNewer) MACRO_TARGETS = { ...MACRO_TARGETS, ...remoteMacros };
+    if (remoteSuppConfig && (cloudIsNewer || !suppConfig)) suppConfig = remoteSuppConfig;
+    if (remoteFoodLibrary && remoteFoodLibrary.length > foodLibrary.length) foodLibrary = remoteFoodLibrary;
+    if (remoteExLibrary && remoteExLibrary.length > exLibrary.length) exLibrary = remoteExLibrary;
+    if (remoteProfile && cloudIsNewer) userProfile = { ...userProfile, ...remoteProfile };
+    if (remotePrefs   && cloudIsNewer) { userPrefs = { ...userPrefs, ...remotePrefs }; DEFAULT_REST_LIVE=userPrefs.restTimer; STEP_GOAL_LIVE=userPrefs.stepGoal; }
+
+    _saveStorageCore(); saveSC();
     updateStats(); renderAchievements(); switchDay(currentDay);
-    const syncedAt = d._syncedAt ? new Date(d._syncedAt).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' }) : '';
-    setSyncStatus('ok', '✓ Synced with Google Drive', syncedAt);
-    if(!_appReady) initBadgeTracking(); // safe to show new-badge notifs now
+    const timeStr = new Date(d.synced_at).toLocaleTimeString('en-US', { hour:'2-digit', minute:'2-digit' });
+    setSyncStatus('ok', '✓ Synced', timeStr);
+    if (!_appReady) initBadgeTracking();
   } catch(e) {
-    console.error('loadFromDrive:', e);
-    setSyncStatus('error', '✗ Could not load — check connection');
-    if(!_appReady) initBadgeTracking(); // Drive failed — still init so badges work
+    console.error('loadFromSupabase:', e);
+    setSyncStatus('error', '✗ Could not connect');
+    if (!_appReady) initBadgeTracking();
   }
   syncInProgress = false;
 }
 
+// Alias for any remaining loadFromDrive calls
+const loadFromDrive = loadFromSupabase;
+
+// ── AUTO-SYNC ─────────────────────────────────────────────────────────────
 function scheduleAutoSync() {
-  if (!driveAccessToken) return; // not signed in, skip silently
   clearTimeout(autoSyncTimer);
-  autoSyncTimer = setTimeout(() => {
-    try { syncNow(); } catch(e) { console.warn('Auto-sync error:', e); }
-  }, 5000); // 5 second delay so it never interferes with UI
+  autoSyncTimer = setTimeout(() => { try { syncNow(); } catch(e) {} }, 3000);
 }
 
-// Patch saveStorage to trigger auto-sync in background — never blocks UI
-const _origSaveStorage = saveStorage;
+// saveStorage: write to localStorage + schedule Supabase sync
 function saveStorage() {
-  try { _origSaveStorage(); } catch(e) { console.error('saveStorage error:',e); }
-  if (driveAccessToken) {
-    clearTimeout(autoSyncTimer);
-    autoSyncTimer = setTimeout(() => { try { syncNow(); } catch(e){} }, 5000);
-  }
+  try { _saveStorageCore(); } catch(e) { console.error('saveStorage error:',e); }
+  clearTimeout(autoSyncTimer);
+  autoSyncTimer = setTimeout(() => { try { syncNow(); } catch(e) {} }, 3000);
 }
 
-function renderCharts(){
-  try{renderProgress();}catch(e){}
-  try{
-    const bwc=document.getElementById('bw-chart');
-    const sc=document.getElementById('steps-chart');
-    const ec=document.getElementById('energy-chart');
-    renderBWChart&&renderBWChart();
-    renderStepsChart&&renderStepsChart();
-    renderEnergyChart&&renderEnergyChart();
-  }catch(e){}
-}
-
-
-// ── FORGE RING UPDATE ─────────────────────────────────────────────────────
-function updateForgeRing(){
-  const xpFL = game.level * 100;
-  const pct = Math.min(1, game.xp / xpFL);
-  const circumference = 119.4;
-  const offset = circumference - (pct * circumference);
-  const ring = document.getElementById('xp-ring');
-  if(ring) ring.style.strokeDashoffset = offset;
-  // Update XP text
-  const xpEl = document.getElementById('s-xp');
-  if(xpEl) xpEl.textContent = game.xp + ' / ' + xpFL + ' XP';
-}
-
-// ── STREAK FLAME ──────────────────────────────────────────────────────────
-function updateStreakFlame(){
-  const flame = document.getElementById('streak-flame');
-  if(!flame) return;
-  const streak = game.streak || 0;
-  if(streak >= 3){
-    flame.classList.add('on-fire');
-    flame.textContent = streak >= 14 ? '⚡' : streak >= 7 ? '🔥' : '🔥';
-  } else {
-    flame.classList.remove('on-fire');
-    flame.textContent = '🔥';
-  }
-}
-
-/* flashPR: V4 canonical version used */
+// ── STUB OUT DRIVE FUNCTIONS (no longer needed) ───────────────────────────
+function driveSignIn()  { setSyncStatus('ok', '✓ Always connected via Supabase'); }
+function driveSignOut() { setSyncStatus('ok', '✓ Always connected via Supabase'); }
 
 // ── APP STARTUP ──────────────────────────────────────────────────────────
-// Check if returning from Google OAuth redirect
-(function handleOAuthReturn(){
-  const hash = window.location.hash;
-  if (hash && hash.includes('access_token')) {
-    const params = new URLSearchParams(hash.replace('#',''));
-    const token = params.get('access_token');
-    const expiresIn = parseInt(params.get('expires_in') || '3600', 10);
-    if (token) {
-      const expiresAt = Date.now() + (expiresIn * 1000);
-      localStorage.setItem('il_drive_token', token);
-      localStorage.setItem('il_drive_token_expiry', String(expiresAt));
-      driveAccessToken = token;
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }
-})();
-
-function isTokenExpired() {
-  const expiry = localStorage.getItem('il_drive_token_expiry');
-  if (!expiry) return true;
-  return Date.now() > parseInt(expiry, 10);
-}
-
-function clearExpiredToken() {
-  driveAccessToken = null;
-  localStorage.removeItem('il_drive_token');
-  localStorage.removeItem('il_drive_token_expiry');
-  setSyncStatus('idle', 'Session expired — tap Sign In to re-connect');
-}
-
-function checkTokenExpiry() {
-  if (!localStorage.getItem('il_drive_token')) return;
-  if (isTokenExpired()) { clearExpiredToken(); }
-}
+// Stub out old Drive token functions — no longer needed
+function isTokenExpired()    { return false; }
+function clearExpiredToken() {}
+function checkTokenExpiry()  {}
 
 try {
   loadStorage();
   loadUserSettings();
 
   ACTIVE_DATE=localKey();lastCheckedDate=localKey();cardioDateKey=localKey();
-  // Restore last used workout day (or check if there's a draft)
   const _lastDay = localStorage.getItem('il_last_day') || 'chest';
+  // Ensure live vars are set before updateStats
+  if(typeof DEFAULT_REST_LIVE === 'undefined') window.DEFAULT_REST_LIVE = 70;
+  if(typeof STEP_GOAL_LIVE === 'undefined') window.STEP_GOAL_LIVE = 12000;
   switchDay(_lastDay);
-  updateStats();renderAchievements();setQuote();
+  try{updateStats();}catch(e){console.warn('updateStats startup:',e);}
+  try{renderAchievements();}catch(e){}
+  try{setQuote();}catch(e){}
   histCalYear=new Date().getFullYear();histCalMonth=new Date().getMonth();
-  // Badge tracking initialized after Drive load (or after 5s fallback) — see initBadgeTracking()
-  // Restore Google sign-in token if previously signed in and not expired
-  const savedToken = localStorage.getItem('il_drive_token');
-  if (savedToken && !isTokenExpired()) {
-    driveAccessToken = savedToken;
-    const lastSync = localStorage.getItem('il_last_sync');
-    setSyncStatus('ok', '✓ Signed in to Google Drive', lastSync || '');
-    // Auto-load from Drive on startup — skip if workout draft in progress
-    setTimeout(() => {
-      try {
-        const raw = localStorage.getItem('il_draft');
-        const hasDraft = raw ? (() => { try { const d=JSON.parse(raw); return d&&!d.savedToday&&Date.now()-d.ts<86400000; } catch(e){ return false; } })() : false;
-        if (!hasDraft) loadFromDrive();
-      } catch(e) {}
-    }, 1500);
-    // Poll Drive every 5 minutes — skip if workout in progress
-    setInterval(() => {
-      checkTokenExpiry();
-      if (driveAccessToken) {
-        try {
-          const raw=localStorage.getItem('il_draft');
-          const hasDraft=raw?(() => { try{const d=JSON.parse(raw);return d&&!d.savedToday&&Date.now()-d.ts<86400000;}catch(e){return false;} })():false;
-          if(!hasDraft) loadFromDrive();
-        } catch(e) {}
-      }
-    }, 5 * 60 * 1000);
-  } else {
-    if (savedToken) clearExpiredToken();
-    else setSyncStatus('idle', 'Tap Sign In with Google to enable sync');
-    setTimeout(initBadgeTracking, 500); // no Drive — init badge tracking after render
-  }
+
+  // Show connected immediately — Supabase needs no sign-in
+  const lastSync = localStorage.getItem('il_last_sync');
+  setSyncStatus('ok', '✓ Connected', lastSync || '');
+
+  // Load from Supabase on startup — skip if workout draft in progress
+  setTimeout(() => {
+    try {
+      const raw = localStorage.getItem('il_draft');
+      const hasDraft = raw ? (() => {
+        try { const d=JSON.parse(raw); return d&&!d.savedToday&&Date.now()-d.ts<86400000; }
+        catch(e){ return false; }
+      })() : false;
+      if (!hasDraft) loadFromSupabase();
+      else { setSyncStatus('ok','✓ Connected',lastSync||''); initBadgeTracking(); }
+    } catch(e) { initBadgeTracking(); }
+  }, 1000);
+
+  // Background sync every 3 minutes
+  setInterval(() => {
+    try {
+      const raw=localStorage.getItem('il_draft');
+      const hasDraft=raw?(() => {
+        try{const d=JSON.parse(raw);return d&&!d.savedToday&&Date.now()-d.ts<86400000;}
+        catch(e){return false;}
+      })():false;
+      if(!hasDraft) loadFromSupabase();
+    } catch(e) {}
+  }, 3 * 60 * 1000);
+
 } catch(e) { console.error('Init error:',e); }
 startClock();
 
@@ -4699,9 +4639,7 @@ function loadUserSettings(){
   }catch(e){}
 }
 
-// Use these live vars everywhere instead of constants
-var DEFAULT_REST_LIVE = 70;
-var STEP_GOAL_LIVE    = 12000;
+// DEFAULT_REST_LIVE and STEP_GOAL_LIVE declared near top
 
 function saveProfile(){
   userProfile.name      = document.getElementById('prf-name')?.value.trim()||userProfile.name;
@@ -4753,8 +4691,6 @@ function populateSettingsTab(){
 
 
 // ── CALENDAR ──────────────────────────────────────────────────────────────
-let histCalYear = new Date().getFullYear();
-let histCalMonth = new Date().getMonth(); // 0-indexed
 
 function histCalNav(dir) {
   histCalMonth += dir;
@@ -4990,6 +4926,27 @@ function openCalDay(key) {
   </div>
   </div>`;
 
+  // ── LIFTING ──
+  // Pre-select day if workout already exists for this date
+  const existWorkout = history.find(h=>h.dateISO===key);
+  const preselDay = existWorkout ? existWorkout.day : '';
+  const dayKeys = Object.keys(DAYS);
+  const dayOpts = dayKeys.map(d=>`<option value="${d}"${d===preselDay?' selected':''}>${DAY_LABEL[d]||d}</option>`).join('');
+  html+=`<div class="cal-section">
+    <div class="cal-section-title">🏋️ ${existWorkout?'Edit':'Log'} Lifting Workout</div>
+    <select id="ced-lday" style="${iStyle};margin-bottom:6px" onchange="calInitLiftEditor()">
+      <option value="">Select workout type...</option>${dayOpts}
+    </select>
+    <div id="ced-lift-exercises"></div>
+    <div style="display:flex;gap:6px;margin-top:6px">
+      <input id="ced-lift-exname" type="text" list="ced-lift-exlist" placeholder="Add exercise..." style="${iStyle}">
+      <datalist id="ced-lift-exlist">${(exLibrary||[]).map(n=>`<option value="${n.replace(/"/g,'&quot;')}">`).join('')}</datalist>
+      <button onclick="calAddLiftExercise()" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;background:var(--dark3);border:1px solid var(--steel2);color:var(--accent);padding:8px 12px;cursor:pointer;border-radius:2px;white-space:nowrap">+ Add</button>
+    </div>
+    <input id="ced-lift-notes" type="text" placeholder="Session notes (optional)" style="${iStyle};margin-top:6px">
+    <div style="margin-top:8px">${saveBtn("calSaveLiftWorkout()",'💾 Save Workout')}</div>
+  </div>`;
+
   // ── BIBLE ──
   const bookOpts = [...OT_BOOKS,...NT_BOOKS].map(b=>`<option value="${b}"${bl.book===b?' selected':''}>${b}</option>`).join('');
   html+=`<div class="cal-section">
@@ -5006,11 +4963,21 @@ function openCalDay(key) {
     ${saveBtn("calSaveBible()",'Save Reading')}
   </div>`;
 
+  // ── SAVE ALL BUTTON ──
+  html+=`<div style="padding:1rem 1.25rem;position:sticky;bottom:0;background:var(--dark2);border-top:1px solid var(--border2);z-index:2">
+    <button onclick="calSaveAll()" style="width:100%;padding:14px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:4px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:var(--white);cursor:pointer;border-radius:3px">
+      ✓ SAVE ALL & CLOSE
+    </button>
+    <div id="cal-save-confirm" style="display:none;text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--green2);letter-spacing:2px;margin-top:6px">ALL DATA SAVED</div>
+  </div>`;
+
   html+=`</div></div>`;
 
   const el=document.createElement('div');
   el.innerHTML=html;
   document.body.appendChild(el.firstElementChild);
+  // If a workout day is preselected (existing workout), init the lift editor
+  if(preselDay) setTimeout(()=>calInitLiftEditor(), 0);
 }
 
 let _calEditKey = '';
@@ -5117,6 +5084,203 @@ function closeCalDay() {
 
 // Close modal on back button (mobile)
 window.addEventListener('popstate', closeCalDay);
+
+// ── CALENDAR LIFTING EDITOR ───────────────────────────────────────────────
+// _calLiftData: live state for the lift editor
+// Each entry: { id, name, sets:[{w,r}] }
+let _calLiftData = [];
+
+function calInitLiftEditor(){
+  const day = document.getElementById('ced-lday')?.value;
+  if(!day){ _calLiftData=[]; calRenderLiftEditor(); return; }
+  // Load existing workout for this date if it matches selected day
+  const existing = history.find(h=>h.dateISO===_calEditKey && h.day===day);
+  if(existing){
+    // Group existing sets by exercise
+    const map = {};
+    (existing.exercises||[]).forEach(s=>{
+      if(!map[s.name]) map[s.name]={id:s.id||('ex-'+s.name.replace(/\s+/g,'-')),name:s.name,sets:[]};
+      map[s.name].sets.push({w:s.weight||'',r:s.reps||''});
+    });
+    _calLiftData = Object.values(map);
+  } else {
+    // Pre-populate with default exercises for this day (1 set each as starting point)
+    _calLiftData = getAllEx(day).map(ex=>({id:ex.id, name:ex.name, sets:[{w:'',r:''}]}));
+  }
+  // Pre-fill notes
+  if(existing){
+    const ni=document.getElementById('ced-lift-notes');
+    if(ni)ni.value=existing.notes||'';
+  }
+  calRenderLiftEditor();
+}
+
+function calRenderLiftEditor(){
+  const container = document.getElementById('ced-lift-exercises');
+  if(!container) return;
+  const iS = 'background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:6px 8px;border-radius:2px;font-family:\'Barlow Condensed\',sans-serif;font-size:14px;outline:none;box-sizing:border-box;width:100%';
+  const btnS = 'background:none;border:1px solid var(--steel2);color:var(--mid);font-family:\'Barlow Condensed\',sans-serif;font-size:11px;letter-spacing:1px;padding:4px 8px;cursor:pointer;border-radius:2px';
+
+  if(!_calLiftData.length){
+    container.innerHTML='<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:12px;color:var(--mid);padding:.5rem 0">Select a workout type above, then add exercises below.</div>';
+    return;
+  }
+
+  let html='';
+  _calLiftData.forEach((ex,ei)=>{
+    html+=`<div style="background:var(--dark3);border:1px solid var(--border);border-radius:3px;padding:.6rem .75rem;margin-bottom:.5rem">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.4rem">
+        <input value="${ex.name}" onchange="calUpdateExName(${ei},this.value)" style="${iS};font-family:\'Bebas Neue\',sans-serif;font-size:15px;letter-spacing:1px;color:var(--accent);border:none;background:transparent;padding:0;width:auto;flex:1">
+        <button onclick="calRemoveExercise(${ei})" style="${btnS};color:var(--accent);border-color:rgba(232,56,13,.3);margin-left:8px">✕ Remove</button>
+      </div>
+      <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:10px;letter-spacing:2px;color:var(--mid);margin-bottom:.35rem">SET — LBS × REPS</div>`;
+    ex.sets.forEach((set,si)=>{
+      html+=`<div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">
+        <div style="font-family:\'Barlow Condensed\',sans-serif;font-size:11px;color:var(--steel2);width:18px;text-align:right;flex-shrink:0">${si+1}</div>
+        <input type="number" value="${set.w}" placeholder="lbs" onchange="calUpdateSet(${ei},${si},'w',this.value)" style="${iS};flex:1">
+        <span style="color:var(--steel2);font-size:11px">×</span>
+        <input type="number" value="${set.r}" placeholder="reps" onchange="calUpdateSet(${ei},${si},'r',this.value)" style="${iS};flex:1">
+        <button onclick="calRemoveSet(${ei},${si})" style="${btnS};flex-shrink:0;padding:4px 6px">−</button>
+      </div>`;
+    });
+    html+=`<div style="display:flex;gap:6px;margin-top:.25rem">
+      <button onclick="calAddSet(${ei})" style="${btnS};color:var(--blue2);border-color:rgba(42,154,212,.3)">+ Set</button>
+      <button onclick="calDupeLastSet(${ei})" style="${btnS}">↻ Copy Last</button>
+    </div>
+    </div>`;
+  });
+  container.innerHTML = html;
+}
+
+function calUpdateExName(ei,val){ if(_calLiftData[ei])_calLiftData[ei].name=val; }
+function calUpdateSet(ei,si,field,val){ if(_calLiftData[ei]?.sets[si])_calLiftData[ei].sets[si][field]=val; }
+function calRemoveExercise(ei){ _calLiftData.splice(ei,1); calRenderLiftEditor(); }
+function calRemoveSet(ei,si){
+  if(!_calLiftData[ei]) return;
+  if(_calLiftData[ei].sets.length<=1) return; // keep at least 1
+  _calLiftData[ei].sets.splice(si,1);
+  calRenderLiftEditor();
+}
+function calAddSet(ei){
+  if(!_calLiftData[ei]) return;
+  const last=_calLiftData[ei].sets[_calLiftData[ei].sets.length-1]||{w:'',r:''};
+  _calLiftData[ei].sets.push({w:last.w,r:''}); // copy last weight as suggestion
+  calRenderLiftEditor();
+}
+function calDupeLastSet(ei){
+  if(!_calLiftData[ei]) return;
+  const last=_calLiftData[ei].sets[_calLiftData[ei].sets.length-1]||{w:'',r:''};
+  _calLiftData[ei].sets.push({...last});
+  calRenderLiftEditor();
+}
+function calAddLiftExercise(){
+  const inp=document.getElementById('ced-lift-exname');
+  const name=(inp?.value||'').trim();
+  if(!name){if(inp){inp.style.borderColor='var(--accent)';setTimeout(()=>inp.style.borderColor='',1500);}return;}
+  const id='cal-'+name.toLowerCase().replace(/\s+/g,'-')+'-'+Date.now();
+  _calLiftData.push({id,name,sets:[{w:'',r:''}]});
+  if(!exLibrary.includes(name)){exLibrary.push(name);try{localStorage.setItem('il_ex_lib',JSON.stringify(exLibrary));}catch(e){}}
+  inp.value='';
+  calRenderLiftEditor();
+  // scroll to new exercise
+  setTimeout(()=>{const c=document.getElementById('ced-lift-exercises');if(c)c.lastElementChild?.scrollIntoView({behavior:'smooth',block:'nearest'});},50);
+}
+
+function calSaveLiftWorkout(){
+  const day = document.getElementById('ced-lday')?.value;
+  if(!day){
+    const sel=document.getElementById('ced-lday');
+    if(sel){sel.style.borderColor='var(--accent)';setTimeout(()=>sel.style.borderColor='',1500);}
+    return;
+  }
+  // Read current values from DOM before saving
+  _calLiftData.forEach((ex,ei)=>{
+    ex.sets.forEach((set,si)=>{
+      const wEl=document.querySelector(`[onchange="calUpdateSet(${ei},${si},'w',this.value)"]`);
+      const rEl=document.querySelector(`[onchange="calUpdateSet(${ei},${si},'r',this.value)"]`);
+      if(wEl)set.w=wEl.value;
+      if(rEl)set.r=rEl.value;
+    });
+    const nameEl=document.querySelector(`[onchange="calUpdateExName(${ei},this.value)"]`);
+    if(nameEl)ex.name=nameEl.value||ex.name;
+  });
+
+  const notes=document.getElementById('ced-lift-notes')?.value||'';
+  const sets=[];
+  let totalVol=0;
+
+  _calLiftData.forEach(ex=>{
+    ex.sets.forEach((set,si)=>{
+      const w=parseFloat(set.w)||0;
+      const r=parseInt(set.r)||0;
+      if(w>0&&r>0){
+        const vol=w*r; totalVol+=vol;
+        sets.push({id:ex.id,name:ex.name,set:si+1,weight:w,reps:r,rpe:'',done:true,vol});
+      }
+    });
+  });
+
+  if(!sets.length){
+    const btn=document.querySelector('[onclick="calSaveLiftWorkout()"]');
+    if(btn){btn.textContent='Enter at least one set';setTimeout(()=>btn.textContent='💾 Save Workout',2000);}
+    return;
+  }
+
+  const dateObj=new Date(_calEditKey+'T12:00:00');
+  const dateStr=dateObj.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  const newEntry={date:dateStr,dateISO:_calEditKey,day,exercises:sets,notes,duration:0};
+
+  // Replace existing entry for this date if same day type, else add
+  const existIdx=history.findIndex(h=>h.dateISO===_calEditKey&&h.day===day);
+  if(existIdx!==-1) history.splice(existIdx,1);
+  history.push(newEntry);
+  history.sort((a,b)=>b.dateISO.localeCompare(a.dateISO));
+
+  game.totalWorkouts=(game.totalWorkouts||0)+1;
+  game.totalSets=(game.totalSets||0)+sets.length;
+  game.totalLifted=(game.totalLifted||0)+totalVol;
+
+  saveStorage(); scheduleAutoSync();
+
+  const btn=document.querySelector('[onclick="calSaveLiftWorkout()"]');
+  if(btn){btn.textContent='✓ Saved!';btn.style.background='var(--green2)';setTimeout(()=>{btn.textContent='💾 Save Workout';btn.style.background='';},1500);}
+  setTimeout(()=>calRefresh(),1600);
+}
+
+// ── SAVE ALL & CLOSE ───────────────────────────────────────────────────────
+function calSaveAll(){
+  // Save steps
+  const stepsVal=parseInt(document.getElementById('ced-steps')?.value)||0;
+  if(stepsVal>0){stepsLog[_calEditKey]=stepsVal;try{localStorage.setItem('il_steps',JSON.stringify(stepsLog));}catch(e){}}
+  // Save body weight
+  const bwVal=parseFloat(document.getElementById('ced-bw')?.value)||0;
+  if(bwVal>0){bwLog[_calEditKey]=bwVal;try{localStorage.setItem('il_bw',JSON.stringify(bwLog));}catch(e){}}
+  // Save energy
+  const enVal=parseInt(document.getElementById('ced-energy')?.value)||0;
+  if(enVal>0){energyLog[_calEditKey]=enVal;try{localStorage.setItem('il_energy',JSON.stringify(energyLog));}catch(e){}}
+  // Save bible
+  const bRead=document.getElementById('ced-bible-read')?.checked||false;
+  const bBook=document.getElementById('ced-bbook')?.value||'';
+  const bChap=parseInt(document.getElementById('ced-bchap')?.value)||0;
+  const bNotes=document.getElementById('ced-bnotes')?.value||'';
+  if(bRead||bBook||bNotes){
+    if(!bibleLog[_calEditKey])bibleLog[_calEditKey]={};
+    bibleLog[_calEditKey]={...bibleLog[_calEditKey],read:bRead,book:bBook,chapter:bChap,notes:bNotes};
+    try{localStorage.setItem('il_bible',JSON.stringify(bibleLog));}catch(e){}
+  }
+  // Save workout notes
+  const w=history.find(h=>h.dateISO===_calEditKey);
+  const wNotes=document.getElementById('ced-wnotes')?.value;
+  if(w&&wNotes!==undefined)w.notes=wNotes;
+  // Persist everything
+  saveStorage();
+  scheduleAutoSync();
+  // Show confirm then close
+  const conf=document.getElementById('cal-save-confirm');
+  if(conf){conf.style.display='block';}
+  renderHistCalendar();
+  setTimeout(()=>closeCalDay(),800);
+}
 </script>
 
 <!-- ADD EXERCISE MODAL -->
@@ -5208,17 +5372,16 @@ window.addEventListener('popstate', closeCalDay);
     </div>
   </div>
 
-  <div class="sec-lbl">&#x2601; Google Drive Sync</div>
+  <div class="sec-lbl">&#x2601; Cloud Sync</div>
   <div class="card" style="margin-bottom:1.25rem">
-    <div id="sync-status-bar2" style="display:flex;align-items:center;gap:10px;margin-bottom:1rem;padding:.65rem .9rem;border-radius:2px;background:var(--dark3);border:1px solid var(--border2)">
-      <div id="sync-dot2" style="width:8px;height:8px;border-radius:50%;background:var(--steel2);flex-shrink:0"></div>
-      <div id="sync-status-txt2" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--mid);flex:1">Not signed in</div>
+    <div id="sync-status-bar2" style="display:flex;align-items:center;gap:10px;margin-bottom:.75rem;padding:.65rem .9rem;border-radius:2px;background:var(--dark3);border:1px solid var(--border2)">
+      <div id="sync-dot2" style="width:8px;height:8px;border-radius:50%;background:#22B05A;flex-shrink:0"></div>
+      <div id="sync-status-txt2" style="font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;color:var(--mid);flex:1">✓ Always connected — no sign-in needed</div>
     </div>
-    <button onclick="driveSignIn()" style="width:100%;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:linear-gradient(135deg,#4285F4,#34A853);border:none;color:#fff;cursor:pointer;border-radius:2px;margin-bottom:8px">&#x1F511; Sign In with Google</button>
+    <div class="settings-note" style="margin-bottom:.75rem">Your data syncs automatically to the cloud every time you save. No login required — works instantly on all devices.</div>
     <div style="display:flex;gap:8px">
-      <button onclick="syncNow()" style="flex:1;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;background:none;border:1px solid rgba(42,154,212,.4);color:var(--blue2);cursor:pointer;border-radius:2px">&#x2191; Save to Drive</button>
-      <button onclick="loadFromDrive()" style="flex:1;padding:10px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;background:none;border:1px solid rgba(42,154,212,.4);color:var(--blue2);cursor:pointer;border-radius:2px">&#x2193; Load from Drive</button>
-      <button onclick="driveSignOut()" style="padding:10px 14px;font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1px;text-transform:uppercase;background:none;border:1px solid var(--border2);color:var(--mid);cursor:pointer;border-radius:2px">Sign Out</button>
+      <button onclick="syncNow()" style="flex:1;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:var(--accent);border:none;color:var(--white);cursor:pointer;border-radius:2px">&#x2191; Save Now</button>
+      <button onclick="loadFromSupabase()" style="flex:1;padding:11px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:none;border:1px solid var(--border2);color:var(--mid);cursor:pointer;border-radius:2px">&#x2193; Load Now</button>
     </div>
   </div>
 
