@@ -437,7 +437,7 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 ::-webkit-scrollbar{width:5px}::-webkit-scrollbar-track{background:var(--dark)}::-webkit-scrollbar-thumb{background:var(--steel2);border-radius:3px}
 
 /* ── BADGE SIDEBARS ── */
-.badge-sidebar{position:fixed;top:80px;width:54px;display:flex;flex-direction:column;gap:6px;z-index:50;padding:6px 0}
+.badge-sidebar{position:fixed;top:80px;width:54px;display:flex;flex-direction:column;gap:6px;z-index:10;padding:6px 0}
 .badge-sidebar.left{left:6px;align-items:flex-end}
 .badge-sidebar.right{right:6px;align-items:flex-start}
 .sdg-badge{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:20px;border:2px solid var(--border2);background:var(--dark2);cursor:pointer;transition:transform .2s,box-shadow .2s;position:relative;flex-shrink:0}
@@ -468,7 +468,7 @@ body::before{content:'';position:fixed;inset:0;background-image:repeating-linear
 .bmob-badge.cat-nutr{border-color:rgba(251,146,60,.6);background:rgba(251,146,60,.1)}
 .bmob-badge.cat-cardio{border-color:rgba(20,184,166,.6);background:rgba(20,184,166,.1)}
 .bmob-badge.cat-game{border-color:rgba(248,113,113,.6);background:rgba(248,113,113,.1)}
-@media(max-width:1100px){.badge-sidebar{display:none}.badge-mobile-strip{display:flex}}
+.badge-sidebar{display:none!important}.badge-mobile-strip{display:flex;flex-wrap:wrap;gap:6px;padding:6px 0;justify-content:center}
 /* WEEKLY STEPS GRID */
 .wk-steps-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
 .wk-step-col{display:flex;flex-direction:column;align-items:center;gap:4px}
@@ -829,6 +829,32 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   border-radius:3px;transition:all .15s;
 }
 .home-action-btn:hover { background:var(--dark3); }
+
+/* ── TAB SUB-NAV ─────────────────────────────────────────────────────────── */
+.tab-subnav{display:flex;gap:6px;margin-bottom:1rem;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;flex-shrink:0}
+.tab-subnav::-webkit-scrollbar{display:none}
+.subnav-btn{font-family:'Barlow Condensed',sans-serif;font-size:12px;letter-spacing:1.5px;text-transform:uppercase;background:var(--dark3);border:1px solid var(--border2);color:var(--mid);padding:8px 14px;cursor:pointer;border-radius:20px;white-space:nowrap;flex-shrink:0;transition:all .15s}
+.subnav-btn.active{background:var(--accent);border-color:var(--accent);color:var(--white)}
+.subnav-btn:hover:not(.active){border-color:var(--accent);color:var(--accent)}
+
+/* ── TROPHY CASE ─────────────────────────────────────────────────────────── */
+.trophy-case-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px;margin-bottom:1.5rem}
+.trophy-card{background:linear-gradient(145deg,var(--dark2),var(--dark3));border:1px solid;border-radius:6px;padding:1rem .75rem;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;overflow:hidden}
+.trophy-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.trophy-card.gold{border-color:rgba(212,168,67,.6);box-shadow:0 0 12px rgba(212,168,67,.15)}
+.trophy-card.silver{border-color:rgba(180,180,180,.5);box-shadow:0 0 8px rgba(180,180,180,.1)}
+.trophy-card.bronze{border-color:rgba(180,100,40,.5);box-shadow:0 0 8px rgba(180,100,40,.1)}
+.trophy-icon{font-size:32px;margin-bottom:.4rem;display:block}
+.trophy-name{font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:var(--white);margin-bottom:.2rem}
+.trophy-lift{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--gold);line-height:1}
+.trophy-lift-sub{font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);letter-spacing:1px}
+.trophy-date{font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--steel2);margin-top:.3rem}
+
+/* ── ACHIEVEMENT CARD — show desc on locked badges ───────────────────────── */
+.ach-card{cursor:pointer;position:relative}
+.ach-card-tooltip{display:none;position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:var(--dark);border:1px solid var(--border2);border-radius:4px;padding:8px 10px;font-family:'Barlow Condensed',sans-serif;font-size:12px;color:var(--white);z-index:100;width:180px;text-align:center;pointer-events:none;white-space:normal;line-height:1.3}
+.ach-card:hover .ach-card-tooltip{display:block}
+.ach-progress{font-family:'Barlow Condensed',sans-serif;font-size:9px;letter-spacing:1px;color:var(--mid);margin-top:3px;text-transform:uppercase}
 </style>
 </head>
 <body>
@@ -864,6 +890,7 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   <button class="dnav-today dim" id="dnav-today" onclick="goToToday()">Today</button>
 </div>
 <div style="max-width:900px;margin:0 auto;padding:1rem 1rem 4rem">
+
 <div class="timer-bar" id="timer-bar" style="display:none"><div id="timer-cnt" class="timer-cnt">70</div><div style="flex:1"><div id="timer-lbl" class="timer-lbl">Rest period</div><div class="timer-track"><div id="timer-fill" class="timer-fill" style="width:100%"></div></div></div><button class="timer-skip" onclick="stopTimer()">Skip</button></div>
 <div class="stat-strip">
   <div class="sc" style="display:flex;flex-direction:column;align-items:center;padding:.6rem .5rem">
@@ -891,16 +918,13 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
 <div class="header-glow-bar"></div>
 <div class="main-nav">
   <button class="nav-tab" data-tab="home" onclick="showTab('home')">&#x2302; Home</button>
-  <button class="nav-tab" data-tab="workout" onclick="showTab('workout')">&#x26A1; Workout</button>
+  <button class="nav-tab active" data-tab="workout" onclick="showTab('workout')">&#x26A1; Train</button>
   <button class="nav-tab" data-tab="fuel" onclick="showTab('fuel')">&#x1F957; Fuel</button>
-  <button class="nav-tab" data-tab="body" onclick="showTab('body')">&#x2696; Body</button>
-  <button class="nav-tab" data-tab="records" onclick="showTab('records')">&#x1F3C6; Records</button>
+  <button class="nav-tab" data-tab="body" onclick="showTab('body')">&#x1F4CA; Body</button>
   <button class="nav-tab" data-tab="history" onclick="showTab('history')">&#x1F4C5; History</button>
-  <button class="nav-tab" data-tab="achievements" onclick="showTab('achievements')">&#x1F947; Badges</button>
+  <button class="nav-tab" data-tab="achievements" onclick="showTab('achievements')">&#x1F3C5; Badges</button>
   <button class="nav-tab" data-tab="bible" onclick="showTab('bible')">&#x271F; Bible</button>
-  <button class="nav-tab" data-tab="advisor" onclick="showTab('advisor')">&#x1F9E0; Advisor</button>
-<button class="nav-tab" data-tab="settings" onclick="showTab('settings')">&#x2699; Settings</button>
-<button class="nav-tab" data-tab="claude" onclick="showTab('claude')">&#x1F916; Coach</button>
+  <button class="nav-tab" data-tab="more" onclick="showTab('more')">&#x2630; More</button>
 </div>
 
 
@@ -911,11 +935,11 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
     <div id="home-quote" style="font-family:'Barlow Condensed',sans-serif;font-size:13px;color:var(--steel2);margin-top:6px;font-style:italic;border-left:2px solid var(--accent);padding-left:10px"></div>
   </div>
   <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin-bottom:1rem">
-    <div class="home-card" onclick="showTab('workout')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(232,56,13,.15);color:var(--accent)">&#x26A1;</div><div style="flex:1"><div class="home-card-lbl">Workout</div><div id="hc-workout" class="home-card-val">&#x2014;</div><div id="hc-workout-sub" class="home-card-sub">Tap to start</div></div><div id="hc-workout-check" class="home-check" style="display:none">&#x2713;</div></div>
-    <div class="home-card" onclick="showTab('fuel')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(34,176,90,.15);color:var(--green2)">&#x1F957;</div><div style="flex:1"><div class="home-card-lbl">Nutrition</div><div id="hc-nutrition" class="home-card-val">&#x2014;</div><div id="hc-nutrition-sub" class="home-card-sub">Log your meals</div></div><div id="hc-nutrition-check" class="home-check" style="display:none">&#x2713;</div></div>
-    <div class="home-card" onclick="showTab('body')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(42,154,212,.15);color:var(--blue2)">&#x1F45F;</div><div style="flex:1"><div class="home-card-lbl">Steps</div><div id="hc-steps" class="home-card-val">0</div><div id="hc-steps-sub" class="home-card-sub">of 12,000</div></div><div id="hc-steps-check" class="home-check" style="display:none">&#x2713;</div></div>
-    <div class="home-card" onclick="showTab('fuel')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(168,85,247,.15);color:#a855f7">&#x1F48A;</div><div style="flex:1"><div class="home-card-lbl">Supplements</div><div id="hc-supps" class="home-card-val">&#x2014;</div><div id="hc-supps-sub" class="home-card-sub">Log your stack</div></div><div id="hc-supps-check" class="home-check" style="display:none">&#x2713;</div></div>
-    <div class="home-card" onclick="showTab('body')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(212,168,67,.15);color:var(--gold)">&#x2696;&#xFE0F;</div><div style="flex:1"><div class="home-card-lbl">Body Weight</div><div id="hc-bw" class="home-card-val">&#x2014;</div><div id="hc-bw-sub" class="home-card-sub">Log today</div></div><div id="hc-bw-check" class="home-check" style="display:none">&#x2713;</div></div>
+    <div class="home-card" onclick="goToSuggestedWorkout()" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(232,56,13,.15);color:var(--accent)">&#x26A1;</div><div style="flex:1"><div class="home-card-lbl">Workout</div><div id="hc-workout" class="home-card-val">&#x2014;</div><div id="hc-workout-sub" class="home-card-sub">Tap to start</div></div><div id="hc-workout-check" class="home-check" style="display:none">&#x2713;</div></div>
+    <div class="home-card" onclick="showTab('fuel');setTimeout(()=>scrollToSection('nutr-section','fuel'),100)" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(34,176,90,.15);color:var(--green2)">&#x1F957;</div><div style="flex:1"><div class="home-card-lbl">Nutrition</div><div id="hc-nutrition" class="home-card-val">&#x2014;</div><div id="hc-nutrition-sub" class="home-card-sub">Log your meals</div></div><div id="hc-nutrition-check" class="home-check" style="display:none">&#x2713;</div></div>
+    <div class="home-card" onclick="showTab('body');setTimeout(()=>scrollToSection('body-steps-section','body'),100)" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(42,154,212,.15);color:var(--blue2)">&#x1F45F;</div><div style="flex:1"><div class="home-card-lbl">Steps</div><div id="hc-steps" class="home-card-val">0</div><div id="hc-steps-sub" class="home-card-sub">of 12,000</div></div><div id="hc-steps-check" class="home-check" style="display:none">&#x2713;</div></div>
+    <div class="home-card" onclick="showTab('fuel');setTimeout(()=>scrollToSection('supp-section','fuel'),100)" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(168,85,247,.15);color:#a855f7">&#x1F48A;</div><div style="flex:1"><div class="home-card-lbl">Supplements</div><div id="hc-supps" class="home-card-val">&#x2014;</div><div id="hc-supps-sub" class="home-card-sub">Log your stack</div></div><div id="hc-supps-check" class="home-check" style="display:none">&#x2713;</div></div>
+    <div class="home-card" onclick="showTab('body');setTimeout(()=>scrollToSection('body-weight-section','body'),100)" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(212,168,67,.15);color:var(--gold)">&#x2696;&#xFE0F;</div><div style="flex:1"><div class="home-card-lbl">Body Weight</div><div id="hc-bw" class="home-card-val">&#x2014;</div><div id="hc-bw-sub" class="home-card-sub">Log today</div></div><div id="hc-bw-check" class="home-check" style="display:none">&#x2713;</div></div>
     <div class="home-card" onclick="showTab('bible')" style="cursor:pointer"><div class="home-card-icon" style="background:rgba(167,139,250,.15);color:#a78bfa">&#x271D;</div><div style="flex:1"><div class="home-card-lbl">Bible Reading</div><div id="hc-bible" class="home-card-val">&#x2014;</div><div id="hc-bible-sub" class="home-card-sub">Daily reading</div></div><div id="hc-bible-check" class="home-check" style="display:none">&#x2713;</div></div>
   </div>
   <div style="background:var(--dark2);border:1px solid var(--border2);border-radius:4px;padding:.9rem 1rem;margin-bottom:1rem">
@@ -1002,37 +1026,63 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
 
 <!-- FUEL TAB -->
 <div id="tab-fuel" style="display:none">
-  <div class="sec-lbl" style="margin-top:0">&#x1F957; Nutrition</div>
-  <div class="past-banner" id="nutr-banner" style="display:none"><div class="past-banner-txt">Viewing past data</div><button class="past-banner-btn" onclick="goToToday()">Back to Today</button></div>
-  <div class="macro-hdr"><div class="macro-title">Nutrition</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div class="tdee-badge" id="tdee-badge-lbl">TDEE ~2,765 cal</div><button class="edit-btn" onclick="toggleTargetsEditor()">&#x270E; Targets</button></div></div>
-  <div class="targets-ed" id="targets-ed" style="display:none"><div class="tg-grid"><div><div class="tg-lbl">Calories</div><input type="number" class="tg-inp" id="tg-cal" value="1765"></div><div><div class="tg-lbl">Protein (g)</div><input type="number" class="tg-inp" id="tg-pro" value="240"></div><div><div class="tg-lbl">Carbs (g)</div><input type="number" class="tg-inp" id="tg-carb" value="121"></div><div><div class="tg-lbl">Fat (g)</div><input type="number" class="tg-inp" id="tg-fat" value="30"></div></div><button class="tg-save" onclick="saveTargets()">Save Targets</button></div>
-  <div class="card" style="margin-bottom:1.25rem"><div id="macro-bars" class="macro-bars"></div></div>
-  <div class="sec-lbl">Meal Plan</div>
-  <div id="meal-list"></div>
-  <div id="custom-foods"></div>
-  <div class="sec-lbl" style="margin-top:1rem">Saved Foods</div>
-  <div id="saved-foods-section"></div>
-  <div class="sec-lbl" style="margin-top:1rem">Search Food</div>
-  <div class="fs-wrap">
-    <div class="fs-title">Food Search</div>
-    <div class="fs-sub">USDA database + AI fallback</div>
-    <div class="fs-row"><input type="text" class="fs-inp" id="fs-inp" placeholder="Search: chicken breast, oats..." onkeydown="if(event.key==='Enter')searchFood()"><button class="fs-btn" id="fs-btn" onclick="searchFood()">&#x1F50D; SEARCH</button></div>
-    <div id="fs-results"></div>
-    <div id="fs-serving-section" style="display:none"></div>
+  <!-- Sub-nav -->
+  <div class="tab-subnav">
+    <button class="subnav-btn active" onclick="scrollToSection('nutr-section','fuel')">🥗 Nutrition</button>
+    <button class="subnav-btn" onclick="scrollToSection('supp-section','fuel')">💊 Supplements</button>
+    <button class="subnav-btn" onclick="scrollToSection('search-section','fuel')">🔍 Food Search</button>
   </div>
-  <div class="sec-lbl" style="margin-top:1rem">Add Manually</div>
-  <div class="card"><div class="af-grid"><div><div class="af-lbl">Food name</div><input type="text" class="af-inp" id="af-name" placeholder="e.g. Greek yogurt"></div><div><div class="af-lbl">Calories</div><input type="number" class="af-inp" id="af-cal" placeholder="150" min="0"></div><div><div class="af-lbl">Protein (g)</div><input type="number" class="af-inp" id="af-pro" placeholder="15" min="0" step="0.1"></div><div><div class="af-lbl">Carbs (g)</div><input type="number" class="af-inp" id="af-carb" placeholder="10" min="0" step="0.1"></div><div><div class="af-lbl">Fat (g)</div><input type="number" class="af-inp" id="af-fat" placeholder="5" min="0" step="0.1"></div><div><div class="af-lbl">&nbsp;</div><button class="af-btn" onclick="addCustomFood()">+ Add</button></div></div></div>
-  <div style="height:1px;background:var(--border2);margin:1.25rem 0"></div>
-  <div class="sec-lbl">&#x1F48A; Supplements</div>
-  <div class="past-banner" id="supps-banner" style="display:none"><div class="past-banner-txt">Viewing past data</div><button class="past-banner-btn" onclick="goToToday()">Back to Today</button></div>
-  <div style="display:flex;justify-content:flex-end;margin-bottom:.75rem"><button class="edit-btn" id="supp-edit-btn" onclick="toggleSuppEdit()">&#x270E; Edit</button></div>
-  <div class="supp-overall"><div><div class="supp-ov-lbl">Daily Compliance</div><div class="supp-ov-val" id="supp-pct">0%</div></div><div class="supp-ov-track"><div class="supp-ov-fill" id="supp-fill" style="width:0%"></div></div></div>
-  <div id="supp-list"></div>
+
+  <!-- NUTRITION SECTION -->
+  <div id="nutr-section">
+    <div class="sec-lbl" style="margin-top:0">&#x1F957; Nutrition</div>
+    <div class="past-banner" id="nutr-banner" style="display:none"><div class="past-banner-txt">Viewing past data</div><button class="past-banner-btn" onclick="goToToday()">Back to Today</button></div>
+    <div class="macro-hdr"><div class="macro-title">Nutrition</div><div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><div class="tdee-badge" id="tdee-badge-lbl">TDEE ~2,765 cal</div><button class="edit-btn" onclick="toggleTargetsEditor()">&#x270E; Targets</button></div></div>
+    <div class="targets-ed" id="targets-ed" style="display:none"><div class="tg-grid"><div><div class="tg-lbl">Calories</div><input type="number" class="tg-inp" id="tg-cal" value="1765"></div><div><div class="tg-lbl">Protein (g)</div><input type="number" class="tg-inp" id="tg-pro" value="240"></div><div><div class="tg-lbl">Carbs (g)</div><input type="number" class="tg-inp" id="tg-carb" value="121"></div><div><div class="tg-lbl">Fat (g)</div><input type="number" class="tg-inp" id="tg-fat" value="30"></div></div><button class="tg-save" onclick="saveTargets()">Save Targets</button></div>
+    <div class="card" style="margin-bottom:1.25rem"><div id="macro-bars" class="macro-bars"></div></div>
+    <div class="sec-lbl">Meal Plan</div>
+    <div id="meal-list"></div>
+    <div id="custom-foods"></div>
+    <div class="sec-lbl" style="margin-top:1rem">Saved Foods</div>
+    <div id="saved-foods-section"></div>
+  </div><!-- end nutr-section -->
+
+  <!-- SUPPLEMENTS SECTION -->
+  <div id="supp-section" style="margin-top:1.5rem">
+    <div class="sec-lbl">&#x1F48A; Supplements</div>
+    <div class="past-banner" id="supps-banner" style="display:none"><div class="past-banner-txt">Viewing past data</div><button class="past-banner-btn" onclick="goToToday()">Back to Today</button></div>
+    <div style="display:flex;justify-content:flex-end;margin-bottom:.75rem"><button class="edit-btn" id="supp-edit-btn" onclick="toggleSuppEdit()">&#x270E; Edit</button></div>
+    <div class="supp-overall"><div><div class="supp-ov-lbl">Daily Compliance</div><div class="supp-ov-val" id="supp-pct">0%</div></div><div class="supp-ov-track"><div class="supp-ov-fill" id="supp-fill" style="width:0%"></div></div></div>
+    <div id="supp-list"></div>
+  </div><!-- end supp-section -->
+
+  <!-- FOOD SEARCH SECTION -->
+  <div id="search-section" style="margin-top:1.5rem">
+    <div style="height:1px;background:var(--border2);margin-bottom:1.25rem"></div>
+    <div class="sec-lbl">&#x1F50D; Food Search</div>
+    <div class="fs-wrap">
+      <div class="fs-title">Food Search</div>
+      <div class="fs-sub">USDA database + AI fallback</div>
+      <div class="fs-row"><input type="text" class="fs-inp" id="fs-inp" placeholder="Search: chicken breast, oats..." onkeydown="if(event.key==='Enter')searchFood()"><button class="fs-btn" id="fs-btn" onclick="searchFood()">&#x1F50D; SEARCH</button></div>
+      <div id="fs-results"></div>
+      <div id="fs-serving-section" style="display:none"></div>
+    </div>
+    <div class="sec-lbl" style="margin-top:1rem">Add Manually</div>
+    <div class="card"><div class="af-grid"><div><div class="af-lbl">Food name</div><input type="text" class="af-inp" id="af-name" placeholder="e.g. Greek yogurt"></div><div><div class="af-lbl">Calories</div><input type="number" class="af-inp" id="af-cal" placeholder="150" min="0"></div><div><div class="af-lbl">Protein (g)</div><input type="number" class="af-inp" id="af-pro" placeholder="15" min="0" step="0.1"></div><div><div class="af-lbl">Carbs (g)</div><input type="number" class="af-inp" id="af-carb" placeholder="10" min="0" step="0.1"></div><div><div class="af-lbl">Fat (g)</div><input type="number" class="af-inp" id="af-fat" placeholder="5" min="0" step="0.1"></div><div><div class="af-lbl">&nbsp;</div><button class="af-btn" onclick="addCustomFood()">+ Add</button></div></div></div>
+  </div><!-- end search-section -->
 </div>
 
 
 
 <div id="tab-body" style="display:none">
+  <!-- Sub-nav -->
+  <div class="tab-subnav">
+    <button class="subnav-btn active" onclick="scrollToSection('body-steps-section','body')">👟 Steps</button>
+    <button class="subnav-btn" onclick="scrollToSection('body-weight-section','body')">⚖️ Weight</button>
+    <button class="subnav-btn" onclick="scrollToSection('body-progress-section','body')">📊 Progress</button>
+    <button class="subnav-btn" onclick="scrollToSection('body-energy-section','body')">⚡ Energy</button>
+  </div>
+  <div id="body-steps-section">
   <div class="past-banner" id="body-banner" style="display:none"><div class="past-banner-txt">Viewing past data</div><button class="past-banner-btn" onclick="goToToday()">Back to Today</button></div>
   <div class="sec-lbl" style="margin-top:0">Daily Steps</div>
   <div class="card">
@@ -1072,6 +1122,8 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   </div>
   <div class="sec-lbl">Steps History</div>
   <div class="chart-box"><div class="chart-wrap"><canvas id="steps-chart"></canvas></div></div>
+  </div><!-- end body-steps-section -->
+  <div id="body-weight-section">
   <div class="sec-lbl">Body Weight</div>
   <div class="card">
     <div class="bw-row"><input type="number" class="bw-inp" id="bw-inp" placeholder="280" min="50" max="600" step="0.1" onkeydown="if(event.key==='Enter')saveBodyWeight()"><div class="bw-unit">lbs</div><button class="bw-save" onclick="saveBodyWeight()">Log Weight</button></div>
@@ -1079,6 +1131,8 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   </div>
   <div class="chart-box"><div class="chart-wrap"><canvas id="bw-chart"></canvas></div></div>
 
+  </div><!-- end body-weight-section -->
+  <div id="body-progress-section">
   <div class="sec-lbl">Weight Trend &amp; Goal Projection</div>
   <div class="card" style="margin-bottom:.75rem">
     <div id="bw-proj-stats"></div>
@@ -1092,9 +1146,12 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
     <div id="heatmap-legend" style="display:flex;gap:12px;font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--mid);flex-wrap:wrap"></div>
   </div>
 
+  </div><!-- end body-progress-section -->
+  <div id="body-energy-section">
   <div class="sec-lbl">Energy Level</div>
   <div class="card"><div class="energy-lbl">How is your energy today? (1 = depleted, 10 = on fire)</div><div class="energy-btns" id="energy-btns"></div></div>
   <div class="chart-box"><div class="chart-wrap"><canvas id="energy-chart"></canvas></div></div>
+  </div><!-- end body-energy-section -->
 </div>
 
 
@@ -1138,7 +1195,21 @@ body.light-mode{--dark:#FFFFFF;--dark2:#F5F5F0;--dark3:#EAEAE5;--steel:#D0D0C8;-
   </div>
 </div>
 
-<div id="tab-achievements" style="display:none"><div class="sec-lbl" style="margin-top:0">Achievements</div><div id="ach-grid" class="ach-grid"></div></div>
+<div id="tab-achievements" style="display:none">
+  <!-- Sub-nav -->
+  <div class="tab-subnav">
+    <button class="subnav-btn active" id="ach-sub-badges" onclick="showAchSection('badges')">🥇 Badges</button>
+    <button class="subnav-btn" id="ach-sub-records" onclick="showAchSection('records')">🏆 Records</button>
+  </div>
+  <!-- Badges section -->
+  <div id="ach-badges-section">
+    <div id="ach-grid" class="ach-grid"></div>
+  </div>
+  <!-- Records / Trophy Case -->
+  <div id="ach-records-section" style="display:none">
+    <div id="trophy-case"></div>
+  </div>
+</div>
 
 <!-- Week tab removed — merged into History tab -->
 <div id="tab-week" style="display:none">
@@ -1544,6 +1615,7 @@ const DEFAULT_SUPPS=[
 const BADGE_CLS={chest:'b-chest',tri:'b-tri',legs:'b-legs',back:'b-back',bi:'b-bi',shoulder:'b-shoulder',core:'b-core'};
 const BADGE_LBL={chest:'Chest',tri:'Triceps',legs:'Legs',back:'Back',bi:'Biceps',shoulder:'Shoulder',core:'Core'};
 const DAY_LABEL={chest:'Chest + Triceps',back:'Back + Biceps',shoulders:'Shoulders + Triceps',legs:'Leg Day',arms:'Arm Day','cardio-day':'Cardio'};
+const DAY_MUSCLES={chest:['chest','triceps','front_delt'],back:['back','biceps','rear_delt'],shoulders:['shoulders','triceps','front_delt'],legs:['quads','hamstrings','glutes'],arms:['biceps','triceps'],'cardio-day':['cardio']};
 const HOME_QUOTES = [
   "No one who conquers the weights stays the same.",
   "Pain is temporary. PRs are forever.",
@@ -1556,7 +1628,7 @@ const HOME_QUOTES = [
   "The only bad workout is the one that didn't happen.",
   "Be the hardest worker in the room. Every room."
 ];
-const ALL_TABS=['home','workout','fuel','body','records','history','achievements','bible','advisor','settings','claude'];
+const ALL_TABS=['home','workout','fuel','body','history','achievements','bible','more'];
 const DAILY_TABS=['fuel','body','bible'];
 
 const VERSES=[
@@ -2997,28 +3069,7 @@ function initBadgeTracking(){
 
 function getUnlocked(){ return ACHIEVEMENTS.filter(a=>{ try{return a.check();}catch(e){return false;} }); }
 
-function renderAchievements(){
-  const grid=document.getElementById('ach-grid');if(!grid)return;
-  const cats={lift:'🏋️ Lifting',game:'🏆 Progress',streak:'🔥 Streaks',steps:'👟 Steps',cardio:'🏃 Cardio',nutr:'🥗 Nutrition',body:'⚖️ Body',bible:'✝️ Bible'};
-  const byCat={};
-  ACHIEVEMENTS.forEach(a=>{if(!byCat[a.cat])byCat[a.cat]=[];byCat[a.cat].push(a);});
-  grid.innerHTML='';
-  Object.entries(cats).forEach(([cat,label])=>{
-    if(!byCat[cat])return;
-    const sec=document.createElement('div');sec.style.cssText='margin-bottom:1.25rem';
-    sec.innerHTML=`<div class="sec-lbl" style="margin:0 0 .6rem">${label}</div><div class="ach-grid" style="margin:0"></div>`;
-    const subGrid=sec.querySelector('.ach-grid');
-    byCat[cat].forEach(a=>{
-      let ul=false;try{ul=a.check();}catch(e){}
-      const div=document.createElement('div');
-      div.className='ach-card'+(ul?' unlocked':'');
-      div.innerHTML=`<div class="ach-icon">${ul?a.icon:'🔒'}</div><div class="ach-name">${ul?a.name:'???'}</div><div class="ach-desc">${ul?a.desc:'Keep going...'}</div>`;
-      subGrid.appendChild(div);
-    });
-    grid.appendChild(sec);
-  });
-  renderBadgeSidebars();
-}
+// renderAchievements: canonical version below
 
 function renderBadgeSidebars(){
   const unlocked=getUnlocked();
@@ -3870,31 +3921,30 @@ function renderWeekGrid(elId,offset){
 // ── TAB SWITCHER ──────────────────────────────────────────────────────────
 let _touchStartX=0, _touchStartY=0;
 function showTab(tab){
-  ALL_TABS.forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.style.display=t===tab?'':'none';});
+  // Remap old tab names to new structure
+  const tabMap={'records':'history','advisor':'more','settings':'more','claude':'more','week':'history'};
+  if(tabMap[tab]) tab=tabMap[tab];
+
+  // Hide all tabs including legacy ones
+  [...ALL_TABS,'records','advisor','settings','claude','week'].forEach(t=>{
+    const el=document.getElementById('tab-'+t);if(el)el.style.display='none';
+  });
+  // Show active tab
+  const activeEl=document.getElementById('tab-'+tab);if(activeEl)activeEl.style.display='';
+
   document.querySelectorAll('.nav-tab').forEach(b=>b.classList.toggle('active',b.dataset.tab===tab));
   const showNav=DAILY_TABS.includes(tab);
   const dNav=document.getElementById('date-nav');if(dNav)dNav.style.display=showNav?'flex':'none';
   if(showNav){updateDateNav();updatePastBanners();}
-  // Show "Add Exercise" button only on workout tab and only for non-cardio days
   const addBtn=document.getElementById('add-ex-btn');
   if(addBtn)addBtn.style.display=(tab==='workout'&&currentDay!=='cardio-day')?'block':'none';
   if(tab==='fuel'){renderNutrition();renderSupplements();}
   else if(tab==='body')renderBodyTab();
-  else if(tab==='records'){renderRecordsTab();}
   else if(tab==='history'){renderHistCalendar();}
   else if(tab==='achievements')renderAchievements();
-  else if(tab==='week')renderWeekly();
   else if(tab==='bible')renderBibleTab();
-  else if(tab==='advisor'){renderAdvisorTab();renderMonthlyTab();}
-  else if(tab==='settings'){populateSettingsTab();}
   else if(tab==='home'){renderHomeTab();}
-  else if(tab==='claude'){
-    // Refresh context display when opening coach
-    const msgs=document.getElementById('claude-messages');
-    if(msgs&&msgs.children.length===0){
-      appendClaudeMsg('assistant',"Hey! I'm your Iron Coach. I have full access to your workouts, nutrition, body weight, PRs, and progress. Ask me anything!");
-    }
-  }
+  else if(tab==='more'){initMoreTab();}
 }
 
 // ── SWIPE GESTURES ────────────────────────────────────────────────────────
@@ -4385,6 +4435,8 @@ try {
   try{setQuote();}catch(e){}
   // Show home tab by default
   showTab('home');
+  // Hide old tabs that no longer have nav buttons
+  ['records','advisor','settings','claude','week'].forEach(t=>{const el=document.getElementById('tab-'+t);if(el)el.style.display='none';});
   histCalYear=new Date().getFullYear();histCalMonth=new Date().getMonth();
 
   // Show connected immediately — Supabase needs no sign-in
@@ -6071,7 +6123,7 @@ function renderHomeTab() {
   }
 
   // ── TODAY CARDS ──
-  // Workout
+  // Workout — show done if saved today, or smart suggestion if not
   const todayWorkout = history.find(h => h.dateISO === TODAY_KEY);
   const wEl = document.getElementById('hc-workout');
   const wSub = document.getElementById('hc-workout-sub');
@@ -6079,12 +6131,14 @@ function renderHomeTab() {
   if (todayWorkout) {
     const vol = Math.round((todayWorkout.exercises||[]).filter(e=>e.done).reduce((a,e)=>a+e.vol,0));
     if (wEl) wEl.textContent = DAY_LABEL[todayWorkout.day] || todayWorkout.day;
-    if (wSub) wSub.textContent = vol.toLocaleString() + ' lbs · Done';
+    if (wSub) wSub.textContent = vol.toLocaleString() + ' lbs · Done ✓';
     if (wCheck) wCheck.style.display = 'block';
   } else {
-    const nextDay = localStorage.getItem('il_last_day') || 'chest';
-    if (wEl) wEl.textContent = DAY_LABEL[nextDay] || nextDay;
-    if (wSub) wSub.textContent = 'Not started';
+    // Smart suggestion: find what muscle groups were hit in last 2 days
+    // and suggest something different
+    const suggested = getSuggestedWorkout();
+    if (wEl) wEl.textContent = DAY_LABEL[suggested.day] || suggested.day;
+    if (wSub) wSub.textContent = 'Suggested · ' + suggested.reason;
     if (wCheck) wCheck.style.display = 'none';
   }
 
@@ -6410,6 +6464,346 @@ function confirmPhotoImport() {
   const photoInput = document.getElementById('workout-photo-input');
   if (photoInput) photoInput.value = '';
 }
+
+// ── MORE TAB ──────────────────────────────────────────────────────────────
+let _moreSection = 'coach';
+let _moreCoachHistory = [];
+
+function showMoreSection(section) {
+  _moreSection = section;
+  ['coach','advisor','settings'].forEach(s => {
+    const el = document.getElementById('more-' + s);
+    const btn = document.getElementById('more-btn-' + s);
+    if (el) el.style.display = s === section ? 'block' : 'none';
+    if (btn) {
+      btn.style.background = s === section ? 'var(--accent)' : 'var(--dark3)';
+      btn.style.color = s === section ? 'var(--white)' : 'var(--mid)';
+      btn.style.border = s === section ? 'none' : '1px solid var(--border2)';
+    }
+  });
+  if (section === 'advisor') {
+    // Show the actual advisor tab content inside more
+    const advTab = document.getElementById('tab-advisor');
+    const content = document.getElementById('more-advisor-content');
+    if (advTab && content) {
+      content.innerHTML = '';
+      // Render advisor directly into the more-advisor div
+      try { renderAdvisorTab(); renderMonthlyTab(); } catch(e) { console.warn('advisor render:',e); }
+      // Move rendered content into more-advisor-content
+      const rendered = document.getElementById('tab-advisor');
+      if (rendered) content.innerHTML = rendered.innerHTML;
+    }
+  }
+  if (section === 'settings') {
+    const content = document.getElementById('more-settings-content');
+    const settingsTab = document.getElementById('tab-settings');
+    if (content && settingsTab && !content.hasAttribute('data-loaded')) {
+      content.innerHTML = settingsTab.innerHTML;
+      content.setAttribute('data-loaded','1');
+    }
+    try { populateSettingsTab(); } catch(e) {}
+  }
+}
+
+function initMoreTab() {
+  showMoreSection(_moreSection || 'coach');
+}
+
+function moreCoachAsk(customMsg) {
+  const inp = document.getElementById('more-claude-input');
+  const msg = customMsg || (inp ? inp.value.trim() : '');
+  if (!msg) return;
+  if (inp) inp.value = '';
+  const qp = document.getElementById('more-quick-prompts');
+  if (qp) qp.style.display = 'none';
+
+  // Append to more-coach messages
+  appendMoreCoachMsg('user', msg);
+  _moreCoachHistory.push({ role: 'user', content: msg });
+
+  const typingId = 'mtyping-' + Date.now();
+  appendMoreCoachMsg('assistant', '...', typingId, true);
+
+  const btn = document.getElementById('more-send-btn');
+  if (btn) { btn.disabled = true; btn.textContent = '...'; }
+
+  fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 1000,
+      system: buildUserContext(),
+      messages: _moreCoachHistory
+    })
+  }).then(r => r.json()).then(data => {
+    const reply = data.content?.[0]?.text || 'Sorry, try again.';
+    document.getElementById(typingId)?.remove();
+    appendMoreCoachMsg('assistant', reply);
+    _moreCoachHistory.push({ role: 'assistant', content: reply });
+    if (_moreCoachHistory.length > 20) _moreCoachHistory = _moreCoachHistory.slice(-20);
+  }).catch(e => {
+    document.getElementById(typingId)?.remove();
+    appendMoreCoachMsg('assistant', 'Connection error. Try again.');
+  }).finally(() => {
+    if (btn) { btn.disabled = false; btn.textContent = 'Send'; }
+    const msgs = document.getElementById('more-claude-messages');
+    if (msgs) msgs.scrollTop = msgs.scrollHeight;
+  });
+}
+
+function appendMoreCoachMsg(role, text, id, isTyping) {
+  const msgs = document.getElementById('more-claude-messages');
+  if (!msgs) return;
+  const wrapper = document.createElement('div');
+  wrapper.className = 'claude-msg ' + role + (isTyping ? ' claude-typing' : '');
+  if (id) wrapper.id = id;
+  const avatar = document.createElement('div');
+  avatar.style.cssText = `width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;${role==='assistant'?'background:linear-gradient(135deg,var(--accent),#a855f7)':'background:var(--dark3);border:1px solid var(--border2)'}`;
+  avatar.textContent = role === 'assistant' ? '🤖' : '👤';
+  const bubble = document.createElement('div');
+  bubble.className = 'claude-bubble';
+  bubble.textContent = text;
+  if (role === 'user') { wrapper.appendChild(bubble); wrapper.appendChild(avatar); }
+  else { wrapper.appendChild(avatar); wrapper.appendChild(bubble); }
+  msgs.appendChild(wrapper);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+// DAY_MUSCLES moved to top-level declarations
+
+function getSuggestedWorkout() {
+  const workoutDays = ['chest','back','shoulders','legs','arms'];
+
+  // Get last 2 days of workouts
+  const recent = history
+    .filter(h => h.dateISO < TODAY_KEY)
+    .slice(0, 2)
+    .map(h => h.day);
+
+  // Get muscles hit recently
+  const recentMuscles = new Set();
+  recent.forEach(day => (DAY_MUSCLES[day] || []).forEach(m => recentMuscles.add(m)));
+
+  // Score each workout day — lower overlap = better suggestion
+  const scores = workoutDays.map(day => {
+    const dayMuscles = DAY_MUSCLES[day] || [];
+    const overlap = dayMuscles.filter(m => recentMuscles.has(m)).length;
+    return { day, overlap };
+  });
+
+  // Sort by overlap (least overlap first), then pick the best
+  scores.sort((a, b) => a.overlap - b.overlap);
+  const best = scores[0];
+
+  // Build reason string
+  let reason = '';
+  if (recent.length === 0) {
+    reason = 'Start here';
+  } else if (best.overlap === 0) {
+    reason = 'Fresh muscles';
+  } else {
+    reason = 'Least overlap';
+  }
+
+  // If they already did this day recently and overlap is high, suggest rest
+  if (best.overlap >= 2 && recent.includes(best.day)) {
+    return { day: best.day, reason: 'Consider rest day' };
+  }
+
+  return { day: best.day, reason };
+}
+
+function goToSuggestedWorkout() {
+  const todayWorkout = history.find(h => h.dateISO === TODAY_KEY);
+  if (todayWorkout) {
+    showTab('workout'); // already done, just go to workout tab
+    return;
+  }
+  const suggested = getSuggestedWorkout();
+  switchDay(suggested.day);
+  showTab('workout');
+}
+
+// ── TAB SUB-NAV ──────────────────────────────────────────────────────────
+function scrollToSection(sectionId, tab) {
+  // Update active button
+  const btn = document.querySelector(`[onclick="scrollToSection('${sectionId}','${tab}')"]`);
+  const allBtns = btn?.closest('.tab-subnav')?.querySelectorAll('.subnav-btn');
+  allBtns?.forEach(b => b.classList.remove('active'));
+  btn?.classList.add('active');
+  // Smooth scroll to section
+  const el = document.getElementById(sectionId);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+// ── ACHIEVEMENTS SUB-NAV ─────────────────────────────────────────────────
+function showAchSection(section) {
+  ['badges','records'].forEach(s => {
+    const el = document.getElementById('ach-' + s + '-section');
+    const btn = document.getElementById('ach-sub-' + s);
+    if (el) el.style.display = s === section ? '' : 'none';
+    if (btn) btn.classList.toggle('active', s === section);
+  });
+  if (section === 'records') renderTrophyCase();
+}
+
+// ── TROPHY CASE ───────────────────────────────────────────────────────────
+function renderTrophyCase() {
+  const container = document.getElementById('trophy-case');
+  if (!container) return;
+
+  // Build PR map from history
+  const prMap = {};
+  history.forEach(h => {
+    (h.exercises || []).forEach(e => {
+      if (!e.done || !e.weight || !e.reps) return;
+      const key = e.name;
+      if (!prMap[key] || e.weight > prMap[key].weight ||
+          (e.weight === prMap[key].weight && e.reps > prMap[key].reps)) {
+        prMap[key] = { weight: e.weight, reps: e.reps, date: h.dateISO, vol: e.weight * e.reps };
+      }
+    });
+  });
+
+  const prs = Object.entries(prMap).sort((a, b) => b[1].vol - a[1].vol);
+
+  if (!prs.length) {
+    container.innerHTML = '<div style="font-family:\'Barlow Condensed\',sans-serif;font-size:14px;color:var(--mid);text-align:center;padding:2rem">Log workouts to fill your trophy case 🏆</div>';
+    return;
+  }
+
+  // Categorize: top 3 get gold/silver/bronze, rest get standard
+  const tiers = ['gold','silver','bronze'];
+  let html = '<div class="sec-lbl" style="margin-top:0">🏆 Trophy Case — Personal Records</div>';
+  html += '<div class="trophy-case-grid">';
+
+  prs.slice(0, 3).forEach(([name, pr], i) => {
+    const trophy = i === 0 ? '🥇' : i === 1 ? '🥈' : '🥉';
+    html += `<div class="trophy-card ${tiers[i]}">
+      <span class="trophy-icon">${trophy}</span>
+      <div class="trophy-name">${name}</div>
+      <div class="trophy-lift">${pr.weight}<span style="font-size:14px">lbs</span></div>
+      <div class="trophy-lift-sub">× ${pr.reps} reps · ${Math.round(pr.weight * (1 + pr.reps/30))}lb 1RM est.</div>
+      <div class="trophy-date">${pr.date}</div>
+    </div>`;
+  });
+
+  html += '</div>';
+
+  if (prs.length > 3) {
+    html += '<div class="sec-lbl">All Records</div><div class="trophy-case-grid">';
+    prs.slice(3).forEach(([name, pr]) => {
+      html += `<div class="trophy-card" style="border-color:var(--border2)">
+        <span class="trophy-icon">🏆</span>
+        <div class="trophy-name">${name}</div>
+        <div class="trophy-lift">${pr.weight}<span style="font-size:14px">lbs</span></div>
+        <div class="trophy-lift-sub">× ${pr.reps} reps</div>
+        <div class="trophy-date">${pr.date}</div>
+      </div>`;
+    });
+    html += '</div>';
+  }
+
+  container.innerHTML = html;
+}
+
+// ── ACHIEVEMENTS — upgrade to show progress on locked badges ─────────────
+// Override renderAchievements to add progress info and tooltips
+const _origRenderAchievements = renderAchievements;
+function renderAchievements() {
+  const grid = document.getElementById('ach-grid');
+  if (!grid) return;
+
+  const cats = {lift:'🏋️ Lifting',game:'🏆 Progress',streak:'🔥 Streaks',steps:'👟 Steps',cardio:'🏃 Cardio',nutr:'🥗 Nutrition',body:'⚖️ Body',bible:'✝️ Bible'};
+  const byCat = {};
+  ACHIEVEMENTS.forEach(a => { if (!byCat[a.cat]) byCat[a.cat] = []; byCat[a.cat].push(a); });
+  grid.innerHTML = '';
+
+  Object.entries(cats).forEach(([cat, label]) => {
+    if (!byCat[cat]) return;
+    const sec = document.createElement('div');
+    sec.style.cssText = 'margin-bottom:1.5rem';
+    sec.innerHTML = `<div class="sec-lbl" style="margin:0 0 .6rem">${label}</div><div class="ach-grid" style="margin:0"></div>`;
+    const subGrid = sec.querySelector('.ach-grid');
+
+    byCat[cat].forEach(a => {
+      let ul = false; try { ul = a.check(); } catch(e) {}
+      const progress = getBadgeProgress(a);
+      const div = document.createElement('div');
+      div.className = 'ach-card' + (ul ? ' unlocked' : '');
+
+      const tooltipContent = ul
+        ? `<strong>${a.name}</strong><br>${a.desc}<br><span style="color:var(--green2)">✓ Unlocked!</span>`
+        : `<strong>???</strong><br>${a.desc}<br>${progress ? `<span style="color:var(--gold)">${progress}</span>` : '<span style="color:var(--mid)">Keep going...</span>'}`;
+
+      div.innerHTML = `
+        <div class="ach-card-tooltip">${tooltipContent}</div>
+        <div class="ach-icon">${ul ? a.icon : '🔒'}</div>
+        <div class="ach-name">${ul ? a.name : '???'}</div>
+        <div class="ach-desc">${ul ? a.desc : a.desc}</div>
+        ${!ul && progress ? `<div class="ach-progress">${progress}</div>` : ''}`;
+      subGrid.appendChild(div);
+    });
+    grid.appendChild(sec);
+  });
+  renderBadgeSidebars();
+}
+
+function getBadgeProgress(a) {
+  // Return a progress string for locked badges
+  try {
+    const id = a.id;
+    if (id === 'sets100') return `${game.totalSets||0} / 100 sets`;
+    if (id === 'sets500') return `${game.totalSets||0} / 500 sets`;
+    if (id === 'sets1000') return `${game.totalSets||0} / 1,000 sets`;
+    if (id.startsWith('lifted')) {
+      const target = parseInt(id.replace('lifted','').replace('k','000').replace('m','000000'));
+      return `${Math.round((game.totalLifted||0)/1000)}k / ${Math.round(target/1000)}k lbs`;
+    }
+    if (id.startsWith('streak')) {
+      const target = parseInt(id.replace('streak',''));
+      return `${game.streak||0} / ${target} days`;
+    }
+    if (id.startsWith('workouts')) {
+      const target = parseInt(id.replace('workouts',''));
+      return `${game.totalWorkouts||0} / ${target}`;
+    }
+    if (id.startsWith('steps') && id !== 'steps1m') {
+      const daily = Object.values(stepsLog);
+      const best = daily.length ? Math.max(...daily) : 0;
+      return `Best day: ${best.toLocaleString()} steps`;
+    }
+    if (id.startsWith('bible') && !isNaN(id.replace('bible',''))) {
+      const count = Object.values(bibleLog).filter(v=>v.read).length;
+      const target = parseInt(id.replace('bible',''));
+      return `${count} / ${target} days`;
+    }
+    if (id.startsWith('nutr')) {
+      const count = Object.keys(nutrData).filter(k=>(nutrData[k]?.checked||[]).length>0).length;
+      return `${count} days logged`;
+    }
+    if (id.startsWith('supp')) {
+      const count = Object.keys(suppData).filter(k=>(suppData[k]?.checked||[]).length>0).length;
+      return `${count} days logged`;
+    }
+    if (id.startsWith('prs')) {
+      const target = parseInt(id.replace('prs',''));
+      return `${game.totalPRs||0} / ${target} PRs`;
+    }
+    if (id.startsWith('level')) {
+      const target = parseInt(id.replace('level',''));
+      return `Level ${game.level||1} / ${target}`;
+    }
+    if (id === 'cardio5' || id === 'cardio20') {
+      const count = Object.values(cardioLog).reduce((a,v)=>a+v.length,0);
+      const target = parseInt(id.replace('cardio',''));
+      return `${count} / ${target} sessions`;
+    }
+  } catch(e) {}
+  return null;
+}
+
 </script>
 
 <!-- ADD EXERCISE MODAL -->
@@ -6585,6 +6979,58 @@ function confirmPhotoImport() {
     <button onclick="claudeAsk()" id="claude-send-btn" style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;background:linear-gradient(135deg,var(--accent),#a855f7);border:none;color:var(--white);cursor:pointer;border-radius:3px;white-space:nowrap;flex-shrink:0">Send</button>
   </div>
   <div style="font-family:'Barlow Condensed',sans-serif;font-size:10px;color:var(--steel2);margin-top:4px;letter-spacing:.5px">Press Enter to send · Shift+Enter for new line</div>
+</div>
+
+<!-- MORE TAB -->
+<div id="tab-more" style="display:none">
+
+  <!-- Sub-nav -->
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:1.25rem">
+    <button onclick="showMoreSection('coach')" id="more-btn-coach" style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;background:var(--accent);border:none;color:var(--white);padding:12px 8px;cursor:pointer;border-radius:3px;width:100%">🤖 Coach</button>
+    <button onclick="showMoreSection('advisor')" id="more-btn-advisor" style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;background:var(--dark3);border:1px solid var(--border2);color:var(--mid);padding:12px 8px;cursor:pointer;border-radius:3px;width:100%">🧠 Advisor</button>
+    <button onclick="showMoreSection('settings')" id="more-btn-settings" style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;background:var(--dark3);border:1px solid var(--border2);color:var(--mid);padding:12px 8px;cursor:pointer;border-radius:3px;width:100%">⚙ Settings</button>
+  </div>
+
+  <!-- Coach section -->
+  <div id="more-coach" style="display:block">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:1rem">
+      <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#a855f7);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🤖</div>
+      <div>
+        <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white)">IRON COACH</div>
+        <div style="font-family:'Barlow Condensed',sans-serif;font-size:11px;color:var(--mid);letter-spacing:1px">Powered by Claude AI · Knows your data</div>
+      </div>
+    </div>
+    <div id="more-claude-messages" style="display:flex;flex-direction:column;gap:10px;margin-bottom:1rem;min-height:200px;max-height:55vh;overflow-y:auto;padding:4px 0">
+      <div class="claude-msg assistant">
+        <div style="width:28px;height:28px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;background:linear-gradient(135deg,var(--accent),#a855f7)">🤖</div>
+        <div class="claude-bubble">Hey! I'm your Iron Coach. Ask me anything about your training, nutrition, or progress.</div>
+      </div>
+    </div>
+    <div id="more-quick-prompts" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:.75rem">
+      <button class="claude-quick" onclick="moreCoachAsk('How is my progress looking this week?')">📊 This week</button>
+      <button class="claude-quick" onclick="moreCoachAsk('What should I focus on in my next workout?')">🏋️ Next workout</button>
+      <button class="claude-quick" onclick="moreCoachAsk('Am I hitting my protein and calorie targets?')">🥗 Nutrition check</button>
+      <button class="claude-quick" onclick="moreCoachAsk('How is my weight loss progressing toward my goal?')">⚖️ Weight trend</button>
+      <button class="claude-quick" onclick="moreCoachAsk('Hype me up based on my stats')">🔥 Hype me up</button>
+    </div>
+    <div style="display:flex;gap:8px;align-items:flex-end">
+      <textarea id="more-claude-input" placeholder="Ask your coach anything..." rows="2" style="flex:1;background:var(--dark3);border:1px solid var(--steel2);color:var(--white);padding:10px;border-radius:3px;font-family:'Barlow Condensed',sans-serif;font-size:14px;resize:none;outline:none;line-height:1.4" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();moreCoachAsk();}"></textarea>
+      <button onclick="moreCoachAsk()" id="more-send-btn" style="padding:10px 16px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:2px;background:linear-gradient(135deg,var(--accent),#a855f7);border:none;color:var(--white);cursor:pointer;border-radius:3px;white-space:nowrap;flex-shrink:0">Send</button>
+    </div>
+  </div>
+
+  <!-- Advisor section (injected from existing advisor tab) -->
+  <div id="more-advisor" style="display:none">
+    <div id="more-advisor-content"></div>
+  </div>
+
+  <!-- Settings section — renders the full settings tab content -->
+  <div id="more-settings" style="display:none">
+    <div id="more-settings-content">
+      <!-- Settings content loaded from tab-settings on open -->
+    </div>
+  </div>
+
 </div>
 </body>
 </html>
