@@ -6085,36 +6085,54 @@ function saveHomeNote() {
 let _photoImportData = null; // parsed workout ready to confirm
 let _photoBase64 = null;
 
+let _photoBase64List = []; // array of base64 strings for multiple photos
+
 function handleWorkoutPhoto(event) {
-  const file = event.target.files?.[0];
-  if (!file) return;
+  const files = Array.from(event.target.files || []);
+  if (!files.length) return;
 
-  const preview = document.getElementById('photo-preview');
   const previewWrap = document.getElementById('photo-preview-wrap');
-  const processBtn = document.getElementById('photo-process-btn');
-  const pickBtn = document.getElementById('photo-pick-btn');
+  const processBtn  = document.getElementById('photo-process-btn');
+  const pickBtn     = document.getElementById('photo-pick-btn');
+  const resultEl    = document.getElementById('photo-result');
+  const confirmBtn  = document.getElementById('photo-confirm-btn');
 
-  // Show preview
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const dataUrl = e.target.result;
-    if (preview) { preview.src = dataUrl; }
-    if (previewWrap) previewWrap.style.display = 'block';
-    if (processBtn) processBtn.style.display = 'block';
-    if (pickBtn) pickBtn.textContent = '📷 Change Photo';
-    // Store base64 (strip data URL prefix)
-    _photoBase64 = dataUrl.split(',')[1];
-    _photoImportData = null;
-    const resultEl = document.getElementById('photo-result');
-    const confirmBtn = document.getElementById('photo-confirm-btn');
-    if (resultEl) resultEl.style.display = 'none';
-    if (confirmBtn) confirmBtn.style.display = 'none';
-  };
-  reader.readAsDataURL(file);
+  _photoBase64List = [];
+  _photoImportData = null;
+  if (resultEl)  resultEl.style.display  = 'none';
+  if (confirmBtn) confirmBtn.style.display = 'none';
+
+  // Build previews
+  const previewContainer = document.getElementById('photo-preview-wrap');
+  previewContainer.innerHTML = '';
+  previewContainer.style.display = 'flex';
+  previewContainer.style.flexWrap = 'wrap';
+  previewContainer.style.gap = '6px';
+
+  let loaded = 0;
+  files.forEach((file, idx) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const dataUrl = e.target.result;
+      _photoBase64List[idx] = dataUrl.split(',')[1];
+      // Thumbnail preview
+      const img = document.createElement('img');
+      img.src = dataUrl;
+      img.style.cssText = 'width:calc(50% - 3px);max-height:120px;object-fit:contain;border-radius:3px;border:1px solid var(--border2)';
+      previewContainer.appendChild(img);
+      loaded++;
+      if (loaded === files.length) {
+        if (processBtn) { processBtn.style.display = 'block'; processBtn.textContent = `🤖 Read ${files.length} Photo${files.length>1?'s':''} with AI`; }
+        if (pickBtn) pickBtn.textContent = `📷 ${files.length} photo${files.length>1?'s':''} selected — change`;
+      }
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
 async function processWorkoutPhoto() {
-  if (!_photoBase64) return;
+  const photos = _photoBase64List.filter(Boolean);
+  if (!photos.length) return;
 
   const statusEl = document.getElementById('photo-status');
   const processBtn = document.getElementById('photo-process-btn');
@@ -6163,7 +6181,7 @@ Rules:
         messages: [{
           role: 'user',
           content: [
-            { type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: _photoBase64 } },
+            ...photos.map(b64 => ({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data: b64 } })),
             { type: 'text', text: prompt }
           ]
         }]
@@ -6392,9 +6410,9 @@ function confirmPhotoImport() {
         <option value="cardio-day">Cardio</option>
       </select>
     </div>
-    <input type="file" id="workout-photo-input" accept="image/*" style="display:none" onchange="handleWorkoutPhoto(event)">
+    <input type="file" id="workout-photo-input" accept="image/*" multiple style="display:none" onchange="handleWorkoutPhoto(event)">
     <button onclick="document.getElementById('workout-photo-input').click()" style="width:100%;padding:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:3px;background:var(--dark3);border:2px dashed var(--steel2);color:var(--mid);cursor:pointer;border-radius:2px;margin-bottom:8px" id="photo-pick-btn">
-      &#x1F4F7; Choose Photo or Take Picture
+      &#x1F4F7; Choose Photos (select multiple)
     </button>
     <div id="photo-preview-wrap" style="display:none;margin-bottom:.75rem">
       <img id="photo-preview" style="width:100%;max-height:200px;object-fit:contain;border-radius:3px;border:1px solid var(--border2)">
