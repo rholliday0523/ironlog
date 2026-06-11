@@ -2517,7 +2517,7 @@ async function searchFood(){
 async function searchFoodAI(q){
   const res=document.getElementById('fs-results');if(res)res.innerHTML='<div class="fs-loading">Asking AI...</div>';
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:`Nutrition for: "${q}". Reply ONLY with JSON array: [{"name":"...","cal":0,"protein":0,"carbs":0,"fat":0,"per":"per 100g"}]. No other text.`}]})});
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:`Nutrition for: "${q}". Reply ONLY with JSON array: [{"name":"...","cal":0,"protein":0,"carbs":0,"fat":0,"per":"per 100g"}]. No other text.`}]})});
     if(!resp.ok)throw new Error('AI error');
     const data=await resp.json();
     const text=(data.content||[]).map(c=>c.text||'').join('');
@@ -4325,22 +4325,25 @@ async function loadFromSupabase() {
 
     // Determine which is newer: cloud or local
     const cloudTime = d.synced_at ? new Date(d.synced_at).getTime() : 0;
-    const localTime = localStorage.getItem('il_device_last_save')
-      ? new Date(localStorage.getItem('il_device_last_save')).getTime() : 0;
-    const cloudIsNewer = cloudTime > localTime;
+    const deviceLastSave = localStorage.getItem('il_device_last_save');
+    const localTime = deviceLastSave ? new Date(deviceLastSave).getTime() : 0;
+    // If this device has never saved to cloud, cloud is always newer
+    const cloudIsNewer = !deviceLastSave || cloudTime > localTime;
 
     // History merge:
     // If cloud is newer (another device saved after us) — take cloud history as base, then add any local-only sessions
     // If local is newer — union (add any cloud sessions we're missing)
+    // Always union history — never lose sessions from either side
+    // Cloud sessions take priority for same date+day (overwrite local with cloud version)
     if (cloudIsNewer && remoteHistory.length > 0) {
-      // Start from cloud, add any local sessions not in cloud
+      // Cloud is authoritative — start with cloud, add any local-only sessions
       const merged = [...remoteHistory];
       history.forEach(s => {
         if (!merged.find(x => x.dateISO === s.dateISO && x.day === s.day)) merged.push(s);
       });
       history = merged;
     } else {
-      // Start from local, add any cloud sessions not in local
+      // Local is newer — union, keeping local versions
       remoteHistory.forEach(s => {
         if (!history.find(x => x.dateISO === s.dateISO && x.day === s.day)) history.push(s);
       });
@@ -4443,7 +4446,7 @@ try {
   const lastSync = localStorage.getItem('il_last_sync');
   setSyncStatus('ok', '✓ Connected', lastSync || '');
 
-  // Load from Supabase on startup — skip if workout draft in progress
+  // Load from Supabase on startup
   setTimeout(() => {
     try {
       const raw = localStorage.getItem('il_draft');
@@ -4451,8 +4454,19 @@ try {
         try { const d=JSON.parse(raw); return d&&!d.savedToday&&Date.now()-d.ts<86400000; }
         catch(e){ return false; }
       })() : false;
-      if (!hasDraft) loadFromSupabase();
-      else { setSyncStatus('ok','✓ Connected',lastSync||''); initBadgeTracking(); }
+      // Always load from Supabase unless actively mid-workout
+      if (!hasDraft) {
+        // Clear il_device_last_save so cloud always wins on fresh load
+        // This ensures we always get the latest data from Supabase
+        if (!localStorage.getItem('il_device_last_save')) {
+          loadFromSupabase();
+        } else {
+          loadFromSupabase();
+        }
+      } else {
+        setSyncStatus('ok','✓ Connected',lastSync||'');
+        initBadgeTracking();
+      }
     } catch(e) { initBadgeTracking(); }
   }, 1000);
 
@@ -4472,128 +4486,6 @@ try {
 startClock();
 
 
-// ── ONE-TIME DATA PATCH: June 3 Shoulders + June 4 Legs ──────────────────
-(function patchJune3Shoulders(){
-  try {
-    if (history.find(h => h.dateISO === '2026-06-03' && h.day === 'shoulders')) return;
-    const sets = [
-      {id:'overhead-press', name:'Overhead Press',       set:1, weight:40,  reps:12, rpe:'',  done:true, vol:480},
-      {id:'overhead-press', name:'Overhead Press',       set:2, weight:45,  reps:11, rpe:'5', done:true, vol:495},
-      {id:'overhead-press', name:'Overhead Press',       set:3, weight:50,  reps:8,  rpe:'',  done:true, vol:400},
-      {id:'overhead-press', name:'Overhead Press',       set:4, weight:50,  reps:8,  rpe:'',  done:true, vol:400},
-      {id:'arnold-press',   name:'Arnold Press',         set:1, weight:20,  reps:12, rpe:'4', done:true, vol:240},
-      {id:'arnold-press',   name:'Arnold Press',         set:2, weight:25,  reps:12, rpe:'4', done:true, vol:300},
-      {id:'arnold-press',   name:'Arnold Press',         set:3, weight:30,  reps:12, rpe:'8', done:true, vol:360},
-      {id:'lateral-raise',  name:'Lateral Raises',       set:1, weight:20,  reps:15, rpe:'',  done:true, vol:300},
-      {id:'lateral-raise',  name:'Lateral Raises',       set:2, weight:20,  reps:15, rpe:'',  done:true, vol:300},
-      {id:'lateral-raise',  name:'Lateral Raises',       set:3, weight:20,  reps:15, rpe:'',  done:true, vol:300},
-      {id:'lateral-raise',  name:'Lateral Raises',       set:4, weight:20,  reps:15, rpe:'',  done:true, vol:300},
-      {id:'lateral-raise',  name:'Lateral Raises',       set:5, weight:20,  reps:15, rpe:'',  done:true, vol:300},
-      {id:'cable-shrugs',   name:'Cable Shrugs',         set:1, weight:90,  reps:12, rpe:'',  done:true, vol:1080},
-      {id:'cable-shrugs',   name:'Cable Shrugs',         set:2, weight:90,  reps:12, rpe:'',  done:true, vol:1080},
-      {id:'cable-shrugs',   name:'Cable Shrugs',         set:3, weight:90,  reps:12, rpe:'',  done:true, vol:1080},
-      {id:'face-pulls',     name:'Face Pulls',           set:1, weight:50,  reps:12, rpe:'',  done:true, vol:600},
-      {id:'face-pulls',     name:'Face Pulls',           set:2, weight:60,  reps:15, rpe:'',  done:true, vol:900},
-      {id:'face-pulls',     name:'Face Pulls',           set:3, weight:70,  reps:12, rpe:'',  done:true, vol:840},
-      {id:'pushdown-c',     name:'Tricep Pushdowns',     set:1, weight:60,  reps:12, rpe:'',  done:true, vol:720},
-      {id:'pushdown-c',     name:'Tricep Pushdowns',     set:2, weight:65,  reps:12, rpe:'',  done:true, vol:780},
-      {id:'pushdown-c',     name:'Tricep Pushdowns',     set:3, weight:70,  reps:12, rpe:'',  done:true, vol:840},
-      {id:'overhead-c',     name:'Tricep Overhead Press',set:1, weight:60,  reps:15, rpe:'',  done:true, vol:900},
-      {id:'overhead-c',     name:'Tricep Overhead Press',set:2, weight:80,  reps:12, rpe:'',  done:true, vol:960},
-      {id:'overhead-c',     name:'Tricep Overhead Press',set:3, weight:85,  reps:10, rpe:'',  done:true, vol:850},
-    ];
-    const vol = sets.reduce((a,s)=>a+s.vol,0);
-    history.push({date:'Wednesday, June 3, 2026',dateISO:'2026-06-03',day:'shoulders',exercises:sets,notes:'Imported from photo',duration:0});
-    history.sort((a,b)=>b.dateISO.localeCompare(a.dateISO));
-    game.totalWorkouts=(game.totalWorkouts||0)+1;
-    game.totalSets=(game.totalSets||0)+sets.length;
-    game.totalLifted=(game.totalLifted||0)+vol;
-    _saveStorageCore(); scheduleAutoSync();
-    console.log('June 3 shoulders patched');
-  } catch(e){ console.warn('patch error:',e); }
-})();
-
-(function patchJune4Legs(){
-  try {
-    if (history.find(h => h.dateISO === '2026-06-04' && h.day === 'legs')) return;
-    const sets = [
-      {id:'belt-squat',    name:'Belt Squats',           set:1, weight:160, reps:15, rpe:'', done:true, vol:2400},
-      {id:'belt-squat',    name:'Belt Squats',           set:2, weight:215, reps:13, rpe:'', done:true, vol:2795},
-      {id:'belt-squat',    name:'Belt Squats',           set:3, weight:235, reps:12, rpe:'', done:true, vol:2820},
-      {id:'belt-squat',    name:'Belt Squats',           set:4, weight:245, reps:11, rpe:'', done:true, vol:2695},
-      {id:'split-squat',   name:'Bulgarian Split Squats',set:1, weight:280, reps:12, rpe:'', done:true, vol:3360},
-      {id:'split-squat',   name:'Bulgarian Split Squats',set:2, weight:280, reps:12, rpe:'', done:true, vol:3360},
-      {id:'split-squat',   name:'Bulgarian Split Squats',set:3, weight:280, reps:12, rpe:'', done:true, vol:3360},
-      {id:'deadlift',      name:'Deadlifts',             set:1, weight:135, reps:10, rpe:'', done:true, vol:1350},
-      {id:'deadlift',      name:'Deadlifts',             set:2, weight:135, reps:10, rpe:'', done:true, vol:1350},
-      {id:'deadlift',      name:'Deadlifts',             set:3, weight:135, reps:10, rpe:'', done:true, vol:1350},
-      {id:'rdl',           name:'Romanian Deadlifts',    set:1, weight:50,  reps:10, rpe:'', done:true, vol:500},
-      {id:'rdl',           name:'Romanian Deadlifts',    set:2, weight:50,  reps:10, rpe:'', done:true, vol:500},
-      {id:'rdl',           name:'Romanian Deadlifts',    set:3, weight:50,  reps:10, rpe:'', done:true, vol:500},
-      {id:'leg-curl',      name:'Leg Curls',             set:1, weight:30,  reps:12, rpe:'', done:true, vol:360},
-      {id:'leg-curl',      name:'Leg Curls',             set:2, weight:30,  reps:12, rpe:'', done:true, vol:360},
-      {id:'leg-curl',      name:'Leg Curls',             set:3, weight:30,  reps:12, rpe:'', done:true, vol:360},
-    ];
-    const vol = sets.reduce((a,s)=>a+s.vol,0);
-    history.push({date:'Thursday, June 4, 2026',dateISO:'2026-06-04',day:'legs',exercises:sets,notes:'Imported from photo',duration:0});
-    history.sort((a,b)=>b.dateISO.localeCompare(a.dateISO));
-    game.totalWorkouts=(game.totalWorkouts||0)+1;
-    game.totalSets=(game.totalSets||0)+sets.length;
-    game.totalLifted=(game.totalLifted||0)+vol;
-    _saveStorageCore(); scheduleAutoSync();
-    console.log('June 4 legs patched');
-  } catch(e){ console.warn('patch error:',e); }
-})();
-// ─────────────────────────────────────────────────────────────────────────
-// ── ONE-TIME DATA PATCH: June 5 Arm Workout ──────────────────────────────
-(function patchJune5Arms(){
-  try {
-    // Only add if not already there
-    const existing = (JSON.parse(localStorage.getItem('il_hist')||'[]'));
-    if (existing.find(h => h.dateISO === '2026-06-05' && h.day === 'arms')) return;
-    // Also check in-memory history
-    if (history.find(h => h.dateISO === '2026-06-05' && h.day === 'arms')) return;
-
-    const sets = [
-      {id:'barbell-curl',   name:'Barbell Curl',         set:1, weight:45,  reps:12, rpe:'', done:true, vol:540},
-      {id:'barbell-curl',   name:'Barbell Curl',         set:2, weight:55,  reps:12, rpe:'', done:true, vol:660},
-      {id:'barbell-curl',   name:'Barbell Curl',         set:3, weight:65,  reps:10, rpe:'', done:true, vol:650},
-      {id:'skullcrusher',   name:'Skullcrusher',         set:1, weight:70,  reps:15, rpe:'', done:true, vol:1050},
-      {id:'skullcrusher',   name:'Skullcrusher',         set:2, weight:80,  reps:15, rpe:'', done:true, vol:1200},
-      {id:'skullcrusher',   name:'Skullcrusher',         set:3, weight:100, reps:13, rpe:'', done:true, vol:1300},
-      {id:'cable-curl',     name:'Cable Curl',           set:1, weight:30,  reps:12, rpe:'', done:true, vol:360},
-      {id:'cable-curl',     name:'Cable Curl',           set:2, weight:35,  reps:12, rpe:'', done:true, vol:420},
-      {id:'cable-curl',     name:'Cable Curl',           set:3, weight:40,  reps:13, rpe:'', done:true, vol:520},
-      {id:'overhead-ext',   name:'Overhead Extensions',  set:1, weight:80,  reps:12, rpe:'', done:true, vol:960},
-      {id:'overhead-ext',   name:'Overhead Extensions',  set:2, weight:70,  reps:12, rpe:'', done:true, vol:840},
-      {id:'overhead-ext',   name:'Overhead Extensions',  set:3, weight:70,  reps:14, rpe:'', done:true, vol:980},
-      {id:'pushdown-c',     name:'Tricep Pushdowns',     set:1, weight:70,  reps:15, rpe:'', done:true, vol:1050},
-      {id:'pushdown-c',     name:'Tricep Pushdowns',     set:2, weight:80,  reps:15, rpe:'', done:true, vol:1200},
-      {id:'pushdown-c',     name:'Tricep Pushdowns',     set:3, weight:85,  reps:15, rpe:'', done:true, vol:1275},
-      {id:'hammer-b',       name:'Hammer Curls',         set:1, weight:30,  reps:15, rpe:'', done:true, vol:450},
-      {id:'hammer-b',       name:'Hammer Curls',         set:2, weight:35,  reps:12, rpe:'', done:true, vol:420},
-      {id:'hammer-b',       name:'Hammer Curls',         set:3, weight:40,  reps:10, rpe:'', done:true, vol:400},
-    ];
-    const totalVol = sets.reduce((a,s)=>a+s.vol,0);
-    const entry = {
-      date:'Friday, June 5, 2026',
-      dateISO:'2026-06-05',
-      day:'arms',
-      exercises:sets,
-      notes:'Imported from photo',
-      duration:0
-    };
-    history.push(entry);
-    history.sort((a,b)=>b.dateISO.localeCompare(a.dateISO));
-    game.totalWorkouts=(game.totalWorkouts||0)+1;
-    game.totalSets=(game.totalSets||0)+sets.length;
-    game.totalLifted=(game.totalLifted||0)+totalVol;
-    _saveStorageCore();
-    scheduleAutoSync();
-    console.log('June 5 arm workout patched in successfully');
-  } catch(e) { console.warn('patch error:', e); }
-})();
-// ─────────────────────────────────────────────────────────────────────────
 
 // Save draft whenever app loses focus (phone lock, app switch, tab change)
 document.addEventListener('visibilitychange', () => { if(document.hidden){ saveDraft(); } });
@@ -4810,7 +4702,7 @@ function runAIAdvisor(){
   history.slice(0,15).forEach(function(sess){(sess.exercises||[]).forEach(function(e){var orm=calc1RM(e.weight||0,e.reps||0);if(!bests[e.name]||orm>bests[e.name])bests[e.name]=orm;});});
   var topLifts=Object.entries(bests).sort(function(a,b){return b[1]-a[1];}).slice(0,5).map(function(e){return e[0]+': ~'+e[1]+'lbs 1RM';}).join(', ');
   var goalLbs=userProfile.goalWeight||225;var ageY=userProfile.age||36;var htStr=Math.floor((userProfile.heightIn||74)/12)+'ft'+((userProfile.heightIn||74)%12)+'in';var goalTypStr=userProfile.goalType||'recomp';var prompt='You are an elite strength coach. Analyze this data and give a SPECIFIC, PERSONALIZED weekly recommendation.\n\nATHLETE: '+(userProfile.gender==='female'?'Female':'Male')+', '+ageY+', '+htStr+', ~'+(bwArr[0]||286)+'lbs, goal '+goalLbs+'lbs '+goalTypStr+'\nWORKOUTS (last 20): '+JSON.stringify(wkCounts)+'\nAVG STEPS: '+avgSteps.toLocaleString()+'/day\nWEIGHT TREND: '+bwArr.join(', ')+' lbs\nTOP LIFTS: '+(topLifts||'building history')+'\nTOTAL LIFTED: '+(game.totalLifted||0).toLocaleString()+' lbs\nSTREAK: '+(game.streak||0)+' sessions\n\nGive advice in 5 short sections: (1) Priority muscle group this week and why, (2) One specific progressive overload target with exact weight, (3) Recovery assessment, (4) One nutrition adjustment, (5) A fired-up motivational closer with their actual numbers. Max 180 words. Be direct and punchy.';
-  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
   .then(function(r){return r.json();})
   .then(function(data){
     var text=(data.content&&data.content[0]&&data.content[0].text)||'Could not generate recommendation.';
