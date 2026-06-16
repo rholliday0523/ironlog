@@ -2517,7 +2517,7 @@ async function searchFood(){
 async function searchFoodAI(q){
   const res=document.getElementById('fs-results');if(res)res.innerHTML='<div class="fs-loading">Asking AI...</div>';
   try{
-    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:400,messages:[{role:'user',content:`Nutrition for: "${q}". Reply ONLY with JSON array: [{"name":"...","cal":0,"protein":0,"carbs":0,"fat":0,"per":"per 100g"}]. No other text.`}]})});
+    const resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:400,messages:[{role:'user',content:`Nutrition for: "${q}". Reply ONLY with JSON array: [{"name":"...","cal":0,"protein":0,"carbs":0,"fat":0,"per":"per 100g"}]. No other text.`}]})});
     if(!resp.ok)throw new Error('AI error');
     const data=await resp.json();
     const text=(data.content||[]).map(c=>c.text||'').join('');
@@ -4702,7 +4702,7 @@ function runAIAdvisor(){
   history.slice(0,15).forEach(function(sess){(sess.exercises||[]).forEach(function(e){var orm=calc1RM(e.weight||0,e.reps||0);if(!bests[e.name]||orm>bests[e.name])bests[e.name]=orm;});});
   var topLifts=Object.entries(bests).sort(function(a,b){return b[1]-a[1];}).slice(0,5).map(function(e){return e[0]+': ~'+e[1]+'lbs 1RM';}).join(', ');
   var goalLbs=userProfile.goalWeight||225;var ageY=userProfile.age||36;var htStr=Math.floor((userProfile.heightIn||74)/12)+'ft'+((userProfile.heightIn||74)%12)+'in';var goalTypStr=userProfile.goalType||'recomp';var prompt='You are an elite strength coach. Analyze this data and give a SPECIFIC, PERSONALIZED weekly recommendation.\n\nATHLETE: '+(userProfile.gender==='female'?'Female':'Male')+', '+ageY+', '+htStr+', ~'+(bwArr[0]||286)+'lbs, goal '+goalLbs+'lbs '+goalTypStr+'\nWORKOUTS (last 20): '+JSON.stringify(wkCounts)+'\nAVG STEPS: '+avgSteps.toLocaleString()+'/day\nWEIGHT TREND: '+bwArr.join(', ')+' lbs\nTOP LIFTS: '+(topLifts||'building history')+'\nTOTAL LIFTED: '+(game.totalLifted||0).toLocaleString()+' lbs\nSTREAK: '+(game.streak||0)+' sessions\n\nGive advice in 5 short sections: (1) Priority muscle group this week and why, (2) One specific progressive overload target with exact weight, (3) Recovery assessment, (4) One nutrition adjustment, (5) A fired-up motivational closer with their actual numbers. Max 180 words. Be direct and punchy.';
-  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
+  fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','x-api-key':ANTHROPIC_KEY,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1000,messages:[{role:'user',content:prompt}]})})
   .then(function(r){return r.json();})
   .then(function(data){
     var text=(data.content&&data.content[0]&&data.content[0].text)||'Could not generate recommendation.';
@@ -5926,7 +5926,7 @@ async function claudeAsk(customMsg) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1000,
         system: systemPrompt,
         messages: _claudeHistory
@@ -6246,7 +6246,7 @@ Rules:
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
+        model: 'claude-sonnet-4-6',
         max_tokens: 1500,
         messages: [{
           role: 'user',
@@ -6423,7 +6423,7 @@ function moreCoachAsk(customMsg) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', 'x-api-key': ANTHROPIC_KEY, 'anthropic-version': '2023-06-01', 'anthropic-dangerous-direct-browser-access': 'true' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-sonnet-4-6',
       max_tokens: 1000,
       system: buildUserContext(),
       messages: _moreCoachHistory
